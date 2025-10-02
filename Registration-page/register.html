@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voter registration page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .user-input {
+        display: block;
+        margin-top: 10px;
+        border-radius: 6px;
+        border-width: 1px;
+        padding-left: 5px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: rgba(169, 169, 169, 0.912);
+        width: 300px;
+      }
+      .sub-btn {
+        display: inline-block;
+        padding-left: 5px;
+        padding-top: 9px;
+        padding-bottom: 9px;
+        width: 100px;
+        border-radius: 50px;
+        border-width: 1px;
+        cursor: pointer;
+        color: white;
+        border: none;
+        background-color: rgb(0, 110, 255);
+        transition: background-color 1s, color 1s;
+      }
+      .sub-btn:hover {
+        background-color: blue;
+        color: white;
+      }
+      .sub-btn:active {
+        opacity: 0.7;
+      }
+      .reset-btn {
+        display: inline-block;
+        padding-left: 5px;
+        padding-top: 9px;
+        padding-bottom: 9px;
+        width: 100px;
+        border-radius: 50px;
+        border-width: 1px;
+        margin-left: 100px;
+        cursor: pointer;
+        color: black;
+        background-color: rgb(184, 10, 10);
+        border: none;
+        transition: background-color 1s, color 1s;
+      }
+      .reset-btn:hover {
+        background-color: red;
+        color: black;
+      }
+      .reset-btn:active {
+        opacity: 0.7;
+      }
+      .radio-txt {
+        display: inline;
+        margin-bottom: 6px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .my-btn {
+        margin-top: 30px;
+        width: 400px;
+      }
+      .my-header {
+        margin-bottom: 10px;
+      }
+
+      .tick {
+        width: 400px;
+      }
+      .details {
+        width: 400px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+      }
+      .body {
+        background-color: lightgray;
+      }
+    </style>
+  </head>
+  <body class="body">
+    <div>
+      <h1 class="header">HEADER</h1>
+    </div>
+    <h2 class="my-header">Personal information</h2>
+    <form id="myform">
+      <div class="details">
+        <div class="child">
+          <label for="fname"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="First Name"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="lname"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="Last Name"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="dob"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="Date of Birth"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="prog"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="Programme"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="SIN"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="Student Number"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="nrc"></label>
+          <input class="user-input" type="text" placeholder="NRC" required />
+        </div>
+        <h3 class="my-header">Gender</h3>
+        <div class="tick">
+          <div>
+            <label>
+              <input type="radio" name="my-radio" value="Female" />
+              <span class="radio-txt">Female</span></label
+            >
+          </div>
+          <div>
+            <label>
+              <input type="radio" name="my-radio" value="Male" />
+              <span class="radio-txt">Male</span></label
+            >
+          </div>
+        </div>
+
+        <h4 class="my-header">Contact information</h4>
+        <div class="child">
+          <label for="e-mail"></label>
+          <input
+            class="user-input"
+            type="text"
+            placeholder="Email Address"
+            required
+          />
+        </div>
+        <div class="child">
+          <label for="phone"></label>
+          <input
+            class="user-input"
+            type="phoneNo"
+            placeholder="Phone Number"
+            required
+          />
+        </div>
+
+        <h5 class="my-header">Address</h5>
+        <div class="tick">
+          <div>
+            <label>
+              <input type="radio" name="my-radio-1" value="Campus" /><span
+                class="radio-txt"
+                >Campus</span
+              >
+            </label>
+          </div>
+          <div>
+            <label>
+              <input type="radio" name="my-radio-1" value="Off-Campus" /><span
+                class="radio-txt"
+                >Off-Campus</span
+              >
+            </label>
+          </div>
+        </div>
+        <div class="my-btn">
+          <button class="sub-btn" type="submit">Submit</button>
+          <button class="reset-btn" type="reset">Clear</button>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>
