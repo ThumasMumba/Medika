@@ -1,0 +1,92 @@
+{% extends 'layout.html' %} {%block body%}
+<form  action="/login" method="post">
+ <nav>
+  <div class="left-section">
+    <span class="h1">Medika</span>
+  </div>
+    <ul class="menu-links">
+      <li> <a href="{{url_for('index')}}"><span>Home</span></a></li>
+      <li><a href="#"><span>How it works</span></a></li>
+      <li><a href="#"><span>Support</span></a></li>
+    </ul>
+  <div class="right-section">
+    <button type="submit" class="sign-btn">Sign In</button>
+  </div>
+</nav>
+  <div class="wrap">
+    <div class="welcome-login"><h1>Welcome Back Please Sign In</h1></div>
+     {%if error %}
+        <p class="error">{{error}} {%endif %}</p>
+    <hr class="horizontal-rule-login" />
+    <div>
+      <span class="login-text">EMAIL ADDRESS</span>
+      <div class="user-input">
+        <!-- Email Input -->
+        <input
+        type="text"
+        autocomplete="off"
+          name="email"
+          class="input-field"
+          placeholder="Email Address"
+          value="{{request.form.email}}"
+        />
+      </div>
+      <span class="login-text">PASSWORD</span>
+      <div class="user-input">
+        <!-- Admin password -->
+        <input
+           type="password"
+           autocomplete="off"
+          name="password"
+          class="input-field"
+          placeholder="Password"
+          
+        />
+      </div>
+      <div class="login-button">
+        <!-- Login Button -->
+        <button class="login-btn" type="submit">Sign In</button>
+      </div>
+      <div class="form-paragraph">
+        <p class="text-paragraph">
+          Don't have an account yet?
+          <a href="/register">
+            <span class="register-link">Sign Up</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</form>
+ <div class="about-login">
+      <ul class="about-list">
+        <li>
+          <div><span>Medika AI</span></div>
+          <ul class="menu-list">
+          <li> Revolutionizing healthcare management <br />
+          through intelligent AI solutions and seamless <br/>
+          digital workflows.</ul></li> 
+        </li>
+        <li>
+          <div><span>Services</span></div>
+          <ul class="menu-list">
+            <li>AI Symptom Checker</li>
+            <li>Find a Doctor</li>
+            <li>Virtual Appointments</li>
+          </ul>
+        </li>
+
+        <li>
+          <div><span>Company</span></div>
+          <ul class="menu-list">
+            <li>About Us</li>
+            <li>Contact</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </li>
+      </ul>
+       <hr class="horizontal-rule" />
+    <div class="copyRight"><span>2026 Medika AI. All rights reversed. professional healthcare advice should always be from licensed practitioners.</span></div>
+  </div>
+    </div>
+{% endblock %}
