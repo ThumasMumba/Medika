@@ -1,0 +1,154 @@
+{%extends 'layout.html'%}{%block body%}
+<form class="signUp-form" action="/signUp" method="post">
+  <div class="main-container">
+    <header>
+      <h1>Join Medika</h1>
+      <p>Create an account to access our healthcare services</p>
+    </header>
+    <label for="fName"></label>
+    <input
+      class="signUp-input"
+      type="text"
+      name="fName"
+      placeholder="First Name"
+      required
+      value="{{request.form['fName']}}"
+    />
+    <label for="lName"></label>
+    <input
+      class="signUp-input"
+      type="text"
+      name="lName"
+      placeholder="Last Name"
+      required
+      value="{{request.form['lName']}}"
+    />
+    <label for="dob"></label>
+    <input
+      class="signUp-input"
+      type="date"
+      name="dob"
+      placeholder="Date of Birth"
+      value="{{request.form['date']}}"
+    />
+    <label for="gender"></label>
+    <select
+      class="signUp-input"
+      name="gender"
+      required
+      value="{{request.form['gender']}}"
+    >
+      <option value="">Select Your gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+    <label for="e-mail"></label>
+    <input
+      class="signUp-input"
+      type="email"
+      name="email"
+      placeholder="Email Address"
+      required
+      value="{{request.form['email']}}"
+    />
+    <label for="phone"></label>
+    <input
+      class="signUp-input"
+      type="tel"
+      name="phone_number"
+      placeholder="Phone Number"
+      required
+      value="{{request.form['phone']}}"
+    />
+    <label for="nrc"></label>
+    <input
+      class="signUp-input"
+      type="nrc"
+      name="nrc"
+      placeholder="NRC Number"
+      required
+      value="{{request.form['nrc']}}"
+    />
+    <input
+      class="signUp-input"
+      type="text"
+      name="address"
+      placeholder="Physical Address"
+      required
+      value="{{request.form['address']}}"
+    />
+    <input
+      class="signUp-input"
+      type="text"
+      name="next_kin_name"
+      placeholder="Next of kin name"
+      required
+      value="{{request.form['kin']}}"
+    />
+    <input
+      class="signUp-input"
+      type="tel"
+      name="next_kin_phone"
+      placeholder="Next of kin phone number"
+      required
+      value="{{request.form['next_kin_phone']}}"
+    />
+    <div class="my-btn">
+      <button class="sub-btn" type="submit">Create Account</button>
+    </div>
+  </div>
+</form>
+<script>
+  //Client-side validation for patient number, NRC, email, and phone number
+  document
+    .getElementByClassName("signUp-form")
+    .addEventListener("submit", function (e) {
+      const email = document.querySelector('input[name="email"]');
+      const nrc = document.querySelector('input[name="nrc"]');
+      const phoneNumber = document.querySelector('input[name="phone_number"]');
+      //Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        alert("Invalid email format. Eg. example@gmail.com.");
+        email.focus();
+        e.preventDefault();
+        return;
+      }
+      //validate NRC (must be in format: 123456/78/9)
+      if (!/^\d{6}\/\d{2}\/\d{1}$/.test(nrc.value)) {
+        alert("NRC must be in the format: 123456/78/9");
+        nrc.focus();
+        e.preventDefault();
+        return;
+      }
+      //Validate phone number (must be 10 digits)
+      if (!/^\d{10}$/.test(phoneNumber.value)) {
+        alert("Phone Number must be exactly 10 digits.");
+        phoneNumber.focus();
+        e.preventDefault();
+        return;
+      }
+    });
+
+  document
+    .querySelector('input[name="date_of_birth"]')
+    .addEventListener("focus", function (e) {
+      this.type = "date";
+    });
+
+  document
+    .querySelector('input[name="nrc"]')
+    .addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
+      if (value.length > 6) {
+        value =
+          value.substring(0, 6) +
+          "/" +
+          value.substring(6, 8) +
+          "/" +
+          value.substring(8, 9);
+      }
+      e.target.value = value;
+    });
+  alert("Form submitted successfully!");
+</script>
+{%endblock %}
