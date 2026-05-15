@@ -1,12 +1,15 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
-from flask import Flask, render_template, request, flash, redirect, url_for
-
+from flask import Flask, get_flashed_messages, render_template, request, flash, redirect, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 #Imports the mysql.connector in order to handle database operations
 import mysql.connector
 from mysql.connector import Error
 #Creating an instance of the flask class to initialize the system. Also a secret string used to encrypt session data and flash messages
 app = Flask(__name__)
+admin_password = "admin123"
+hash_password = generate_password_hash(admin_password)
+print("Store this in DB: ", hash_password)
 
 # Add this configuration to ensure HTML files process Jinja2 syntax
 app.jinja_env.add_extension('jinja2.ext.do')
@@ -52,10 +55,7 @@ def initialize_db():
                             nrc VARCHAR(20) UNIQUE NOT NULL,
                             phone VARCHAR(20) UNIQUE NOT NULL,
                             email VARCHAR(100) UNIQUE NOT NULL,
-                            address VARCHAR(100) NOT NULL,
                             password VARCHAR(255) NOT NULL,
-                            next_kin_name VARCHAR(100) NOT NULL,
-                            next_kin_phone VARCHAR(10) NOT NULL,
                             registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             has_signup BOOLEAN DEFAULT FALSE
                        )
@@ -108,22 +108,160 @@ initialize_db()
 @app.route('/')
 def index():
      return render_template("/index.html")
-
-@app.route('/login', methods=['POST', 'GET'])
-def login():
+#Admin login route
+@app.route('/adminLogin', methods=['GET', 'POST'])
+def adminLogin():
+     """"
+     Handles the login process for administrators.
+     It accepts both GET and POST requests.
+     """
+     
      error = None
      # Login Admin
-     #if the method in which data is accessed from the form is POST
+     if request.method == 'GET':
+        session.get('admin_logged_in')
+    
+     if 'admin_logged_in' in session:
+        flash("Admin already logged in. ", "success")
+        return redirect(url_for('admin_dashboard'))
      if request.method == 'POST':
-          #Then check if the entered details form the user are correct then return success
-          if request.form['email'] != 'admin@gmail.com' or request.form['password'] != 'test123':
-               error = "Invalid credentials"
-          else:
-               flash("You have successfully logged in")
-               return redirect(url_for('index'))
-     #Login Patient
+          #Get login details from the admin
+          email = request.form.get("email")
+          password = request.form.get("password")
+          #Debugging admin login details
+          print("DEBUG: Submitted email: ", email)
+          print("DEBUG: Submitted password: ", password)
           
-     return render_template("/login.html", error=error)
+          if not email or not password:
+            flash('Please enter both email and password.', 'error')
+            return redirect(url_for(('adminLogin')))
+          else:
+               connection = create_connection()
+               if connection is None:
+                    flash("Failed to connect to the database. Please try again later.", "error")
+               else:
+                    try:
+                         cursor = connection.cursor(dictionary=True) 
+                         #SQL query to check if the admin with the provided email exists in the database
+                         cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
+                         # Fetch the admin record from the database
+                         admin = cursor.fetchone()
+                         # Fetch admin record from DB
+                         print("DEBUG: admin record from DB: ", admin)
+                         if not admin:
+                              flash("Invalid email or password", 'error')
+                              return redirect(url_for('adminLogin'))
+                         elif not check_password_hash(admin['password'], password):
+                              flash("Invalid password", 'error')
+                              return redirect(url_for('adminLogin'))
+                         # Check if admin exists
+                         elif admin and check_password_hash(admin['password'], password):
+                              # Only sets session to true after successful check and the admin exists in our DB
+                              session['admin_logged_in'] = True
+                              session['admin_id'] = admin['id']
+                              session['admin_email'] = admin['email']
+                              session['admin_username'] = admin['username']
+                              session['admin_role'] = admin['role']
+                              flash("Admin login successfully!",'success')
+                              return redirect(url_for('admin_dashboard'))
+                         else:
+                             flash('No admin found with that email and password.', 'error')
+                             return redirect(url_for('adminLogin'))
+                    except Error as e:
+                         print(f"Database error: {e}")
+                         flash("An error occurred while processing your request. Please try again later.", "error")
+                         return redirect(url_for('adminLogin'))
+     return render_template("adminLogin.html", error=error)
+# Admin logout route
+@app.route('/admin_logout')
+def admin_logout():
+    session.clear()
+    flash("Logout successfully.", "success")
+    return redirect(url_for('adminLogin'))
+
+# admin-dashboard
+@app.route('/admin_dashboard', methods=['GET'])
+
+def admin_dashboard():
+     """Renders the admin dashboard page. 
+     This page is only accessible to logged-in administrators."""
+     if not 'admin_logged_in':
+          flash("Enter both email and password to access the admin dashboard", 'error')
+     connection = create_connection()
+     if connection is None:
+          return "Database connection error. Please try again later."
+     try:
+          cursor = connection.cursor(dictionary=True)
+          #SQL query to get the total number of patients in the database
+          cursor.execute("SELECT COUNT(*) AS total_patients FROM patient")
+          total_patients = cursor.fetchone()['total_patients']
+          #SQL query to get the total number of doctors in the database
+          cursor.execute("SELECT COUNT(*) AS total_doctors FROM doctors")
+          total_doctors = cursor.fetchone()['total_doctors']
+          #SQL query to get the total number of appointments in the database
+          cursor.execute("SELECT COUNT(*) AS total_appointments FROM appointments")
+          total_appointments = cursor.fetchone()['total_appointments']
+          # Pass the retrieved data to the admin dashboard template for display
+          return render_template("/admin_dashboard.html", total_patients=total_patients, total_doctors=total_doctors, total_appointments=total_appointments)
+     except Error as e:  
+          print(f"Database error: {e}")
+     return render_template("admin_dashboard.html")
+
+#Creates a route for the user login
+@app.route('/login', methods = ["POST", "GET"])
+def userLogin():
+     """"
+     Handles the login process for administrators.
+     It accepts both GET and POST requests.
+     """
+     if request.method == 'POST':
+        #Get login credentials from the form
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        #Check if the fields are not empty
+        if not email or not password:
+            flash('Please enter both email and password', "error")
+            return redirect(url_for('login'))
+
+        connection = create_connection()
+        if connection is None:
+            flash('Database connection error. Please try again later.', 'error')
+            return redirect(url_for('userLogin'))
+
+        try:
+            cursor = connection.cursor(dictionary=True, buffered=True)
+
+            #SQL Query to verify patient credentials
+            login_query = """
+            SELECT id, first_name, last_name, email, password, address, phone,
+             nrc, gender, date_of_birth
+            FROM patient
+            WHERE email = %s
+            """
+            cursor.execute(login_query, (email,))
+            #Get the patient record
+            patient = cursor.fetchone()
+            #Check if patient exists
+            if patient and check_password_hash(patient['password'], password):
+                session['patient_logged_in'] = True
+                session['patient_id'] = patient['id']
+                session['first_name'] = patient['first_name']
+                session['last_name'] = patient['last_name']
+                session['gender'] = patient['gender']
+                session['email'] = patient['email']
+                session['phone'] = patient['phone']
+                flash('Login successful! Welcome on board.', 'success')
+                return redirect(url_for('index'))
+            else:
+                flash('No patient found with that email and password.', 'error')
+                return redirect(url_for(('login')))
+
+        except Error as e:
+            flash(f'Database error: {str(e)}', 'error')
+            return render_template('/login.html')
+      #GET request, show the login form
+     return render_template('/login.html')
 
 @app.route('/signUp', methods=["POST", "GET"])
 def signUp():
@@ -142,20 +280,18 @@ def signUp():
           email = request.form.get("email")
           phone_number = request.form.get("phone_number")
           nrc = request.form.get("nrc")
-          address = request.form.get("address")
-          next_kin_name = request.form.get("next_kin_name")
-          next_kin_phone = request.form.get("next_kin_phone")
+          password = request.form.get("password")
           
           #Check if fields are not empty before inserting into the database
-          if not all([first_name, last_name, date_of_birth, gender, email, phone_number, nrc, address, next_kin_name, next_kin_phone]):
-               flash("Please fill in all the required fields.")
-               return render_template("/signUp.html")
+          if not all([first_name, last_name, date_of_birth, gender, email, phone_number, nrc, password]):
+               flash("Please fill in all the required fields.", 'error')
+               return redirect(url_for("signUp"))
           
      # Get a database connection then insert into the patient table
           connection = create_connection()
           if connection is None:
-               flash("Failed to connect to the database. Please try again later.")
-               return render_template("/signUp.html")
+               flash("Failed to connect to the database. Please try again later.", 'error')
+               return render_template("signUp.html")
           try:
                cursor = connection.cursor()
                #SQL query to check if patient with the same email, phone number or NRC already exists
@@ -163,21 +299,66 @@ def signUp():
                (email, phone_number, nrc))
                existing_patient = cursor.fetchone()
                if existing_patient:
-                    flash("A patient with the same email, phone number, or NRC already exists.")
-                    return render_template("/signUp.html")
+                    flash("A patient with the same email, phone number, or NRC already exists.", "error")
+                    return redirect(url_for("signUp"))
                #SQL query to insert new patient record into the database
+          #     Hash the password before inserting it
+               hash_password = generate_password_hash(password)
                insert_query = """
                   INSERT INTO patient
-                         (first_name, last_name, date_of_birth, gender, email, phone, nrc, address, next_kin_name, next_kin_phone)
-                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                         (first_name, last_name, date_of_birth, gender, email, phone, nrc, password)
+                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
                #Exceptions are handled in case of any database errors during the insertion process
-               cursor.execute(insert_query, (first_name, last_name, date_of_birth, gender, email, phone_number, nrc, address, next_kin_name, next_kin_phone))
+               cursor.execute(insert_query, (first_name, last_name, date_of_birth, gender, email, phone_number, nrc, hash_password))
                connection.commit()
-               flash("You have successfully signed up!")
+               flash("You have successfully signed up!", 'success')
+               return redirect(url_for("signUp"))
           except Error as e:
                print(f"Database error: {e}")
-               flash("An error occurred while processing your request. Please try again later.")
-     return render_template("/signUp.html")
+               flash("An error occurred while processing your request. Please try again later.", 'error')
+     return render_template("signUp.html")
+
+@app.route("/create_offers", methods=["POST"])
+def create_offers():
+     """Handles the creation of new offers. 
+     This route is a placeholder and should be implemented with the actual logic to create offers in the system."""
+     flash("Create Offers functionality is not implemented yet.", "error")
+     return redirect(url_for('admin_dashboard'))
+
+
+
+@app.route("/view_patients", methods=["GET"])
+def view_patients():
+     """Handles the viewing of patient information. 
+     This route is a placeholder and should be implemented with the actual logic to view patients in the system."""
+     connection = create_connection()
+     if connection is None:
+          return "Database connection error. Please try again later."
+     try:
+          cursor = connection.cursor(dictionary=True)
+          #SQL query to get the total number of patients in the database
+          cursor.execute("SELECT COUNT(*) AS total_patients FROM patient")
+          total_patients = cursor.fetchone()['total_patients']
+          flash("Total registered patients in the database.", "success")
+          return render_template("/admin_dashboard.html", total_patients=total_patients)
+     except Error as e:  
+          print(f"Database error: {e}")
+     return render_template("admin_dashboard.html")
+
+@app.route("/manage_patients", methods=["GET"])
+def manage_patients():
+     """Handles the management of patient information. 
+     This route is a placeholder and should be implemented with the actual logic to manage patients in the system."""
+     flash("Manage Patients functionality is not implemented yet.", "error")
+     return redirect(url_for('admin_dashboard'))
+
+@app.route("/system_settings", methods=["GET"])
+def system_settings():
+     """Handles the management of system settings. 
+     This route is a placeholder and should be implemented with the actual logic to manage system settings in the system."""
+     flash("System Settings functionality is not implemented yet.", "error")
+     return redirect(url_for('admin_dashboard'))
+
 
 
 if __name__ == '__main__':
