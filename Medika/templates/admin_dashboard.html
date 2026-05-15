@@ -1,0 +1,163 @@
+{% extends 'layout.html' %} {% block body %}
+<nav>
+  <div class="left-section">
+    <span class="h1">Medika</span>
+  </div>
+  <ul class="menu-links">
+    <li>
+      <a href="{{url_for('index')}}"><span>View Doctors</span></a>
+    </li>
+    <li>
+      <a href="#"><span>View Patients</span></a>
+    </li>
+    <li>
+      <a href="#"><span>View Appointments</span></a>
+    </li>
+  </ul>
+  <div class="right-section">
+    <button
+      onclick="location.href = '/admin_logout'"
+      type="submit"
+      class="sign-btn"
+    >
+      Sign Out
+    </button>
+  </div>
+</nav>
+
+{# <aside>
+  <nav class="sideBar">
+    <span id="side-dash">📊 Dashboard</span>
+    <hr />
+    <span>Patient Dashboard </span>
+    <span>Doctor Dashboard</span>
+    <span> Hospital Dashboard</span>
+    <span>📅 Appointments</span>
+    <span>💬 Messages</span>
+    <span>📁 Medical Records</span>
+    <span>⚕️ Prescriptions</span>
+    <span>💳 Billing & Payments</span>
+    <span>📊 Analytics & Reports</span>
+
+    <hr />
+    <hr />
+    <span id="side-dash">Components</span>
+    <span>👥 User Management</span>
+    <span>🩺 Doctor Verification</span>
+    <span>📋 Activity Logs</span>
+    <span>⚙️ Settings</span>
+  </nav>
+</aside>
+#}
+<form class="admin_dashboard" action="{{url_for('admin_dashboard')}}">
+  <main class="main-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number">{{ total_patients }}</span>
+            <span class="stat-label">Total Registered Patients</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">{{ total_appointments }}</span>
+            <span class="stat-label">Appointments Scheduled</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">{{ pending_registrations }}</span>
+            <span class="stat-label">Pending Registrations</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">{{ active_appointments }}</span>
+            <span class="stat-label">Active Appointments</span>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="section-title">Quick Actions</div>
+          <div class="actions-grid">
+            <div class="action-card" onclick="location.href='{{ url_for('create_offers') }}'">
+              ➕ Create New Offers
+            </div>
+            <div class="action-card" onclick="location.href='{{ url_for('manage_patients') }}'">
+              👥 Manage Patients
+            </div>
+            <div class="action-card" onclick="location.href='{{ url_for('view_patients') }}'">
+              📊 View Patients
+            </div>
+            <div class="action-card" onclick="location.href='{{ url_for('system_settings') }}'">
+              ⚙️ System Settings
+            </div>
+          </div>
+        </div>
+
+        <div class="tables-section">
+          <div class="table-container">
+            <div class="table-header">
+              <div class="table-title">Recent Patient Registrations</div>
+              <a href="{{ url_for('manage_patients') }}" class="view-all-btn">View All</a>
+            </div>
+            <div class="empty-state">
+              <div>👥</div>
+              <p></p>
+              <small></small>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <div class="table-header">
+              <div class="table-title">Recent Patient Registrations</div>
+              <a href="{{ url_for('view_patients') }}" class="view-all-btn">View All</a>
+            </div>
+            {% if recent_patients %}
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Date of Birth</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>NRC</th>
+                    <th>Gender</th>
+                    <th>Registration Date</th>
+                    <th>Patient Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for patient in recent_patients %}
+                  <tr>
+                    <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                    <td>{{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth else 'N/A' }}</td>
+                    <td>{{ patient.email }}</td>
+                    <td>{{ patient.phone_number }}</td>
+                    <td>{{ patient.nrc }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.registration_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                      <span class="status-badge {% if patient.has_voted %}status-voted{% else %}status-not-voted{% endif %}">
+                        {% if patient.has_signup %}Registered{% else %}Not Registered{% endif %}
+                      </span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+
+            <div class="empty-state">
+              <div>👥</div>
+              <p>No patients registered yet</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 20px; background-color: #0a1426; padding: 20px; text-align: center;">
+    <div class="copyRight"><span>2026 Medika AI. All rights reversed. professional healthcare advice should always be from licensed practitioners.</span></div>
+  </div>
+    </div>
+    </footer>
+</form>
+{% endblock %}

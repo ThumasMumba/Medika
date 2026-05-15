@@ -1,0 +1,110 @@
+{% extends "layout.html" %}{% block body%}
+<nav>
+  <div class="left-section">
+    <span class="h1">Medika</span>
+  </div>
+  <ul class="menu-links">
+    <li>
+      <a href="{{url_for('index')}}"><span>Home</span></a>
+    </li>
+    <li>
+      <a href="#"><span>How it works</span></a>
+    </li>
+    <li>
+      <a href="#"><span>Support</span></a>
+    </li>
+  </ul>
+  <div class="right-section">
+    <button onclick="location.href = '/login'" type="submit" class="sign-btn">
+      Sign In
+    </button>
+  </div>
+</nav>
+
+<form class="adminLogin-form" action="{{url_for('adminLogin')}}" method="post">
+  <div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel-admin">
+      <div class="logo-med">
+        <div class="icon-med"></div>
+        <div>
+          <h3>Medika Admin</h3>
+          <small>Secure Governance Portal</small>
+        </div>
+      </div>
+
+      <div class="hero-text-admin">
+        <h1>
+          Centralized <br />
+          <span>Oversight</span> for <br />
+          Healthcare Excellence.
+        </h1>
+
+        <p>
+          Access the administrative core of Medika AI. Manage practitioner
+          verifications, monitor system health, and ensure patient data
+          integrity.
+        </p>
+      </div>
+
+      <div class="features-admin">
+        <div>✔ End-to-End Encryption</div>
+        <div>✔ Multi-Factor Authentication</div>
+        <div>✔ Real-time Audit Logging</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel-admin">
+      <div class="login-card-admin">
+        <h2>Administrator Login</h2>
+        <p class="subtitle">Enter your secure credentials to proceed.</p>
+
+          <label class="admin-label">Admin Email</label>
+          <input class="admin-input" name="email" type="email" placeholder="admin@medika.com" />
+
+          <label class="admin-label">Security Password</label>
+          <input class="admin-input" name="password" type="password" placeholder="********" />
+
+          <label class="admin-label">Access Key (Optional)</label>
+          <input class="admin-input" type="text" placeholder="AL-XXXX-XXXX" />
+
+          <button onclick="window.location.href='{{ url_for('admin_dashboard') }}'" class="admin-btn" type="submit">Initialize Session →</button>
+        <a href="{{url_for('index')}}" class="back-link">Return to Public Portal</a>
+      </div>
+    </div>
+  </div>
+
+</form>
+  <div class="about-login">
+      <ul class="about-list">
+        <li>
+          <div><span>Medika AI</span></div>
+          <ul class="menu-list">
+          <li> Revolutionizing healthcare management <br />
+          through intelligent AI solutions and seamless <br/>
+          digital workflows.</ul></li> 
+        </li>
+        <li>
+          <div><span>Services</span></div>
+          <ul class="menu-list">
+            <li>AI Symptom Checker</li>
+            <li>Find a Doctor</li>
+            <li>Virtual Appointments</li>
+          </ul>
+        </li>
+
+        <li>
+          <div><span>Company</span></div>
+          <ul class="menu-list">
+            <li>About Us</li>
+            <li>Contact</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </li>
+      </ul>
+       <hr class="horizontal-rule" />
+    <div class="copyRight"><span>2026 Medika AI. All rights reversed. professional healthcare advice should always be from licensed practitioners.</span></div>
+  </div>
+    </div>
+  {% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+{% block body %}
+<form class="signUp-form" action="/signUp" method="post">
+<div class="payment-card">
+    <div class="top">
+      <h2>MedikaAI User sign in</h2>
+      <div class="chip"></div>
+    </div>
+
+    <div class="details">
+    </div>
+
+    <div class="input-group">
+      <label>First name</label>
+      <input type="text" name="fName" id="first_name" placeholder="John">
+    </div>
+
+    <div class="input-group">
+      <label>Last name</label>
+      <input type="text" name="lName" id="last_name" placeholder="Doe">
+    </div>
+    <div class="input-group">
+      <label>Email</label>
+      <input type="email" name="email" id="email" placeholder="john.doe@example.com">
+    </div>
+
+    <div class="input-group">
+      <label>Nrc</label>
+      <input type="nrc" name="nrc" id="nrc" placeholder="">
+    </div>
+    
+    <div class="input-group">
+      <label>Date of birth</label>
+      <input name="dob" type="date" id="date_of_birth" placeholder="MM/DD/YYYY">
+    </div>
+    <div class="input-group">
+      <label>Gender</label>
+      <select type="gender" name="gender">
+        <option value="male">Male</option>
+        <option   value="female">Female</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Phone</label>
+      <input type="numeric" name="phone_number" length="10" id="phone" placeholder="0967402677">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" name="password" id="password" placeholder="Enter your password">
+    </div>
+
+    <div class="row">
+    <button class="pay-btn" type="submit">
+      Register
+    </button>
+  </div>
+</form>
+
+{#Client-side validation for patient number, NRC, email, and phone number#}
+<script>
+  document
+    .getElementByClassName("signUp-form")
+    .addEventListener("submit", function (e) {
+      const email = document.querySelector('input[name="email"]');
+      const nrc = document.querySelector('input[name="nrc"]');
+      const phoneNumber = document.querySelector('input[name="phone_number"]');
+      //Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        alert("Invalid email format. Eg. example@gmail.com.");
+        email.focus();
+        e.preventDefault();
+        return;
+      }
+      //validate NRC (must be in format: 123456/78/9)
+      if (!/^\d{6}\/\d{2}\/\d{1}$/.test(nrc.value)) {
+        alert("NRC must be in the format: 123456/78/9");
+        nrc.focus();
+        e.preventDefault();
+        return;
+      }
+      //Validate phone number (must be 10 digits)
+      if (!/^\d{10}$/.test(phoneNumber.value)) {
+        alert("Phone Number must be exactly 10 digits.");
+        phoneNumber.focus();
+        e.preventDefault();
+        return;
+      }
+    });
+
+  document
+    .querySelector('input[name="date_of_birth"]')
+    .addEventListener("focus", function (e) {
+      this.type = "date";
+    });
+
+  document
+    .querySelector('input[name="nrc"]')
+    .addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
+      if (value.length > 6) {
+        value =
+          value.substring(0, 6) +
+          "/" +
+          value.substring(6, 8) +
+          "/" +
+          value.substring(8, 9);
+      }
+      e.target.value = value;
+    });
+  alert("Form submitted successfully!");
+</script>
+{% endblock %}

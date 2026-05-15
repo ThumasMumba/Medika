@@ -4,12 +4,12 @@
     <span class="h1">Medika</span>
   </div>
     <ul class="menu-links">
-      <li> <a href="#"><span>Home</span></a></li>
-      <li><a href="#"><span>How it works</span></a></li>
-      <li><a href="#"><span>Support</span></a></li>
+      <li class="nav-item"> <a href="{{url_for('index')}}"><span>Home</span></a></li>
+      <li class="nav-item"><a href="#"><span>How it works</span></a></li>
+      <li class="nav-item"><a href="#"><span>Support</span></a></li>
     </ul>
   <div class="right-section">
-    <button type="submit" class="sign-btn">Sign In</button>
+    <button onclick="location.href='/login'"  type="submit" class="sign-btn">Sign In</button>
   </div>
 </nav>
 
@@ -20,7 +20,7 @@
       <span class="badge">EMPOWERING HEALTH WITH AI</span>
      <h1> Smarter Care for a
      <br />
-    <span class="highlight">Healthier </span>Tomorrow.</h1>
+     Healthier Tomorrow.</h1>
     </p>
     <p class="text">
       Experience the next generation of healthcare.<br />
@@ -116,13 +116,15 @@
             <li>About Us</li>
             <li>Contact</li>
             <li>Privacy Policy</li>
-          </ul>
+<li onclick="window.location.href='{{ url_for('adminLogin') }}'">
+    Admin Dashboard
+</li>          </ul>
         </li>
       </ul>
 
     </div>
     <hr class="horizontal-rule" />
-    <div class="copyRight"><span>2026 Medika AI. All rights reversed. professional healthcare advice should always be from licensed practitioners.</span></div>
+    <div class="copyRight"><span>2026 Medika AI. All rights reserved. professional healthcare advice should always be from licensed practitioners.</span></div>
   </div>
 </div>
 
