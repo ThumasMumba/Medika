@@ -1,105 +1,63 @@
-{%extends 'layout.html'%}{%block body%}
+{% extends 'layout.html' %}
+{% block body %}
 <form class="signUp-form" action="/signUp" method="post">
-  <div class="main-container">
-    <header>
-      <h1>Join Medika</h1>
-      <p>Create an account to access our healthcare services</p>
-    </header>
-    <label for="fName"></label>
-    <input
-      class="signUp-input"
-      type="text"
-      name="fName"
-      placeholder="First Name"
-      required
-      value="{{request.form['fName']}}"
-    />
-    <label for="lName"></label>
-    <input
-      class="signUp-input"
-      type="text"
-      name="lName"
-      placeholder="Last Name"
-      required
-      value="{{request.form['lName']}}"
-    />
-    <label for="dob"></label>
-    <input
-      class="signUp-input"
-      type="date"
-      name="dob"
-      placeholder="Date of Birth"
-      value="{{request.form['date']}}"
-    />
-    <label for="gender"></label>
-    <select
-      class="signUp-input"
-      name="gender"
-      required
-      value="{{request.form['gender']}}"
-    >
-      <option value="">Select Your gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-    <label for="e-mail"></label>
-    <input
-      class="signUp-input"
-      type="email"
-      name="email"
-      placeholder="Email Address"
-      required
-      value="{{request.form['email']}}"
-    />
-    <label for="phone"></label>
-    <input
-      class="signUp-input"
-      type="tel"
-      name="phone_number"
-      placeholder="Phone Number"
-      required
-      value="{{request.form['phone']}}"
-    />
-    <label for="nrc"></label>
-    <input
-      class="signUp-input"
-      type="nrc"
-      name="nrc"
-      placeholder="NRC Number"
-      required
-      value="{{request.form['nrc']}}"
-    />
-    <input
-      class="signUp-input"
-      type="text"
-      name="address"
-      placeholder="Physical Address"
-      required
-      value="{{request.form['address']}}"
-    />
-    <input
-      class="signUp-input"
-      type="text"
-      name="next_kin_name"
-      placeholder="Next of kin name"
-      required
-      value="{{request.form['kin']}}"
-    />
-    <input
-      class="signUp-input"
-      type="tel"
-      name="next_kin_phone"
-      placeholder="Next of kin phone number"
-      required
-      value="{{request.form['next_kin_phone']}}"
-    />
-    <div class="my-btn">
-      <button class="sub-btn" type="submit">Create Account</button>
+<div class="payment-card">
+    <div class="top">
+      <h2>MedikaAI User sign in</h2>
+      <div class="chip"></div>
     </div>
+
+    <div class="details">
+    </div>
+
+    <div class="input-group">
+      <label>First name</label>
+      <input type="text" name="fName" id="first_name" placeholder="John">
+    </div>
+
+    <div class="input-group">
+      <label>Last name</label>
+      <input type="text" name="lName" id="last_name" placeholder="Doe">
+    </div>
+    <div class="input-group">
+      <label>Email</label>
+      <input type="email" name="email" id="email" placeholder="john.doe@example.com">
+    </div>
+
+    <div class="input-group">
+      <label>Nrc</label>
+      <input type="nrc" name="nrc" id="nrc" placeholder="">
+    </div>
+    
+    <div class="input-group">
+      <label>Date of birth</label>
+      <input name="dob" type="date" id="date_of_birth" placeholder="MM/DD/YYYY">
+    </div>
+    <div class="input-group">
+      <label>Gender</label>
+      <select type="gender" name="gender">
+        <option value="male">Male</option>
+        <option   value="female">Female</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Phone</label>
+      <input type="numeric" name="phone_number" length="10" id="phone" placeholder="0967402677">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" name="password" id="password" placeholder="Enter your password">
+    </div>
+
+    <div class="row">
+    <button class="pay-btn" type="submit">
+      Register
+    </button>
   </div>
 </form>
+
+{#Client-side validation for patient number, NRC, email, and phone number#}
 <script>
-  //Client-side validation for patient number, NRC, email, and phone number
   document
     .getElementByClassName("signUp-form")
     .addEventListener("submit", function (e) {
@@ -151,4 +109,4 @@
     });
   alert("Form submitted successfully!");
 </script>
-{%endblock %}
+{% endblock %}
