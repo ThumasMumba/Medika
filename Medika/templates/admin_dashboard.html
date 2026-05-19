@@ -8,7 +8,7 @@
       <a href="{{url_for('index')}}"><span>View Doctors</span></a>
     </li>
     <li>
-      <a href="#"><span>View Patients</span></a>
+      <a href="{{url_for('view_patients')}}"><span>View Patients</span></a>
     </li>
     <li>
       <a href="#"><span>View Appointments</span></a>
@@ -53,29 +53,24 @@
   <main class="main-content">
         <div class="stats-grid">
           <div class="stat-card">
-            <span class="stat-number">{{ total_patients }}</span>
+            <div><span class="stat-number">{{ total_patients }}</span></div>
             <span class="stat-label">Total Registered Patients</span>
           </div>
           <div class="stat-card">
-            <span class="stat-number">{{ total_appointments }}</span>
-            <span class="stat-label">Appointments Scheduled</span>
+            <div><span class="stat-number">{{ total_doctors }}</span></div>
+            <span class="stat-label">Total Registered Doctors</span>
           </div>
           <div class="stat-card">
-            <span class="stat-number">{{ pending_registrations }}</span>
-            <span class="stat-label">Pending Registrations</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">{{ active_appointments }}</span>
+            <div><span class="stat-number">{{ total_appointments }}</span>
+            </div>
             <span class="stat-label">Active Appointments</span>
           </div>
         </div>
 
         <div class="quick-actions">
           <div class="section-title">Quick Actions</div>
+          
           <div class="actions-grid">
-            <div class="action-card" onclick="location.href='{{ url_for('create_offers') }}'">
-              ➕ Create New Offers
-            </div>
             <div class="action-card" onclick="location.href='{{ url_for('manage_patients') }}'">
               👥 Manage Patients
             </div>
@@ -132,7 +127,7 @@
                     <td>{{ patient.gender }}</td>
                     <td>{{ patient.registration_date.strftime('%Y-%m-%d') }}</td>
                     <td>
-                      <span class="status-badge {% if patient.has_voted %}status-voted{% else %}status-not-voted{% endif %}">
+                      <span class="status-badge {% if patient.has_signup %}status-signup{% else %}status-not-signup{% endif %}">
                         {% if patient.has_signup %}Registered{% else %}Not Registered{% endif %}
                       </span>
                     </td>
