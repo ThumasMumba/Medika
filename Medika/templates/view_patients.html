@@ -1,6 +1,94 @@
-{% extends 'layout.html' %}
-{% block body %}
-<form action="/view_patients" class="view-patient-form" method="GET">
-  <!-- Your form fields here -->
-</form>
-{% endblock  %}
+{% extends 'layout.html' %} {% block body %}
+<main>
+  <!-- patient table (only shown on /view_patients) -->
+  {% if patients is defined %}
+  <div class="section-header-admin">
+    <h2>
+      patient records &nbsp;<span
+        style="color: var(--muted); font-weight: 400; font-size: 0.88rem"
+        >({{ stats['total_patients'] }} total)</span
+      >
+    </h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline"
+      >&#8592; Back to dashboard</a
+    >
+  </div>
+  <div class="table-card-admin">
+    {% if patients %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full name</th>
+          <th>Date of birth</th>
+          <th>Gender</th>
+          <th>phone</th>
+          <th>Email</th>
+          <th>Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in patients %}
+        <tr>
+          <td style="color: var(--muted)">{{ patient.id }}</td>
+          <td>
+            <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>
+          </td>
+          <td>{{ patient.date_of_birth }}</td>
+          <td>
+            {% if patient.gender|lower == 'm' or patient.gender|lower == 'male'
+            %}
+            <span class="badge-admin badge-m">Male</span>
+            {% elif patient.gender|lower == 'f' or patient.gender|lower ==
+            'female' %}
+            <span class="badge-admin badge-f">Female</span>
+            {% else %}
+            <span class="badge-admin badge-o">{{ patient.gender }}</span>
+            {% endif %}
+          </td>
+          <td>{{ patient.phone or '—' }}</td>
+          <td>{{ patient.email or '—' }}</td>
+          <td style="color: var(--muted)">
+            {{ patient.registration_date.strftime('%d %b %Y') if
+            patient.registration_date else '—' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- pagination -->
+    {% if total_pages > 1 %}
+    <div style="padding: 0.75rem 1rem; border-top: 1px solid var(--border)">
+      <div class="pagination">
+        <span class="page-info">page {{ page }} of {{ total_pages }}</span>
+        {% if page > 1 %}
+        <a href="{{ url_for('view_patients', page=page-1) }}" class="page-btn"
+          >&laquo; prev</a
+        >
+        {% endif %} {% for p in range(1, total_pages + 1) %} {% if p == page %}
+        <span class="page-btn active">{{ p }}</span>
+        {% elif p == 1 or p == total_pages or (p >= page-2 and p <= page+2) %}
+        <a href="{{ url_for('view_patients', page=p) }}" class="page-btn"
+          >{{ p }}</a
+        >
+        {% elif p == page-3 or p == page+3 %}
+        <span style="color: var(--muted); padding: 0 4px">…</span>
+        {% endif %} {% endfor %} {% if page < total_pages %}
+        <a href="{{ url_for('view_patients', page=page+1) }}" class="page-btn"
+          >Next &raquo;</a
+        >
+        {% endif %}
+      </div>
+    </div>
+    {% endif %} {% else %}
+    <div class="empty-state">
+      <div class="icon">&#x1F4CB;</div>
+      <p>No patients found in the database.</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</main>
+
+{% endblock %}
