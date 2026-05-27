@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedCore Pro | Patient Records</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "on-background": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#89f5e7",
+                        "on-primary-container": "#eeefff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-fixed": "#00174b",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#eec200",
+                        "inverse-surface": "#2d3133",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-secondary-fixed-variant": "#005049",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container": "#eceef0",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed": "#dbe1ff",
+                        "primary": "#004ac6",
+                        "on-secondary-container": "#006f66",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-container": "#2563eb",
+                        "background": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#737686",
+                        "on-error-container": "#93000a",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#231b00",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed": "#ffe083",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface-variant": "#434655",
+                        "tertiary-container": "#cea700",
+                        "tertiary": "#735c00",
+                        "secondary-container": "#86f2e4",
+                        "on-tertiary-container": "#4e3d00",
+                        "secondary": "#006a61",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed": "#00201d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "xl": "48px",
+                        "container-max": "1440px",
+                        "sm": "16px",
+                        "gutter": "24px",
+                        "lg": "32px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "display-stat-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-base": ["Inter"],
+                        "display-stat": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-stat-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-stat": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #CBD5E1;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+        }
+        /* Mobile Drawer Style */
+        #mobile-drawer.open {
+            transform: translateX(0);
+        }
+    </style>
+  </head>
+  <body class="bg-background text-on-surface">
+    <!-- TopNavBar Shell -->
+    <header
+      class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-sm md:px-md h-16 bg-surface-container-lowest shadow-sm border-b border-surface-container-highest"
+    >
+      <div class="flex items-center gap-xs md:gap-md">
+        <button
+          class="md:hidden p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors"
+          id="drawer-toggle"
+        >
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <span
+          class="font-headline-md text-headline-md text-primary tracking-tight"
+          >Medika AI</span
+        >
+        <nav class="hidden md:flex items-center gap-sm ml-lg">
+          <a
+            class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-base rounded-lg font-body-sm text-body-sm"
+            href="#"
+            >Overview</a
+          >
+          <a
+            class="text-primary font-semibold border-b-2 border-primary px-xs py-base font-body-sm text-body-sm"
+            href="{{ url_for('view_patients') }}"
+            >Patients</a
+          >
+          <a
+            class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-base rounded-lg font-body-sm text-body-sm"
+            href="#"
+            >Appointments</a
+          >
+        </nav>
+      </div>
+      <div class="flex items-center gap-sm">
+        <div class="relative hidden sm:block">
+          <span
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+            >search</span
+          >
+          <input
+            class="pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-body-sm focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all w-48 lg:w-64"
+            placeholder="Search..."
+            type="text"
+          />
+        </div>
+        <button
+          class="p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors"
+        >
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div
+          class="flex items-center gap-xs ml-xs cursor-pointer hover:bg-surface-container-low p-1 rounded-lg transition-colors"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden border border-outline-variant"
+          >
+            <img
+              alt="Dr. Julianne Smith"
+              class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNX-HPFJWej6kjanL6JqIaIdC-bY4rtKEekp14O9In_p1N2q_MBQNIDhA2REfoJ8rtGeD4Zo9054s3hEWu1EEwpQaRWXp8FMPv8Mr_7DaEudZWOD_z86oWzT6PB2Awx4d3X78ZDBSk02hrd06c6lxIcZZYr5f2l1Mu81U61U1h4bbllotKlERzp-p-oeGMgkifQwuSe86YBniUsPd975nPpblGizCBQ9sK0896XpTJg2_bNwfykH3eUrRh1P0UO_Y8rJEU8nBpAw"
+            />
+          </div>
+          <span class="text-body-sm font-semibold hidden sm:block"
+            >{{ admin_name }}</span
+          >
+        </div>
+      </div>
+    </header>
+    <!-- Mobile Overlay -->
+    <div
+      class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity"
+      id="drawer-overlay"
+    ></div>
+    <!-- SideNavBar / Mobile Drawer -->
+    <aside
+      class="fixed left-0 top-0 bottom-0 w-[280px] bg-surface-container-lowest border-r border-surface-container-highest shadow-xl z-[60] flex flex-col p-sm gap-xs transition-transform -translate-x-full md:translate-x-0 md:top-16 md:w-[240px] md:shadow-none md:z-40"
+      id="mobile-drawer"
+    >
+      <div class="px-xs py-sm mb-xs flex items-center justify-between">
+        <div class="flex items-center gap-xs">
+          <div
+            class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >medical_services</span
+            >
+          </div>
+          <div>
+            <p
+              class="font-headline-md text-[14px] leading-tight text-primary font-bold"
+            >
+              Medika AI Clinic
+            </p>
+            <p
+              class="text-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold"
+            >
+              Medical Group
+            </p>
+          </div>
+        </div>
+        <button
+          class="md:hidden p-2 rounded-full hover:bg-surface-container text-on-surface-variant"
+          id="drawer-close"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="flex-1 space-y-1">
+        <a
+          class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-container transition-all rounded-lg group"
+          href="{{url_for('admin_dashboard')}}"
+        >
+          <span
+            class="material-symbols-outlined text-outline group-hover:text-on-surface"
+            >dashboard</span
+          >
+          <span class="font-body-sm text-body-sm">Dashboard</span>
+        </a>
+        <a
+          class="flex items-center gap-sm px-sm py-xs bg-primary-container text-on-primary-container font-bold rounded-lg group"
+          href="{{url_for('view_patients')}}"
+        >
+          <span
+            class="material-symbols-outlined"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >group</span
+          >
+          <span class="font-body-sm text-body-sm">Patients</span>
+        </a>
+        <a
+          class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-container transition-all rounded-lg group"
+          href="#"
+        >
+          <span
+            class="material-symbols-outlined text-outline group-hover:text-on-surface"
+            >calendar_today</span
+          >
+          <span class="font-body-sm text-body-sm">Appointments</span>
+        </a>
+        <a
+          class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-container transition-all rounded-lg group"
+          href="#"
+        >
+          <span
+            class="material-symbols-outlined text-outline group-hover:text-on-surface"
+            >settings</span
+          >
+          <span class="font-body-sm text-body-sm">Settings</span>
+        </a>
+      </div>
+      <div class="pt-sm border-t border-surface-container-highest">
+        <button
+          class="w-full bg-primary text-on-primary py-xs rounded-lg font-semibold text-body-sm flex items-center justify-center gap-xs hover:opacity-90 active:scale-95 transition-all mb-sm"
+        >
+          <span class="material-symbols-outlined text-sm">add</span>
+          New Appointment
+        </button>
+        <a
+          class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:text-on-surface transition-all rounded-lg group"
+          href="{{url_for('admin_logout')}}"
+        >
+          <span
+            class="material-symbols-outlined text-outline group-hover:text-on-surface"
+            >logout</span
+          >
+          <span class="font-body-sm text-body-sm">Logout</span>
+        </a>
+      </div>
+    </aside>
+    <!-- Main Content Canvas -->
+    <main class="md:ml-[240px] pt-16 min-h-screen">
+      <div class="p-sm md:p-md lg:p-lg max-w-container-max mx-auto">
+        <!-- Breadcrumbs / Actions -->
+        <div
+          class="flex flex-col lg:flex-row lg:items-center justify-between gap-md mb-lg"
+        >
+          <div>
+            <a
+              href="{{url_for('admin_dashboard')}}"
+              class="flex items-center gap-xs text-primary font-semibold hover:gap-sm transition-all mb-xs group"
+            >
+              <span class="material-symbols-outlined text-lg">arrow_back</span>
+              <span class="font-body-sm text-body-sm">Back to dashboard</span>
+            </a>
+            <h1
+              class="font-display-stat text-display-stat-mobile md:text-display-stat text-on-surface"
+            >
+              Patient Records
+            </h1>
+            <p class="text-body-sm md:text-body-base text-on-surface-variant">
+              Manage and view all registered patient information in one
+              centralized hub.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-sm">
+            <button
+              class="flex-1 sm:flex-none flex items-center justify-center gap-xs px-sm py-xs bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg hover:bg-surface-container-low transition-colors shadow-sm"
+            >
+              <span class="material-symbols-outlined">filter_list</span>
+              <span class="font-body-sm text-body-sm">Filters</span>
+            </button>
+            <a
+              href="{{url_for('signUp')}}"
+              class="flex-1 sm:flex-none flex items-center justify-center gap-xs px-sm py-xs bg-primary text-on-primary rounded-lg hover:opacity-90 transition-opacity shadow-sm font-semibold"
+            >
+              <span class="material-symbols-outlined">person_add</span>
+              <span class="font-body-sm text-body-sm whitespace-nowrap"
+                >Register Patient</span
+              >
+            </a>
+          </div>
+        </div>
+        <!-- Card Layout Stats -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm md:gap-md mb-lg"
+        >
+          <div
+            class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-t-2 border-primary"
+            style="box-shadow: 0 4px 6px rgba(0, 74, 198, 0.1)"
+          >
+            <p class="text-body-sm text-on-surface-variant font-medium">
+              Total Patients
+            </p>
+            <div class="flex items-center justify-between mt-xs">
+              <p
+                class="font-display-stat text-[24px] md:text-[28px] leading-tight text-on-surface"
+              >
+                {{stats['total_patients']}}
+              </p>
+              <span
+                class="text-secondary text-xs font-bold bg-secondary-container/20 px-xs py-base rounded-full"
+                >+2%</span
+              >
+            </div>
+          </div>
+          <div
+            class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-t-2 border-secondary"
+            style="box-shadow: 0 4px 6px rgba(134, 242, 228, 0.3)"
+          >
+            <p class="text-body-sm text-on-surface-variant font-medium">
+              Active This Month
+            </p>
+            <div class="flex items-center justify-between mt-xs">
+              <p
+                class="font-display-stat text-[24px] md:text-[28px] leading-tight text-on-surface"
+              >
+                {{stats['total_patients']}}
+              </p>
+              <span
+                class="text-primary text-xs font-bold bg-primary-fixed/30 px-xs py-base rounded-full"
+                >+1.4%</span
+              >
+            </div>
+          </div>
+          <div
+            class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-t-2 border-tertiary"
+            style="box-shadow: 0 4px 6px rgba(13, 12, 12, 0.36)"
+          >
+            <p class="text-body-sm text-on-surface-variant font-medium">
+              Wait List
+            </p>
+            <div class="flex items-center justify-between mt-xs">
+              <p
+                class="font-display-stat text-[24px] md:text-[28px] leading-tight text-on-surface"
+              >
+                {{stats['wait_list']}}
+              </p>
+              <span
+                class="text-error text-xs font-bold bg-error-container/30 px-xs py-base rounded-full"
+                >-2</span
+              >
+            </div>
+          </div>
+          <div
+            class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-t-2 border-outline"
+          >
+            <p class="text-body-sm text-on-surface-variant font-medium">
+              Average Stay
+            </p>
+            <div class="flex items-center justify-between mt-xs">
+              <p
+                class="font-display-stat text-[24px] md:text-[28px] leading-tight text-on-surface"
+              >
+                {{stats['average_stay']}} days
+              </p>
+              <span
+                class="text-outline text-xs font-bold bg-surface-container/50 px-xs py-base rounded-full"
+                >--</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Content Card (Table Container) -->
+        <div
+          class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-highest overflow-hidden"
+        >
+          <div
+            class="p-md border-b border-surface-container-highest flex flex-col sm:flex-row sm:items-center justify-between gap-sm"
+          >
+            <div class="flex items-center gap-sm">
+              <h2 class="font-headline-md text-headline-md text-on-surface">
+                Comprehensive Directory
+              </h2>
+              <span
+                class="hidden xs:block px-xs py-base bg-surface-container text-on-surface-variant text-[12px] font-bold rounded-lg uppercase tracking-wider"
+                >All Records</span
+              >
+            </div>
+            <div class="flex items-center gap-xs">
+              <div class="relative flex-1 sm:flex-none">
+                <span
+                  class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm"
+                  >search</span
+                >
+                <input
+                  class="pl-9 pr-4 py-xs bg-surface-container-low border border-outline-variant rounded-lg text-body-sm focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all w-full sm:w-64"
+                  placeholder="Search directory..."
+                  type="text"
+                />
+              </div>
+              <button
+                class="p-xs rounded-lg hover:bg-surface-container text-on-surface-variant"
+              >
+                <span class="material-symbols-outlined">download</span>
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table
+              class="w-full text-left border-collapse min-w-[800px] lg:min-w-full"
+            >
+              <thead class="bg-surface-container-low">
+                <tr>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    # Patient ID
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Full Name
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Date of Birth
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Gender
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Phone
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Email
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap"
+                  >
+                    Registered Date
+                  </th>
+                  <th
+                    class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap text-center"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container-highest">
+                {% for patient in patients %}
+                <tr
+                  class="hover:bg-surface-container-low/50 transition-colors cursor-pointer group"
+                >
+                  <td
+                    class="px-md py-md font-body-sm text-body-sm text-primary font-semibold"
+                  >
+                    {{patient['id']}}
+                  </td>
+                  <td class="px-md py-md flex items-center gap-xs">
+                    <div
+                      class="w-8 h-8 rounded-full bg-surface-container overflow-hidden"
+                    >
+                      <img
+                        alt="{{patient['first_name']}} {{patient['last_name']}}"
+                        class="w-full h-full object-cover"
+                        src="{{patient['profile_image']}}"
+                      />
+                    </div>
+                    <span
+                      class="font-body-sm text-body-sm font-medium text-on-surface"
+                      >{{patient['first_name']}} {{patient['last_name']}}</span
+                    >
+                  </td>
+                  <td
+                    class="px-md py-md font-body-sm text-body-sm text-on-surface-variant"
+                  >
+                    {{patient['date_of_birth']}}
+                  </td>
+                  <td class="px-md py-md">
+                    <span
+                      class="px-xs py-base rounded-full text-xs font-bold 
+                              {{ 
+                              'bg-primary/20 text-primary' if patient['gender']|trim|lower == 'male' 
+                              else 'bg-secondary/20 text-secondary' if patient['gender']|trim|lower == 'female' 
+                              else 'bg-outline/20 text-outline' 
+                              }}"
+                      >{{patient['gender']}}</span
+                    >
+                  </td>
+                  <td
+                    class="px-md py-md font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap"
+                  >
+                    {{patient['phone']}}
+                  </td>
+                  <td
+                    class="px-md py-md font-body-sm text-body-sm text-on-surface-variant"
+                  >
+                    {{patient['email']}}
+                  </td>
+                  <td
+                    class="px-md py-md font-body-sm text-body-sm text-on-surface-variant"
+                  >
+                    {{patient['registration_date']}}
+                  </td>
+                  <td class="px-md py-md text-center">
+                    <button
+                      class="p-xs rounded-full hover:bg-primary-container/10 text-primary transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-sm"
+                        >visibility</span
+                      >
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div
+            class="p-md bg-surface-container-low border-t border-surface-container-highest flex flex-col sm:flex-row items-center justify-between gap-md"
+          >
+            <p class="text-body-sm text-on-surface-variant">
+              Showing
+              <span class="font-bold text-on-surface"
+                >1 - {{stats['total_patients']}}</span
+              >
+              of
+              <span class="font-bold text-on-surface"
+                >{{stats['total_patients']}}</span
+              >
+              patients
+            </p>
+            <div class="flex items-center gap-xs">
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-50"
+                disabled=""
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >chevron_left</span
+                >
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold text-xs"
+              >
+                1
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors text-xs font-semibold"
+              >
+                2
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors text-xs font-semibold"
+              >
+                3
+              </button>
+              <span class="text-outline mx-xs">...</span>
+              <button
+                class="hidden xs:flex w-8 h-8 items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors text-xs font-semibold"
+              >
+                257
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >chevron_right</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Dashboard Preview / Recent Image -->
+        <div class="mt-xl">
+          <div class="flex items-center justify-between mb-sm">
+            <h3 class="font-headline-md text-headline-md text-on-surface">
+              Clinical Analytics Context
+            </h3>
+            <button
+              class="text-primary text-body-sm font-semibold hover:underline"
+            >
+              View reports
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Micro-interaction Scripts -->
+    <script>
+      // Drawer Logic
+      const drawer = document.getElementById("mobile-drawer");
+      const overlay = document.getElementById("drawer-overlay");
+      const toggleBtn = document.getElementById("drawer-toggle");
+      const closeBtn = document.getElementById("drawer-close");
+
+      function openDrawer() {
+        drawer.classList.add("open");
+        overlay.classList.remove("hidden");
+        setTimeout(() => overlay.classList.add("opacity-100"), 10);
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove("open");
+        overlay.classList.remove("opacity-100");
+        setTimeout(() => overlay.classList.add("hidden"), 300);
+      }
+
+      toggleBtn.addEventListener("click", openDrawer);
+      closeBtn.addEventListener("click", closeDrawer);
+      overlay.addEventListener("click", closeDrawer);
+
+      // Row interaction
+      document.querySelectorAll("tbody tr").forEach((row) => {
+        row.addEventListener("click", () => {
+          const patientName = row.querySelector(".font-medium").innerText;
+          console.log(`Navigating to profile: ${patientName}`);
+        });
+      });
+
+      // Search bar focus effect
+      const searchInputs = document.querySelectorAll('input[type="text"]');
+      searchInputs.forEach((input) => {
+        input.addEventListener("focus", () => {
+          input.parentElement.classList.add("scale-[1.01]");
+        });
+        input.addEventListener("blur", () => {
+          input.parentElement.classList.remove("scale-[1.01]");
+        });
+      });
+    </script>
+  </body>
+</html>

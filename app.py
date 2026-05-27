@@ -1,5 +1,6 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
+from functools import wraps
 from flask import Flask, get_flashed_messages, render_template, request, flash, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 #Imports the mysql.connector in order to handle database operations
@@ -9,34 +10,36 @@ from mysql.connector import Error
 app = Flask(__name__)
 admin_password = "admin123"
 hash_password = generate_password_hash(admin_password)
-print("Store this in DB: ", hash_password)
+# print("Store this in DB: ", hash_password)
 
 # Add this configuration to ensure HTML files process Jinja2 syntax
 app.jinja_env.add_extension('jinja2.ext.do')
 app.secret_key = 'medika_ai_secret_key'
 
-# Connects to the MYSQL database and store the results in the variable conn
-conn = mysql.connector.connect(
-     host = "localhost",
-     user = "root",
-     password = "",
-     database = "medika"
-)
-cursor = conn.cursor()
-#in order to execute statements we are going to create a cursor which is a function
 # We define a function that checks if the connection to the database was a success or not
 def create_connection():
-     """Creates and return a database connection"""
-     try:
-           cursor.execute("CREATE DATABASE IF NOT EXISTS medika")
-           conn.commit()
-           cursor.execute("USE medika")
-           return conn
-     except Error as e:
-          print(f"An error occurred while connecting to the database:  {e}")
-          return None
+    try:
+         # Connects to the MYSQL database and store the results in the variable conn
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+        )
+        
+        #in order to execute statements we are going to create a cursor which is a function
+        cursor = connection.cursor()
+
+        cursor.execute("CREATE DATABASE IF NOT EXISTS medika")
+        cursor.execute("USE medika")
+
+        return connection
+
+    except Error as e:
+        print(f"Database connection error: {e}")
+        return None
 
 #Initializes the database and ensures that all the required tables exists  
+
 def initialize_db():
      connection = create_connection()
      if connection is None:
@@ -92,7 +95,6 @@ def initialize_db():
                             username VARCHAR(100) NOT NULL,
                             email VARCHAR(100) UNIQUE NOT NULL,
                             password VARCHAR(255) NOT NULL,
-                            # Defines a column in the table that can only take the value 'admin' and defaults to 'admin' if no value is provided. This ensures that all entries in the admin table are categorized as 'admin'.
                             role ENUM('admin') DEFAULT 'admin',
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             is_active BOOLEAN DEFAULT TRUE
@@ -104,6 +106,18 @@ def initialize_db():
            print(f"Error Initializing Database: {e}")
             
 initialize_db()
+# # ─── Auth helpers ─────────────────────────────────────────────────────────────
+
+def login_required(f):
+    """Decorator: redirect to login if the admin is not authenticated."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            flash("Please log in to access the admin dashboard.", "error")
+            return redirect(url_for("adminLogin"))
+        return f(*args, **kwargs)
+    return decorated
+
 #App decorator: Tied to the function that comes after it
 @app.route('/')
 def index():
@@ -181,11 +195,11 @@ def admin_logout():
 
 # admin-dashboard
 @app.route('/admin_dashboard', methods=['GET'])
-
+@login_required
 def admin_dashboard():
      """Renders the admin dashboard page. 
      This page is only accessible to logged-in administrators."""
-     if not 'admin_logged_in':
+     if not session.get('admin_logged_in'):
           flash("Enter both email and password to access the admin dashboard", 'error')
      connection = create_connection()
      if connection is None:
@@ -201,15 +215,40 @@ def admin_dashboard():
           #SQL query to get the total number of appointments in the database
           cursor.execute("SELECT COUNT(*) AS total_appointments FROM appointments")
           total_appointments = cursor.fetchone()['total_appointments']
+          cursor.execute("SELECT * FROM patient ORDER BY registration_date DESC LIMIT 20")
+          patients = cursor.fetchall()
+          #Patients registered today
+          cursor.execute(
+               "SELECT COUNT(*) AS total FROM patient "
+               "WHERE DATE(registration_date) = CURDATE()")
+          patients_registered_today = cursor.fetchone()['total']
+          
+          #patients registered this month
+          cursor.execute(
+            "SELECT COUNT(*) AS total FROM patient "
+            "WHERE MONTH(registration_date) = MONTH(CURDATE())"
+            "AND YEAR(registration_date) = YEAR(CURDATE())")
+          patients_registered_this_month = cursor.fetchone()['total']
+          
+          # Stats
+          stats = {
+               "total_patients": total_patients,
+               "patients_today": patients_registered_today,
+               "patients_this_month": patients_registered_this_month,
+          }
+          # Pagination placeholders
+          page = 1
+          total_pages = 1
           # Pass the retrieved data to the admin dashboard template for display
-          return render_template("/admin_dashboard.html", total_patients=total_patients, total_doctors=total_doctors, total_appointments=total_appointments)
+          return render_template("admin_dashboard.html", stats=stats, patients=patients, page=page, total_pages=total_pages)
      except Error as e:  
           print(f"Database error: {e}")
-     return render_template("admin_dashboard.html")
+          flash("An error occurred while processing your request. Please try again later.", "error")
+          return render_template("admin_dashboard.html", stats=None)
 
 #Creates a route for the user login
 @app.route('/login', methods = ["POST", "GET"])
-def userLogin():
+def login():
      """"
      Handles the login process for administrators.
      It accepts both GET and POST requests.
@@ -234,7 +273,7 @@ def userLogin():
 
             #SQL Query to verify patient credentials
             login_query = """
-            SELECT id, first_name, last_name, email, password, address, phone,
+            SELECT id, first_name, last_name, email, password, phone,
              nrc, gender, date_of_birth
             FROM patient
             WHERE email = %s
@@ -252,16 +291,23 @@ def userLogin():
                 session['email'] = patient['email']
                 session['phone'] = patient['phone']
                 flash('Login successful! Welcome on board.', 'success')
-                return redirect(url_for('index'))
+                return render_template('patient_dashboard.html')
             else:
                 flash('No patient found with that email and password.', 'error')
-                return redirect(url_for(('login')))
+                return redirect(url_for('login'))
 
         except Error as e:
             flash(f'Database error: {str(e)}', 'error')
             return render_template('/login.html')
       #GET request, show the login form
      return render_template('/login.html')
+
+# user logout route
+@app.route('/logout')
+def logout():
+     session.clear()
+     flash("Logout successfully.", "success")
+     return redirect(url_for('login'))
 
 @app.route('/signUp', methods=["POST", "GET"])
 def signUp():
@@ -312,13 +358,14 @@ def signUp():
                cursor.execute(insert_query, (first_name, last_name, date_of_birth, gender, email, phone_number, nrc, hash_password))
                connection.commit()
                flash("You have successfully signed up!", 'success')
-               return redirect(url_for("signUp"))
+               return redirect(url_for("patient_dashboard"))
           except Error as e:
                print(f"Database error: {e}")
                flash("An error occurred while processing your request. Please try again later.", 'error')
      return render_template("signUp.html")
 
 @app.route("/create_offers", methods=["POST"])
+@login_required
 def create_offers():
      """Handles the creation of new offers. 
      This route is a placeholder and should be implemented with the actual logic to create offers in the system."""
@@ -328,24 +375,52 @@ def create_offers():
 
 
 @app.route("/view_patients", methods=["GET"])
+@login_required
 def view_patients():
      """Handles the viewing of patient information. 
      This route is a placeholder and should be implemented with the actual logic to view patients in the system."""
      connection = create_connection()
      if connection is None:
-          return "Database connection error. Please try again later."
+          flash("Database connection error. Please try again later.", "error")
+          return render_template("admin_dashboard.html", stats=None)
      try:
           cursor = connection.cursor(dictionary=True)
           #SQL query to get the total number of patients in the database
+          #total patient count
           cursor.execute("SELECT COUNT(*) AS total_patients FROM patient")
           total_patients = cursor.fetchone()['total_patients']
-          flash("Total registered patients in the database.", "success")
-          return render_template("/admin_dashboard.html", total_patients=total_patients)
+          # Paginated patient list (20 per page)
+          page     = max(1, int(request.args.get("page", 1)))
+          per_page = 20
+          offset   = (page - 1) * per_page
+          
+          #Selects all patients from the database ordered by registration date in descending order and limits the results to 20 per page based on the pagination parameters
+          cursor.execute(
+               "SELECT id, first_name, last_name, email, password, phone, nrc, gender, date_of_birth, registration_date "
+               "FROM patient ORDER BY registration_date DESC LIMIT %s OFFSET %s",
+               (per_page, offset),
+          )
+          # patient variable stores all the patient records fetched from the database based on the pagination parameters and is passed to the template for rendering the patient list on the admin dashboard
+          patients = cursor.fetchall()
+
+          total_pages = max(1, -(-total_patients // per_page))  # ceiling division
+
+          flash(f"Total registered patients in the database: {total_patients}", "success")
+          return render_template(
+               "view_patients.html",
+               stats={"total_patients": total_patients, "patients_today": None, "patients_this_month": None},
+               patients=patients,
+               page=page,
+               total_pages=total_pages,
+               total_patients=total_patients,
+          )
      except Error as e:  
           print(f"Database error: {e}")
+          flash("An error occurred while processing your request. Please try again later.", "error")
      return render_template("admin_dashboard.html")
 
 @app.route("/manage_patients", methods=["GET"])
+@login_required
 def manage_patients():
      """Handles the management of patient information. 
      This route is a placeholder and should be implemented with the actual logic to manage patients in the system."""
@@ -353,6 +428,7 @@ def manage_patients():
      return redirect(url_for('admin_dashboard'))
 
 @app.route("/system_settings", methods=["GET"])
+@login_required
 def system_settings():
      """Handles the management of system settings. 
      This route is a placeholder and should be implemented with the actual logic to manage system settings in the system."""

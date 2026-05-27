@@ -1,0 +1,822 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "weight" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .tonal-elevation {
+        box-shadow:
+          0px 1px 3px rgba(0, 0, 0, 0.05),
+          0px 10px 15px -3px rgba(0, 0, 0, 0.03);
+      }
+      /* Mobile menu drawer transition */
+      #mobile-menu {
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%);
+      }
+      #mobile-menu.active {
+        transform: translateX(0);
+      }
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#2563eb",
+              "surface-bright": "#f7f9fb",
+              surface: "#f7f9fb",
+              "surface-container-highest": "#e0e3e5",
+              "tertiary-container": "#cea700",
+              "surface-container-high": "#e6e8ea",
+              "tertiary-fixed": "#ffe083",
+              "inverse-surface": "#2d3133",
+              "on-primary-container": "#eeefff",
+              background: "#f7f9fb",
+              "surface-container": "#eceef0",
+              "primary-fixed-dim": "#b4c5ff",
+              "surface-container-low": "#f2f4f6",
+              "primary-fixed": "#dbe1ff",
+              "on-primary": "#ffffff",
+              "on-secondary-container": "#006f66",
+              outline: "#737686",
+              "on-primary-fixed-variant": "#003ea8",
+              "surface-variant": "#e0e3e5",
+              "on-primary-fixed": "#00174b",
+              "on-error": "#ffffff",
+              "on-background": "#191c1e",
+              "on-surface": "#191c1e",
+              "inverse-primary": "#b4c5ff",
+              tertiary: "#735c00",
+              error: "#ba1a1a",
+              "inverse-on-surface": "#eff1f3",
+              "on-tertiary-container": "#4e3d00",
+              "surface-tint": "#0053db",
+              "on-secondary-fixed-variant": "#005049",
+              "outline-variant": "#c3c6d7",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#89f5e7",
+              "on-secondary-fixed": "#00201d",
+              "secondary-container": "#86f2e4",
+              "on-error-container": "#93000a",
+              "surface-dim": "#d8dadc",
+              "on-tertiary-fixed-variant": "#574500",
+              "on-tertiary-fixed": "#231b00",
+              "error-container": "#ffdad6",
+              "tertiary-fixed-dim": "#eec200",
+              "surface-container-lowest": "#ffffff",
+              secondary: "#006a61",
+              "on-surface-variant": "#434655",
+              primary: "#004ac6",
+              "secondary-fixed-dim": "#6bd8cb",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              sm: "16px",
+              lg: "32px",
+              "container-max": "1440px",
+              base: "4px",
+              md: "24px",
+              xl: "48px",
+              gutter: "24px",
+              xs: "8px",
+            },
+            fontFamily: {
+              "body-base": ["Inter"],
+              "headline-md": ["Inter"],
+              "body-sm": ["Inter"],
+              "display-stat": ["Inter"],
+            },
+            fontSize: {
+              "body-base": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "label-caps": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-md": [
+                "20px",
+                { lineHeight: "28px", fontWeight: "600" },
+              ],
+              "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+              "display-stat": [
+                "36px",
+                {
+                  lineHeight: "44px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "display-stat-mobile": [
+                "28px",
+                { lineHeight: "34px", fontWeight: "700" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-surface text-on-surface">
+    <!-- TopNavBar -->
+    <header
+      class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-sm md:px-md h-16 bg-surface-container-lowest shadow-sm border-b border-surface-container-highest"
+    >
+      <div class="flex items-center gap-sm md:gap-md">
+        <button
+          class="md:hidden p-2 -ml-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
+          id="menu-toggle"
+        >
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <span
+          class="text-headline-md font-headline-md text-primary tracking-tight"
+          >MedCore Pro</span
+        >
+        <nav class="hidden md:flex gap-sm ml-xl">
+          <a
+            class="text-primary font-semibold border-b-2 border-primary py-xs font-body-base text-body-base"
+            href="#"
+            >Dashboard</a
+          >
+          <a
+            class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-xs rounded font-body-base text-body-base"
+            href="#"
+            >Schedules</a
+          >
+          <a
+            class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-xs rounded font-body-base text-body-base"
+            href="#"
+            >Reports</a
+          >
+        </nav>
+      </div>
+      <div class="flex items-center gap-xs md:gap-sm">
+        <div class="relative hidden lg:block">
+          <span
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+            >search</span
+          >
+          <input
+            class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-sm focus:ring-2 focus:ring-primary-container/20 w-64"
+            placeholder="Search patients..."
+            type="text"
+          />
+        </div>
+        <button
+          class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
+        >
+          <span class="material-symbols-outlined" data-icon="notifications"
+            >notifications</span
+          >
+        </button>
+        <button
+          class="hidden sm:block p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
+        >
+          <span class="material-symbols-outlined" data-icon="help">help</span>
+        </button>
+        <div
+          class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant"
+        >
+          <img
+            alt="Dr. Julianne Smith"
+            data-alt="A professional headshot of a female doctor with a kind expression, wearing a white lab coat and a stethoscope. The background is a brightly lit, clean medical clinic with soft blue accents, emphasizing a high-end and trustworthy healthcare atmosphere."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaUMfrZLmV9CGlAnsGWXuBVh-nLjBqbE24q-xSe6XoMfQUp2cx5osYiXM9v0oRCuA7BIwzOeohzowf3eh5CVBRn6xxWHnUsp_wTMzcyUWdpuCK-Ue1FYi1ddFf-lOffUZsww_1jcLAiCnPSIfOjUU8Kk7aOqxcG7CKvZOFZp5ma6Dh9QTPkBC7IXWOIMNVLQDU_aEj7jDfpD034Y7iiHsSGjLGSCDnJyx4Xafnf-3iVW7jbL0HLc8mgxUhmcOgHPGo2gnJMKTM2w"
+          />
+        </div>
+      </div>
+    </header>
+    <!-- Overlay for mobile menu -->
+    <div
+      class="fixed inset-0 bg-black/50 z-[55] hidden opacity-0 transition-opacity"
+      id="mobile-overlay"
+    ></div>
+    <!-- Mobile Navigation Drawer -->
+    <aside
+      class="fixed left-0 top-0 bottom-0 w-[280px] bg-surface-container-lowest z-[60] flex flex-col p-sm gap-xs shadow-xl md:hidden"
+      id="mobile-menu"
+    >
+      <div class="mb-lg px-xs py-sm flex justify-between items-start">
+        <div class="flex items-center gap-sm">
+          <div
+            class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary"
+          >
+            <span class="material-symbols-outlined">local_hospital</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-primary text-sm leading-tight">
+              City Central Clinic
+            </h2>
+            <p
+              class="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold"
+            >
+              Medical Group
+            </p>
+          </div>
+        </div>
+        <button
+          class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full"
+          id="close-menu"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <nav class="flex-1 flex flex-col gap-xs">
+        <a
+          class="bg-primary-container text-on-primary-container font-bold rounded-lg flex items-center gap-sm px-md py-sm transition-transform font-body-sm text-body-sm"
+          href="{{url_for('admin_dashboard')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="dashboard"
+            >dashboard</span
+          >
+          Dashboard
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="{{url_for('view_patients')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="group">group</span>
+          Patients
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="calendar_today"
+            >calendar_today</span
+          >
+          Appointments
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="settings"
+            >settings</span
+          >
+          Settings
+        </a>
+      </nav>
+      <div class="mt-auto pt-sm border-t border-surface-container-highest">
+        <button
+          class="w-full bg-primary text-on-primary py-sm rounded-lg font-semibold hover:opacity-90 transition-opacity mb-sm"
+        >
+          New Appointment
+        </button>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="{{url_for('admin_logout')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="logout"
+            >logout</span
+          >
+          Logout
+        </a>
+      </div>
+    </aside>
+    <!-- SideNavBar (Desktop only) -->
+    <aside
+      class="hidden md:flex fixed left-0 top-16 bottom-0 w-[240px] bg-surface-container-lowest border-r border-surface-container-highest flex-col p-sm gap-xs shadow-sm"
+    >
+      <div class="mb-lg px-xs py-sm">
+        <div class="flex items-center gap-sm">
+          <div
+            class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary"
+          >
+            <span class="material-symbols-outlined">local_hospital</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-primary text-sm leading-tight">
+              Medika AI
+            </h2>
+            <p
+              class="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold"
+            >
+              Medical Group
+            </p>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 flex flex-col gap-xs">
+        <a
+          class="bg-primary-container text-on-primary-container font-bold rounded-lg flex items-center gap-sm px-md py-sm scale-95 active:scale-100 transition-transform font-body-sm text-body-sm"
+          href="{{url_for('admin_dashboard')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="dashboard"
+            >dashboard</span
+          >
+          Dashboard
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="{{url_for('view_patients')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="group">group</span>
+          Patients
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="calendar_today"
+            >calendar_today</span
+          >
+          Appointments
+        </a>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="settings"
+            >settings</span
+          >
+          Settings
+        </a>
+      </nav>
+      <div class="mt-auto pt-sm border-t border-surface-container-highest">
+        <button
+          class="w-full bg-primary text-on-primary py-sm rounded-lg font-semibold hover:opacity-90 transition-opacity mb-sm"
+        >
+          New Appointment
+        </button>
+        <a
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-sm px-md py-sm transition-all font-body-sm text-body-sm"
+          href="{{url_for('admin_logout')}}"
+        >
+          <span class="material-symbols-outlined" data-icon="logout"
+            >logout</span
+          >
+          Logout
+        </a>
+      </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="md:ml-[240px] mt-16 p-sm md:p-lg">
+      <div class="max-w-container-max mx-auto">
+        <!-- Hero Section -->
+
+        <section class="mb-sm md:mb-lg px-xs md:px-0">
+          <h1
+            class="font-display-stat text-display-stat-mobile md:text-display-stat text-on-surface"
+          >
+            Welcome Back, Admin
+          </h1>
+          <p
+            class="font-body-base text-body-sm md:text-body-base text-on-surface-variant mt-xs"
+          >
+            Here is what's happening at City Central Clinic today.
+          </p>
+        </section>
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-sm md:gap-md mb-lg">
+          <!-- Total Patients -->
+          <div
+            class="bg-surface-container-lowest p-md rounded-xl tonal-elevation border-t-[3px] border-primary"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p
+                  class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-base"
+                >
+                  Total Patients
+                </p>
+                <h3
+                  class="font-display-stat text-2xl md:text-display-stat text-primary"
+                >
+                  {{stats['total_patients']}}
+                </h3>
+              </div>
+              <span
+                class="material-symbols-outlined text-primary-container opacity-20 text-3xl md:text-4xl"
+                >group</span
+              >
+            </div>
+          </div>
+          <!-- Registered Today -->
+          <div
+            class="bg-surface-container-lowest p-md rounded-xl tonal-elevation border-t-[3px] border-tertiary-container"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p
+                  class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-base"
+                >
+                  Registered Today
+                </p>
+                <h3
+                  class="font-display-stat text-2xl md:text-display-stat text-tertiary-container"
+                >
+                  {{stats['patients_today']}}
+                </h3>
+              </div>
+              <span
+                class="material-symbols-outlined text-tertiary-container opacity-20 text-3xl md:text-4xl"
+                >person_add</span
+              >
+            </div>
+          </div>
+          <!-- This Month -->
+          <div
+            class="bg-surface-container-lowest p-md rounded-xl tonal-elevation border-t-[3px] border-secondary"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <p
+                  class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-base"
+                >
+                  This Month
+                </p>
+                <h3
+                  class="font-display-stat text-2xl md:text-display-stat text-secondary"
+                >
+                  {{stats['patients_this_month']}}
+                </h3>
+              </div>
+              <span
+                class="material-symbols-outlined text-secondary-container opacity-20 text-3xl md:text-4xl"
+                >calendar_month</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Quick Actions -->
+        <p
+          class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-base"
+        >
+          Quick Actions
+        </p>
+        <section class="mb-lg px-xs md:px-0">
+          <div class="flex flex-col sm:flex-row gap-sm md:gap-md">
+            <a
+              href="{{url_for('view_patients')}}"
+              class="width: 100% sm:flex-1 md:flex-none flex items-center justify-center gap-xs px-md md:px-xl py-sm bg-primary text-on-primary rounded-lg font-semibold shadow-sm hover:shadow-md transition-all active:scale-95"
+            >
+              <span class="material-symbols-outlined">visibility</span>
+              View all patients
+            </a>
+            <a
+              href="{{url_for('signUp')}}"
+              class="width: 100% sm:flex-1 md:flex-none flex items-center justify-center gap-xs px-md md:px-xl py-sm bg-inverse-surface text-on-primary rounded-lg font-semibold shadow-sm hover:shadow-md transition-all active:scale-95"
+            >
+              <span class="material-symbols-outlined">add</span>
+              Add patient
+            </a>
+          </div>
+        </section>
+        <!-- Two-Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-sm md:gap-lg">
+          <!-- Recent Appointments (70%) -->
+          <div
+            class="lg:col-span-7 bg-surface-container-lowest rounded-xl tonal-elevation overflow-hidden"
+          >
+            <div
+              class="p-md border-b border-surface-container-highest flex justify-between items-center"
+            >
+              <h2 class="font-headline-md text-headline-md text-on-surface">
+                Recent Appointments
+              </h2>
+              <button
+                class="text-primary font-semibold text-body-sm hover:underline"
+              >
+                View Schedule
+              </button>
+            </div>
+            <div class="divide-y divide-surface-container-highest">
+              <!-- Row 1 -->
+              <div
+                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
+              >
+                <div class="flex items-center gap-sm md:gap-md">
+                  <div
+                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold text-sm md:text-base"
+                  >
+                    SJ
+                  </div>
+                  <div>
+                    <h4
+                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
+                    >
+                      Sarah Jenkins
+                    </h4>
+                    <p
+                      class="text-[12px] md:text-body-sm text-on-surface-variant"
+                    >
+                      General Consultation
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-sm md:gap-lg">
+                  <span
+                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
+                    >09:30 AM</span
+                  >
+                  <button
+                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined">more_vert</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Row 2 -->
+              <div
+                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
+              >
+                <div class="flex items-center gap-sm md:gap-md">
+                  <div
+                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-bold text-sm md:text-base"
+                  >
+                    MC
+                  </div>
+                  <div>
+                    <h4
+                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
+                    >
+                      Michael Chen
+                    </h4>
+                    <p
+                      class="text-[12px] md:text-body-sm text-on-surface-variant"
+                    >
+                      Annual Physical
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-sm md:gap-lg">
+                  <span
+                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
+                    >10:45 AM</span
+                  >
+                  <button
+                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined">more_vert</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Row 3 -->
+              <div
+                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
+              >
+                <div class="flex items-center gap-sm md:gap-md">
+                  <div
+                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold text-sm md:text-base"
+                  >
+                    ER
+                  </div>
+                  <div>
+                    <h4
+                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
+                    >
+                      Elena Rodriguez
+                    </h4>
+                    <p
+                      class="text-[12px] md:text-body-sm text-on-surface-variant"
+                    >
+                      Follow-up Visit
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-sm md:gap-lg">
+                  <span
+                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
+                    >01:15 PM</span
+                  >
+                  <button
+                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined">more_vert</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Row 4 -->
+              <div
+                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
+              >
+                <div class="flex items-center gap-sm md:gap-md">
+                  <div
+                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-sm md:text-base"
+                  >
+                    DW
+                  </div>
+                  <div>
+                    <h4
+                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
+                    >
+                      David Wilson
+                    </h4>
+                    <p
+                      class="text-[12px] md:text-body-sm text-on-surface-variant"
+                    >
+                      Specialist Referral
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-sm md:gap-lg">
+                  <span
+                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
+                    >03:00 PM</span
+                  >
+                  <button
+                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined">more_vert</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Right Column (30%) -->
+          <div
+            class="lg:col-span-3 flex flex-col gap-sm md:gap-lg mb-20 md:mb-0"
+          >
+            <!-- Data Insight Card -->
+            <div
+              class="bg-surface-container-lowest p-md rounded-xl tonal-elevation"
+            >
+              <div class="flex items-center gap-xs mb-sm">
+                <span
+                  class="material-symbols-outlined text-primary"
+                  style="font-variation-settings: &quot;FILL&quot; 1"
+                  >insights</span
+                >
+                <h3 class="font-headline-md text-sm text-on-surface">
+                  Data Insight
+                </h3>
+              </div>
+              <p
+                class="text-body-sm text-on-surface-variant mb-md leading-relaxed"
+              >
+                Patient intake has increased by
+                <span class="text-secondary font-bold">12%</span> this week.
+                Consider opening an additional slot for morning consultations to
+                maintain wait-time efficiency.
+              </p>
+              <div
+                class="h-1 bg-surface-container-high rounded-full overflow-hidden"
+              >
+                <div class="h-full bg-secondary w-3/4"></div>
+              </div>
+            </div>
+            <!-- Marketing/Image Card -->
+            <div
+              class="relative rounded-xl overflow-hidden tonal-elevation group h-[240px] md:h-[280px]"
+            >
+              <img
+                alt="Clinic Workflow Optimization"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                data-alt="A futuristic medical dashboard displayed on a sleek, transparent glass screen. A professional healthcare administrator is subtly blurred in the background of a modern clinic corridor with soft blue and white lighting. The image emphasizes digital efficiency, medical precision, and a clean, organized healthcare environment using a high-key light mode aesthetic."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZvqWwJFntAU152zKtGCCjMkXNZxsCiPDp7muYxmEFaz-pJBA8cq3gP8i7RUmxjTLo5QE2_gSVsMfmrUW8Hj-x-2qTuSOolP7VKPz1cgM6_1iFYzP_ZKo3nsEriksFN5Ao6QWpFDoGUbqOgYkD-IP_dOMwZiaHbqtYF13zyl6Yrsn8E-Dr1XhpkCFFn-csAbwJjZsJM5jn-kI3fdTi6-p5gfKULiCSKbHJwOyE2dl3Gbq-e4Zt4GH0uo0V-u-o5DAkcHyaYBc8cA"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-md"
+              >
+                <h3
+                  class="text-white font-headline-md text-base md:text-lg mb-xs"
+                >
+                  Optimizing Clinic Workflow
+                </h3>
+                <p
+                  class="text-white/80 text-[12px] md:text-body-sm line-clamp-2 mb-sm"
+                >
+                  Discover how new automation tools are reducing administrative
+                  overhead by 40%.
+                </p>
+                <button
+                  class="bg-white text-on-surface py-2 px-md rounded-lg text-body-sm font-semibold self-start hover:bg-primary hover:text-on-primary transition-colors"
+                >
+                  Read Guide
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Bottom Navigation Bar (Mobile only) -->
+    <div
+      class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-surface-container-highest z-50 flex items-center justify-around px-sm"
+    >
+      <a
+        class="flex flex-col items-center gap-1 text-primary"
+        href="{{url_for('admin_dashboard')}}"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >dashboard</span
+        >
+        <span class="text-[10px] font-bold">Dash</span>
+      </a>
+      <a
+        class="flex flex-col items-center gap-1 text-on-surface-variant"
+        href="{{url_for('view_patients')}}"
+      >
+        <span class="material-symbols-outlined">group</span>
+        <span class="text-[10px]">Patients</span>
+      </a>
+      <a
+        class="flex flex-col items-center gap-1 text-on-surface-variant"
+        href="#"
+      >
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span class="text-[10px]">Apps</span>
+      </a>
+      <a
+        class="flex flex-col items-center gap-1 text-on-surface-variant"
+        href="#"
+      >
+        <span class="material-symbols-outlined">settings</span>
+        <span class="text-[10px]">Settings</span>
+      </a>
+    </div>
+    <script>
+      // Mobile menu toggle logic
+      const menuToggle = document.getElementById("menu-toggle");
+      const closeMenu = document.getElementById("close-menu");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+
+      function toggleMenu() {
+        const isActive = mobileMenu.classList.contains("active");
+        if (isActive) {
+          mobileMenu.classList.remove("active");
+          mobileOverlay.classList.add("hidden");
+          mobileOverlay.classList.remove("opacity-100");
+        } else {
+          mobileMenu.classList.add("active");
+          mobileOverlay.classList.remove("hidden");
+          setTimeout(() => mobileOverlay.classList.add("opacity-100"), 10);
+        }
+      }
+
+      menuToggle.addEventListener("click", toggleMenu);
+      closeMenu.addEventListener("click", toggleMenu);
+      mobileOverlay.addEventListener("click", toggleMenu);
+
+      // Simple micro-interaction for active states
+      document.querySelectorAll("nav a").forEach((link) => {
+        link.addEventListener("click", function (e) {
+          // If it's a side nav or top nav link
+          const isSideNav = this.closest("aside");
+          const links = isSideNav
+            ? document.querySelectorAll("aside nav a")
+            : document.querySelectorAll("header nav a");
+
+          links.forEach((l) => {
+            l.classList.remove(
+              "bg-primary-container",
+              "text-on-primary-container",
+              "font-bold",
+              "border-b-2",
+              "border-primary",
+              "text-primary",
+            );
+            l.classList.add("text-on-surface-variant");
+          });
+
+          if (isSideNav) {
+            this.classList.add(
+              "bg-primary-container",
+              "text-on-primary-container",
+              "font-bold",
+            );
+            this.classList.remove("text-on-surface-variant");
+          } else {
+            this.classList.add(
+              "text-primary",
+              "font-semibold",
+              "border-b-2",
+              "border-primary",
+            );
+            this.classList.remove("text-on-surface-variant");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

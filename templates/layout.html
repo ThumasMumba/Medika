@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medika AI---Integrated-Health-Management</title>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <span
+          class="close-btn"
+          onclick="this.parentElement.style.display = 'none'"
+          >&times;</span
+        >
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="body">
+    {%block body%}{% endblock %} {% block scripts %}
+    <script>
+      const menuBtn = document.querySelector(".hamburger");
+      const navLinks = document.querySelector(".nav-links");
+      menuBtn.addEventListener("click", () => {
+        menuBtn.classList.toggle("active");
+        navLinks.classList.toggle("active");
+      });
+      document.querySelectorAll(".nav-links a").forEach((link) =>
+        link.addEventListener("click", () => {
+          menuBtn.classList.remove("active");
+          navLinks.classList.remove("active");
+        }),
+      );
+    </script>
+    {% endblock %}
+  </body>
+</html>
