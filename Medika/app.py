@@ -10,24 +10,23 @@ from mysql.connector import Error
 app = Flask(__name__)
 admin_password = "admin123"
 hash_password = generate_password_hash(admin_password)
-print("Store this in DB: ", hash_password)
+# print("Store this in DB: ", hash_password)
 
 # Add this configuration to ensure HTML files process Jinja2 syntax
 app.jinja_env.add_extension('jinja2.ext.do')
 app.secret_key = 'medika_ai_secret_key'
 
-# Connects to the MYSQL database and store the results in the variable conn
-#in order to execute statements we are going to create a cursor which is a function
 # We define a function that checks if the connection to the database was a success or not
 def create_connection():
     try:
+         # Connects to the MYSQL database and store the results in the variable conn
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
             password="",
-            database="medika"
         )
-
+        
+        #in order to execute statements we are going to create a cursor which is a function
         cursor = connection.cursor()
 
         cursor.execute("CREATE DATABASE IF NOT EXISTS medika")
@@ -274,7 +273,7 @@ def login():
 
             #SQL Query to verify patient credentials
             login_query = """
-            SELECT id, first_name, last_name, email, password, address, phone,
+            SELECT id, first_name, last_name, email, password, phone,
              nrc, gender, date_of_birth
             FROM patient
             WHERE email = %s
@@ -292,10 +291,10 @@ def login():
                 session['email'] = patient['email']
                 session['phone'] = patient['phone']
                 flash('Login successful! Welcome on board.', 'success')
-                return redirect(url_for('index'))
+                return render_template('patient_dashboard.html')
             else:
                 flash('No patient found with that email and password.', 'error')
-                return redirect(url_for(('login')))
+                return redirect(url_for('login'))
 
         except Error as e:
             flash(f'Database error: {str(e)}', 'error')
@@ -359,7 +358,7 @@ def signUp():
                cursor.execute(insert_query, (first_name, last_name, date_of_birth, gender, email, phone_number, nrc, hash_password))
                connection.commit()
                flash("You have successfully signed up!", 'success')
-               return redirect(url_for("signUp"))
+               return redirect(url_for("patient_dashboard"))
           except Error as e:
                print(f"Database error: {e}")
                flash("An error occurred while processing your request. Please try again later.", 'error')
