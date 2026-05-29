@@ -24,6 +24,7 @@ def create_connection():
             host="localhost",
             user="root",
             password="",
+            connection_timeout=10
         )
         
         #in order to execute statements we are going to create a cursor which is a function
