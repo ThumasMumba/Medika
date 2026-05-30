@@ -1,0 +1,1 @@
+#Empty python file to make the Medika_AI_Model a package. This allows us to import modules from this directory in other parts of the application.

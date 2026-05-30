@@ -1,0 +1,19 @@
+#virtual environment
+venv/
+
+__pycache__/
+# Visual Studio
+.vs/
+
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Python virtual environments
+venv/
+.venv/
+env/
