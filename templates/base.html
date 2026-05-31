@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medika AI---Integrated-Health-Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/patient.css" />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#171f33",
+              "on-primary-fixed-variant": "#003ea8",
+              "tertiary-fixed": "#6ffbbe",
+              "error-container": "#93000a",
+              "on-tertiary-container": "#bdffdb",
+              "on-error-container": "#ffdad6",
+              "on-tertiary-fixed": "#002113",
+              "on-secondary-container": "#00424e",
+              "surface-dim": "#0b1326",
+              "surface-bright": "#31394d",
+              "on-surface": "#dae2fd",
+              "on-primary-fixed": "#00174b",
+              "secondary-container": "#03b5d3",
+              "surface-container-highest": "#2d3449",
+              "surface-tint": "#b4c5ff",
+              "on-secondary-fixed": "#001f26",
+              "primary-fixed": "#dbe1ff",
+              "on-primary": "#002a78",
+              "on-error": "#690005",
+              background: "#0b1326",
+              "surface-container-low": "#131b2e",
+              "on-background": "#dae2fd",
+              "surface-variant": "#2d3449",
+              "surface-container-high": "#222a3d",
+              "primary-fixed-dim": "#b4c5ff",
+              "on-tertiary": "#003824",
+              "inverse-on-surface": "#283044",
+              "on-primary-container": "#eeefff",
+              "on-tertiary-fixed-variant": "#005236",
+              "outline-variant": "#434655",
+              "primary-container": "#2563eb",
+              "inverse-surface": "#dae2fd",
+              "surface-container-lowest": "#060e20",
+              "secondary-fixed": "#acedff",
+              surface: "#0b1326",
+              error: "#ffb4ab",
+              "tertiary-fixed-dim": "#4edea3",
+              secondary: "#4cd7f6",
+              outline: "#8d90a0",
+              "tertiary-container": "#007d55",
+              "on-surface-variant": "#c3c6d7",
+              "on-secondary-fixed-variant": "#004e5c",
+              "secondary-fixed-dim": "#4cd7f6",
+              "on-secondary": "#003640",
+              "inverse-primary": "#0053db",
+              tertiary: "#4edea3",
+              primary: "#b4c5ff",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              xs: "4px",
+              sm: "12px",
+              "margin-desktop": "48px",
+              md: "24px",
+              lg: "40px",
+              "margin-mobile": "16px",
+              gutter: "24px",
+              xl: "64px",
+              base: "8px",
+            },
+            fontFamily: {
+              "headline-md": ["Outfit"],
+              "body-lg": ["Inter"],
+              "label-md": ["Inter"],
+              "display-lg": ["Outfit"],
+              "headline-lg-mobile": ["Outfit"],
+              "headline-lg": ["Outfit"],
+              "body-md": ["Inter"],
+              caption: ["Inter"],
+            },
+            fontSize: {
+              "headline-md": [
+                "24px",
+                { lineHeight: "32px", fontWeight: "500" },
+              ],
+              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+              "label-md": [
+                "14px",
+                {
+                  lineHeight: "20px",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "display-lg": [
+                "48px",
+                {
+                  lineHeight: "56px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "headline-lg-mobile": [
+                "24px",
+                { lineHeight: "32px", fontWeight: "600" },
+              ],
+              "headline-lg": [
+                "32px",
+                {
+                  lineHeight: "40px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              caption: ["12px", { lineHeight: "16px", fontWeight: "400" }],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="body">
+    {%block body%}{% endblock %}
+    <script>
+      // Drawer Logic
+      const menuBtn = document.getElementById("menu-btn");
+      const drawerOverlay = document.getElementById("drawer-overlay");
+      const body = document.body;
+
+      const toggleDrawer = () => {
+        const isOpen = body.classList.contains("drawer-open");
+        if (isOpen) {
+          body.classList.remove("drawer-open");
+          body.classList.add("drawer-closed");
+        } else {
+          body.classList.add("drawer-open");
+          body.classList.remove("drawer-closed");
+        }
+      };
+
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleDrawer();
+      });
+
+      drawerOverlay.addEventListener("click", toggleDrawer);
+
+      // Simulate real-time Heart Rate updates
+      const hrValueElement = document.getElementById("heart-rate-value");
+      setInterval(() => {
+        if (!hrValueElement) return;
+        const currentHR = parseInt(hrValueElement.innerText);
+        const fluctuation = Math.floor(Math.random() * 5) - 2; // -2 to +2
+        let nextHR = currentHR + fluctuation;
+
+        if (nextHR < 70) nextHR = 72;
+        if (nextHR > 95) nextHR = 90;
+
+        hrValueElement.innerText = nextHR;
+      }, 3000);
+
+      // Tab Switching Logic (except menu which triggers drawer)
+      const navButtons = document.querySelectorAll("[data-nav]");
+      navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.getAttribute("data-nav") === "menu") return;
+
+          navButtons.forEach((b) => {
+            b.classList.remove(
+              "bg-secondary-container",
+              "text-on-secondary-container",
+              "shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]",
+            );
+            b.classList.add("text-on-surface-variant");
+            const icon = b.querySelector(".material-symbols-outlined");
+            if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+          });
+
+          btn.classList.add(
+            "bg-secondary-container",
+            "text-on-secondary-container",
+            "shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]",
+          );
+          btn.classList.remove("text-on-surface-variant");
+          const activeIcon = btn.querySelector(".material-symbols-outlined");
+          if (activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+        });
+      });
+
+      const aiBtn = document.getElementById("ai-assistant");
+      aiBtn.addEventListener("click", () => {
+        alert(
+          "Medika AI Assistant: 'How can I help you with your health records today, {{session['first_name']}}?'",
+        );
+      });
+    </script>
+  </body>
+</html>

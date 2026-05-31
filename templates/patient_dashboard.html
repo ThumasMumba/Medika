@@ -1,503 +1,390 @@
-<!doctype html>
-<html class="dark" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-      name="viewport"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <title>MedikaAI - Patient Dashboard</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <style>
-      .glass-card {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .inner-glow {
-        box-shadow:
-          inset 0 1px 1px rgba(255, 255, 255, 0.05),
-          inset 0 -1px 1px rgba(0, 0, 0, 0.2);
-      }
-      .outer-glow-primary {
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
-      }
-      .neon-border-cyan {
-        box-shadow: 0 0 10px rgba(76, 215, 246, 0.3);
-        border: 1px solid rgba(76, 215, 246, 0.5);
-      }
-      @keyframes pulse-glow {
-        0% {
-          transform: scale(1);
-          opacity: 0.8;
-          box-shadow: 0 0 0 0px rgba(78, 222, 163, 0.4);
-        }
-        70% {
-          transform: scale(1.05);
-          opacity: 1;
-          box-shadow: 0 0 0 15px rgba(78, 222, 163, 0);
-        }
-        100% {
-          transform: scale(1);
-          opacity: 0.8;
-          box-shadow: 0 0 0 0px rgba(78, 222, 163, 0);
-        }
-      }
-      .animate-pulse-glow {
-        animation: pulse-glow 3s infinite ease-in-out;
-      }
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-    </style>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "tertiary-fixed": "#6ffbbe",
-              "inverse-surface": "#dae2fd",
-              "surface-container-high": "#222a3d",
-              background: "#0b1326",
-              "on-primary-container": "#eeefff",
-              "primary-fixed-dim": "#b4c5ff",
-              "surface-container": "#171f33",
-              "surface-container-low": "#131b2e",
-              "primary-fixed": "#dbe1ff",
-              surface: "#0b1326",
-              "surface-bright": "#31394d",
-              "primary-container": "#2563eb",
-              "surface-container-highest": "#2d3449",
-              "tertiary-container": "#007d55",
-              "on-primary-fixed-variant": "#003ea8",
-              "on-background": "#dae2fd",
-              "on-primary-fixed": "#00174b",
-              "on-error": "#690005",
-              "surface-variant": "#2d3449",
-              "on-surface": "#dae2fd",
-              tertiary: "#4edea3",
-              "inverse-primary": "#0053db",
-              "on-primary": "#002a78",
-              "on-secondary-container": "#00424e",
-              outline: "#8d90a0",
-              "on-secondary": "#003640",
-              "outline-variant": "#434655",
-              "on-tertiary": "#003824",
-              "secondary-fixed": "#acedff",
-              "on-secondary-fixed": "#001f26",
-              "inverse-on-surface": "#283044",
-              error: "#ffb4ab",
-              "on-tertiary-container": "#bdffdb",
-              "surface-tint": "#b4c5ff",
-              "on-secondary-fixed-variant": "#004e5c",
-              secondary: "#4cd7f6",
-              "surface-container-lowest": "#060e20",
-              "tertiary-fixed-dim": "#4edea3",
-              "on-surface-variant": "#c3c6d7",
-              "secondary-fixed-dim": "#4cd7f6",
-              primary: "#b4c5ff",
-              "surface-dim": "#0b1326",
-              "secondary-container": "#03b5d3",
-              "on-error-container": "#ffdad6",
-              "on-tertiary-fixed-variant": "#005236",
-              "on-tertiary-fixed": "#002113",
-              "error-container": "#93000a",
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              full: "9999px",
-            },
-            spacing: {
-              "margin-desktop": "48px",
-              base: "8px",
-              xs: "4px",
-              xl: "64px",
-              sm: "12px",
-              lg: "40px",
-              "margin-mobile": "16px",
-              md: "24px",
-              gutter: "24px",
-            },
-            fontFamily: {
-              "headline-md": ["Outfit"],
-              "display-lg": ["Outfit"],
-              "body-lg": ["Inter"],
-              "label-md": ["Inter"],
-              caption: ["Inter"],
-              "headline-lg-mobile": ["Outfit"],
-              "headline-lg": ["Outfit"],
-              "body-md": ["Inter"],
-            },
-            fontSize: {
-              "headline-md": [
-                "24px",
-                { lineHeight: "32px", fontWeight: "500" },
-              ],
-              "display-lg": [
-                "48px",
-                {
-                  lineHeight: "56px",
-                  letterSpacing: "-0.02em",
-                  fontWeight: "700",
-                },
-              ],
-              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-              "label-md": [
-                "14px",
-                {
-                  lineHeight: "20px",
-                  letterSpacing: "0.05em",
-                  fontWeight: "600",
-                },
-              ],
-              caption: ["12px", { lineHeight: "16px", fontWeight: "400" }],
-              "headline-lg-mobile": [
-                "24px",
-                { lineHeight: "32px", fontWeight: "600" },
-              ],
-              "headline-lg": [
-                "32px",
-                {
-                  lineHeight: "40px",
-                  letterSpacing: "-0.01em",
-                  fontWeight: "600",
-                },
-              ],
-              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      body {
-        min-height: max(884px, 100dvh);
-      }
-    </style>
-  </head>
-  <body
-    class="bg-background text-on-background font-body-md min-h-screen pb-32"
-  >
-    <!-- Top App Bar -->
-    <header
-      class="bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(37,99,235,0.1)] fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16"
+{% extends "base.html" %}
+{% block title %}Medika Patient Dashboard{% endblock %}
+{% block body %} 
+{#  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <span
+          class="close-btn"
+          onclick="this.parentElement.style.display = 'none'"
+          >&times;</span
+        >
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %} #}
+<!-- Navigation Drawer -->
+    <div
+      class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
+      id="drawer-overlay"
+    ></div>
+    <aside
+      class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full"
+      id="nav-drawer"
     >
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary" data-icon="menu"
-          >menu</span
+      <div class="flex flex-col h-full p-md">
+        <div class="flex items-center gap-3 mb-xl">
+          <span
+            class="material-symbols-outlined text-primary text-3xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >clinical_notes</span
+          >
+          <span
+            class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+            >Medika</span
+          >
+        </div>
+        <nav class="flex-1 space-y-2">
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
+              >person</span
+            >
+            <span class="font-label-md text-label-md">Profile</span>
+          </a>
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+              >description</span
+            >
+            <span class="font-label-md text-label-md">Health Records</span>
+          </a>
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
+              >calendar_month</span
+            >
+            <span class="font-label-md text-label-md">Appointments</span>
+          </button>
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+              >settings</span
+            >
+            <span class="font-label-md text-label-md">Settings</span>
+        </a>
+        </nav>
+        <div class="mt-auto pt-md border-t border-white/10">
+          <a
+            href="{{url_for('logout')}}"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:scale-110 transition-transform"
+              >logout</span
+            >
+            <span class="font-label-md text-label-md font-bold">Logout</span>
+        </a>
+        </div>
+      </div>
+    </aside>
+    <!-- Top Navigation Bar -->
+    <nav
+      class="fixed top-0 w-full z-50 bg-surface-dim/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-margin-mobile py-base shadow-[0_0_20px_rgba(37,99,235,0.1)]"
+    >
+      <div class="flex items-center gap-2">
+        <span
+          class="material-symbols-outlined text-primary"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >clinical_notes</span
         >
-        <h1
-          class="font-headline-md text-headline-md font-bold tracking-tight text-primary"
+        <span
+          class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+          >Medika</span
         >
-          Medika
-        </h1>
       </div>
       <div class="flex items-center gap-4">
         <button
-          class="relative hover:bg-white/5 transition-colors p-2 rounded-full active:scale-95 duration-200"
+          class="material-symbols-outlined text-on-surface-variant hover:brightness-110 active:scale-95 duration-200"
         >
-          <span
-            class="material-symbols-outlined text-on-surface-variant"
-            data-icon="notifications"
-            >notifications</span
-          >
-          <span
-            class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full border-2 border-background"
-          ></span>
+          notifications
         </button>
         <div
           class="w-8 h-8 rounded-full overflow-hidden border border-primary/30"
         >
           <img
-            alt="Alex Rivers"
             class="w-full h-full object-cover"
-            data-alt="A professional studio headshot of a young male patient with a friendly expression, set against a clean, softly lit architectural background with cool blue and white tones that match a high-end medical clinic aesthetic. The lighting is crisp and modern, emphasizing clarity and health."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN6Fjv2KPpzQlAGVZWV4ujcldsXPoXcuiE4mJzb-HSZ-39yBgIkCcrDH68Z9LxomCPZUpWO5rVfXdvBxGcbTDDiDTnA0Hp2o1-Zpnhf72xB8lkbhHu38748qs0zCePn1tF3bocA0ap6_t5JCTTaDX0IkDeb_Zn1PLlZwh9yjgoM3iNjxdcdlq3-6hbXq5LH-Y3Hz72txV6Jbl0Q2ByYoNP3trKjdmDBswXYvIlgzxMH_cUbzmTUTsWuagcM_gHk8Zq1yhMddZ4Jg"
+            data-alt="A professional headshot of a young male patient"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzQZGgQnp24xrbCjL2iAOh8vN3rBIoSM7eyWYJS7QgXf0vD010LWyu4et6Oyd1GiJzKgEU8eVdW-1z8NXq1jIpMHKhnK10tByn6wDKkjz2zVSqnLzDoDQOIKlpQkCCHl6IohsH6pVU4w2icSV6QjCxq-93cmGK_zLbjSHA_1qnO7rOrHYd79VrcZFEjtbDkZiuL58XGQw5Vn9TBCex-GMZhtgryNR-3NVv2etlSUWBUckf89Ubaw1CGeSE-T8ZUlcK_tw-OjDqVw"
           />
         </div>
       </div>
-    </header>
-    <main class="pt-20 px-margin-mobile flex flex-col gap-8">
+    </nav>
+    <!-- Main Content Canvas -->
+    <main class="mt-20 px-margin-mobile space-y-md">
       <!-- Welcome Hero Section -->
-      <section
-        class="relative overflow-hidden glass-card rounded-3xl p-6 outer-glow-primary"
-      >
-        <div class="relative z-10">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <p
-                class="font-label-md text-label-md text-primary tracking-widest uppercase mb-1"
-              >
-                Hello, {{session['first_name']}}!
-              </p>
-              <h2
-                class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface"
-              >
-                Your Health is Peak
-              </h2>
-            </div>
-            <div
-              class="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-tertiary/20 border border-tertiary/30"
+      <section class="glass-card rounded-3xl p-md relative overflow-hidden">
+        <div class="flex justify-between items-start z-10 relative">
+          <div class="space-y-1">
+            <p class="font-label-md text-label-md text-secondary">Dashboard</p>
+            <h1
+              class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface"
             >
-              <span class="font-display-lg text-[20px] font-bold text-tertiary"
+              Welcome back, {{session['first_name']}}
+            </h1>
+            <p
+              class="font-caption text-caption text-on-surface-variant max-w-[180px]"
+            >
+              Your health recovery is on track for the month.
+            </p>
+          </div>
+          <!-- Health Score Circular Progress -->
+          <div class="relative w-20 h-20">
+            <svg class="w-full h-full transform -rotate-90">
+              <circle
+                class="text-white/10"
+                cx="40"
+                cy="40"
+                fill="transparent"
+                r="34"
+                stroke="currentColor"
+                stroke-width="6"
+              ></circle>
+              <circle
+                class="text-secondary drop-shadow-[0_0_8px_rgba(3,181,211,0.5)]"
+                cx="40"
+                cy="40"
+                fill="transparent"
+                r="34"
+                stroke="currentColor"
+                stroke-dasharray="213.6"
+                stroke-dashoffset="17"
+                stroke-width="6"
+              ></circle>
+            </svg>
+            <div
+              class="absolute inset-0 flex items-center justify-center flex-col"
+            >
+              <span
+                class="font-headline-md text-[18px] leading-tight text-on-surface"
                 >92%</span
               >
-              <span class="text-[10px] uppercase font-bold text-tertiary/70"
-                >Score</span
-              >
             </div>
           </div>
-          <p class="text-on-surface-variant max-w-[200px] mb-4">
-            Your vitals have improved by 4% since last month. Keep up the
-            hydration.
-          </p>
+        </div>
+        <div class="mt-md flex gap-3">
           <button
-            class="bg-primary-container text-on-primary-container font-label-md px-6 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform inner-glow"
+            class="bg-gradient-to-r from-primary to-secondary text-on-primary-fixed px-md py-sm rounded-xl font-label-md text-label-md glow-primary active:scale-95 transition-all"
           >
             View Insights
-            <span
-              class="material-symbols-outlined text-[18px]"
-              data-icon="arrow_forward"
-              >arrow_forward</span
-            >
           </button>
         </div>
-        <!-- Abstract 3D-Style Medical Asset -->
+        <!-- Decorative Glow Background -->
         <div
-          class="absolute -right-4 -bottom-4 w-40 h-40 opacity-40 mix-blend-screen pointer-events-none"
-        >
-          <div
-            class="w-full h-full bg-gradient-to-tr from-primary to-secondary rounded-full blur-[40px] animate-pulse"
-          ></div>
-        </div>
-        <div
-          class="absolute right-2 top-1/2 -translate-y-1/2 opacity-80 pointer-events-none"
-        >
-          <span
-            class="material-symbols-outlined text-[120px] text-primary/10 select-none"
-            data-icon="clinical_notes"
-            style="font-variation-settings: &quot;FILL&quot; 1"
-            >clinical_notes</span
-          >
-        </div>
+          class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/20 blur-[60px] rounded-full"
+        ></div>
       </section>
-      <!-- Horizontal Quick Stats -->
-      <section>
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="font-headline-md text-[18px] text-on-surface">
-            Today's Focus
-          </h3>
-          <button class="text-secondary text-sm font-medium">View All</button>
-        </div>
-        <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-          <!-- Stat Card 1 -->
-          <div
-            class="glass-card min-w-[260px] p-5 rounded-2xl flex flex-col gap-4"
+      <!-- Today's Focus Horizontal Cards -->
+      <section class="space-y-sm">
+        <h2
+          class="font-label-md text-label-md text-on-surface-variant flex items-center justify-between px-1"
+        >
+          TODAY'S FOCUS
+          <span class="material-symbols-outlined text-[16px]"
+            >arrow_forward</span
           >
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20"
-              >
-                <span
-                  class="material-symbols-outlined"
-                  data-icon="calendar_today"
-                  >calendar_today</span
-                >
-              </div>
-              <div>
-                <p class="text-caption text-on-surface-variant">Next Visit</p>
-                <p class="font-label-md text-on-surface">Today, 2:00 PM</p>
-              </div>
-            </div>
-            <div class="flex items-center justify-between mt-auto">
-              <div class="flex items-center gap-2">
-                <div
-                  class="w-6 h-6 rounded-full overflow-hidden border border-white/10"
-                >
-                  <img
-                    alt="#"
-                    class="w-full h-full object-cover"
-                    data-alt="A close-up portrait of a professional male doctor in a white coat with a stethoscope around his neck, smiling warmly in a bright, modern medical setting. The scene uses soft lighting and a professional bokeh background to emphasize trust and expertise."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKFU9C5MvG-61O4XKjreUUDPs20Eff4t-hKRIDvRLfWMIOPsRsxfbwjta96uUOACZ9aTYZGB7a41oT4lr1ELa83YoftPWkxDEoXdQNS5YCWg49W6JSJmPlRbgo27Sxz3bdTik-XccpYFKaKTOCs1W4t7-63deo99i8UCr8Mdm1ur7deiC-T2RG9MV9apNtFFpClKtrxu388vPg8_C02xISFwm2d8Jyis-hHB4dsVvZ4i8yNzJbGsj_ChbrGauMyXWkE49nfAI0UA"
-                  />
-                </div>
-                <span class="text-sm font-medium"
-                  >{{ session.get('first_name') }} {{ session.get('last_name')
-                  }}</span
-                >
-              </div>
+        </h2>
+        <div class="flex overflow-x-auto gap-md hide-scrollbar pb-2">
+          <!-- Next Visit Card -->
+          <div
+            class="glass-card min-w-[280px] rounded-2xl p-sm flex items-center gap-sm"
+          >
+            <div
+              class="w-14 h-14 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center"
+            >
               <span
-                class="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                >Cardiology</span
+                class="material-symbols-outlined text-secondary"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >medical_services</span
               >
             </div>
-          </div>
-          <!-- Stat Card 2 -->
-          <div
-            class="glass-card min-w-[260px] p-5 rounded-2xl flex flex-col gap-4"
-          >
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary border border-tertiary/20"
-              >
-                <span class="material-symbols-outlined" data-icon="medication"
-                  >medication</span
-                >
-              </div>
-              <div>
-                <p class="text-caption text-on-surface-variant">Active Meds</p>
-                <p class="font-label-md text-on-surface">3 Prescriptions</p>
-              </div>
-            </div>
-            <div class="flex flex-col gap-2 mt-auto">
-              <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                <div class="h-full bg-tertiary w-2/3"></div>
-              </div>
-              <p class="text-[10px] text-tertiary font-medium">
-                Next dose in 1h 20m
+            <div>
+              <p class="font-label-md text-label-md text-on-surface">
+                {session['']}
+              </p>
+              <p class="font-caption text-caption text-secondary">
+                Cardiology • 2:30 PM
               </p>
             </div>
           </div>
-        </div>
-      </section>
-      <!-- Health Analytics -->
-      <section class="grid grid-cols-1 gap-4">
-        <h3 class="font-headline-md text-[18px] text-on-surface">
-          Live Vitals
-        </h3>
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Heart Rate -->
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden">
-            <div class="flex justify-between items-start mb-2">
-              <span
-                class="material-symbols-outlined text-error"
-                data-icon="favorite"
-                style="font-variation-settings: &quot;FILL&quot; 1"
-                >favorite</span
+          <!-- Medication Tracker Card -->
+          <div class="glass-card min-w-[280px] rounded-2xl p-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-tertiary"
+                  >pill</span
+                >
+                <span class="font-label-md text-label-md text-on-surface"
+                  >Medication Tracker</span
+                >
+              </div>
+              <span class="font-caption text-caption text-tertiary"
+                >2/3 Done</span
               >
-              <span class="text-[10px] text-tertiary font-bold">+2 bpm</span>
             </div>
-            <p class="text-caption text-on-surface-variant">Heart Rate</p>
-            <h4
-              class="font-headline-lg-mobile text-[24px] text-on-surface mb-4"
-            >
-              72
-              <span class="text-sm font-normal text-on-surface-variant"
-                >bpm</span
-              >
-            </h4>
-            <div class="h-10 w-full flex items-end gap-1">
-              <div class="w-full h-[40%] bg-primary/20 rounded-t-sm"></div>
-              <div class="w-full h-[60%] bg-primary/20 rounded-t-sm"></div>
-              <div class="w-full h-[50%] bg-primary/20 rounded-t-sm"></div>
-              <div class="w-full h-[80%] bg-primary/40 rounded-t-sm"></div>
-              <div class="w-full h-[70%] bg-primary/60 rounded-t-sm"></div>
-              <div class="w-full h-[90%] bg-primary rounded-t-sm"></div>
+            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+              <div
+                class="bg-tertiary h-full rounded-full w-[66%] shadow-[0_0_10px_rgba(78,222,163,0.3)]"
+              ></div>
             </div>
           </div>
-          <!-- Blood Pressure -->
+        </div>
+      </section>
+      <!-- Live Vitals Grid -->
+      <section class="grid grid-cols-2 gap-md">
+        <!-- Heart Rate Card -->
+        <div
+          class="glass-card rounded-2xl p-md space-y-base overflow-hidden relative"
+        >
+          <div class="flex justify-between items-center">
+            <span
+              class="material-symbols-outlined text-error"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >favorite</span
+            >
+            <span class="font-caption text-caption text-on-surface-variant"
+              >BPM</span
+            >
+          </div>
+          <div>
+            <span
+              class="font-display-lg text-[32px] leading-tight text-on-surface"
+              id="heart-rate-value"
+              >78</span
+            >
+            <span class="text-error font-caption text-[10px] ml-1">▲ 2%</span>
+          </div>
+          <svg class="w-full h-10 mt-2" viewbox="0 0 100 40">
+            <path
+              class="vitals-path"
+              d="M0,35 Q10,10 20,30 T40,25 T60,35 T80,10 T100,30"
+              fill="none"
+              stroke="#ffb4ab"
+              stroke-width="2"
+            ></path>
+            <rect
+              fill="url(#grad1)"
+              height="40"
+              opacity="0.1"
+              width="100"
+            ></rect>
+            <defs>
+              <lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+                <stop
+                  offset="0%"
+                  style="stop-color: #ffb4ab; stop-opacity: 1"
+                ></stop>
+                <stop
+                  offset="100%"
+                  style="stop-color: #ffb4ab; stop-opacity: 0"
+                ></stop>
+              </lineargradient>
+            </defs>
+          </svg>
+        </div>
+        <!-- Blood Pressure Card -->
+        <div
+          class="glass-card rounded-2xl p-md space-y-base overflow-hidden relative"
+        >
+          <div class="flex justify-between items-center">
+            <span
+              class="material-symbols-outlined text-secondary"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >blood_pressure</span
+            >
+            <span class="font-caption text-caption text-on-surface-variant"
+              >mmHg</span
+            >
+          </div>
+          <div>
+            <span
+              class="font-display-lg text-[32px] leading-tight text-on-surface"
+              >118/72</span
+            >
+            <span class="text-tertiary font-caption text-[10px] ml-1"
+              >Stable</span
+            >
+          </div>
+          <div class="mt-4 flex gap-1 items-end h-6">
+            <div class="w-full bg-secondary/20 h-[40%] rounded-t-sm"></div>
+            <div class="w-full bg-secondary/40 h-[60%] rounded-t-sm"></div>
+            <div class="w-full bg-secondary/20 h-[50%] rounded-t-sm"></div>
+            <div class="w-full bg-secondary/60 h-[80%] rounded-t-sm"></div>
+            <div class="w-full bg-secondary/30 h-[45%] rounded-t-sm"></div>
+          </div>
+        </div>
+      </section>
+      <!-- Quick Action Grid (2x2) -->
+      <section class="grid grid-cols-2 gap-md">
+        <button
+          class="glass-card hover:bg-white/5 p-md rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
+        >
           <div
-            class="glass-card p-4 rounded-2xl relative overflow-hidden neon-border-cyan"
+            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:glow-primary transition-all"
           >
-            <div class="flex justify-between items-start mb-2">
-              <span
-                class="material-symbols-outlined text-secondary"
-                data-icon="speed"
-                >speed</span
-              >
-              <span class="text-[10px] text-on-surface-variant font-bold"
-                >Stable</span
-              >
-            </div>
-            <p class="text-caption text-on-surface-variant">Blood Pressure</p>
-            <h4
-              class="font-headline-lg-mobile text-[24px] text-on-surface mb-4"
+            <span class="material-symbols-outlined text-primary"
+              >calendar_add_on</span
             >
-              120<span class="text-[16px] text-on-surface-variant">/80</span>
-            </h4>
-            <svg class="w-full h-10" viewbox="0 0 100 40">
-              <path
-                class="text-secondary"
-                d="M0 35 Q 20 10, 40 30 T 100 5"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-width="3"
-              ></path>
-            </svg>
           </div>
-        </div>
-      </section>
-      <!-- Quick Actions Grid -->
-      <section>
-        <h3 class="font-headline-md text-[18px] text-on-surface mb-4">
-          Quick Actions
-        </h3>
-        <div class="grid grid-cols-3 gap-4">
-          <button
-            class="flex flex-col items-center gap-2 p-3 glass-card rounded-2xl active:scale-95 transition-all group"
+          <span class="font-label-md text-label-md text-on-surface"
+            >Book Visit</span
           >
-            <div
-              class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:bg-primary group-hover:text-background transition-colors"
-            >
-              <span class="material-symbols-outlined" data-icon="add_box"
-                >add_box</span
-              >
-            </div>
-            <span
-              class="text-[10px] font-bold text-on-surface-variant uppercase text-center"
-              >Book Appointment</span
-            >
-          </button>
-          <button
-            class="flex flex-col items-center gap-2 p-3 glass-card rounded-2xl active:scale-95 transition-all group"
+        </button>
+        <button
+          class="glass-card hover:bg-white/5 p-md rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center group-hover:glow-secondary transition-all"
           >
-            <div
-              class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20 group-hover:bg-secondary group-hover:text-background transition-colors"
+            <span class="material-symbols-outlined text-secondary"
+              >pill_off</span
             >
-              <span class="material-symbols-outlined" data-icon="autorenew"
-                >Auto renew</span
-              >
-            </div>
-            <span
-              class="text-[10px] font-bold text-on-surface-variant uppercase text-center"
-              >Refill Request</span
-            >
-          </button>
-          <button
-            class="flex flex-col items-center gap-2 p-3 glass-card rounded-2xl active:scale-95 transition-all group"
+          </div>
+          <span class="font-label-md text-label-md text-on-surface"
+            >Refill Req</span
           >
-            <div
-              class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary border border-tertiary/20 group-hover:bg-tertiary group-hover:text-background transition-colors"
+        </button>
+        <button
+          class="glass-card hover:bg-white/5 p-md rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(78,222,163,0.3)] transition-all"
+          >
+            <span class="material-symbols-outlined text-tertiary">science</span>
+          </div>
+          <span class="font-label-md text-label-md text-on-surface"
+            >Lab Results</span
+          >
+        </button>
+        <button
+          class="glass-card hover:bg-white/5 p-md rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-on-surface-variant/10 flex items-center justify-center transition-all"
+          >
+            <span class="material-symbols-outlined text-on-surface-variant"
+              >forum</span
             >
-              <span class="material-symbols-outlined" data-icon="smart_toy"
-                >smart_toy</span
-              >
-            </div>
-            <span
-              class="text-[10px] font-bold text-on-surface-variant uppercase text-center"
-              >Chat with AI</span
-            >
-          </button>
-        </div>
+          </div>
+          <span class="font-label-md text-label-md text-on-surface"
+            ><a href="{{url_for('ai_ui')}}">Chat AI</a></span
+          >
+        </button>
       </section>
       <!-- Appointments List -->
       <section>
@@ -530,129 +417,93 @@
                 <p class="text-xs text-on-surface-variant">09:15 AM</p>
               </div>
             </div>
-            <button
-              class="w-full py-2.5 bg-secondary text-on-secondary font-label-md rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            <div
+              class="w-10 h-10 rounded-full bg-tertiary/20 flex items-center justify-center text-tertiary pulse-animation"
             >
-              <span
-                class="material-symbols-outlined text-[18px]"
-                data-icon="videocam"
-                >videocam</span
-              >
-              Join Virtual Room
-            </button>
+              <span class="material-symbols-outlined">videocam</span>
+            </div>
           </div>
+          <button
+            class="mt-md w-full py-sm bg-tertiary text-on-tertiary-fixed font-label-md text-label-md rounded-xl hover:brightness-110 active:scale-[0.98] transition-all"
+          >
+            Join Virtual Room
+          </button>
         </div>
       </section>
-      <!-- Emergency & Bio Info -->
-      <section class="mb-12">
-        <div
-          class="bg-error/10 border border-error/20 rounded-2xl p-4 flex gap-4 items-center"
-        >
+      <!-- Emergency Profile -->
+      <section
+        class="glass-card rounded-2xl p-md flex items-center justify-between"
+      >
+        <div class="flex items-center gap-sm">
           <div
-            class="w-12 h-12 rounded-xl bg-error/20 flex items-center justify-center text-error"
+            class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center"
           >
-            <span class="material-symbols-outlined" data-icon="emergency"
-              >emergency</span
+            <span class="material-symbols-outlined text-error"
+              >emergency_home</span
             >
           </div>
-          <div class="flex-1 grid grid-cols-2 gap-4">
-            <div>
-              <p
-                class="text-[10px] text-error font-bold uppercase tracking-wider"
-              >
-                Blood Group
-              </p>
-              <p class="font-headline-md text-[20px] text-on-surface">
-                O Positive
-              </p>
-            </div>
-            <div>
-              <p
-                class="text-[10px] text-error font-bold uppercase tracking-wider"
-              >
-                Allergies
-              </p>
-              <p class="text-sm text-on-surface leading-tight">
-                Penicillin, Shellfish
-              </p>
-            </div>
+          <div>
+            <p class="font-label-md text-label-md text-on-surface">
+              Emergency Profile
+            </p>
+            <p class="font-caption text-caption text-on-surface-variant">
+              Blood: O+ | No Allergies
+            </p>
           </div>
         </div>
+        <span class="material-symbols-outlined text-on-surface-variant"
+          >chevron_right</span
+        >
       </section>
     </main>
-    <!-- AI Assistant FAB -->
-    <div class="fixed bottom-24 right-6 z-50">
-      <button
-        class="w-16 h-16 rounded-full bg-gradient-to-tr from-tertiary to-primary flex items-center justify-center text-on-primary-container shadow-2xl animate-pulse-glow group"
-      >
-        <span
-          class="material-symbols-outlined text-[32px]"
-          data-icon="model_training"
-          style="font-variation-settings: &quot;FILL&quot; 1"
-          >model_training</span
-        >
-      </button>
-    </div>
-    <!-- Bottom Navigation Bar -->
-    <nav
-      class="bg-surface-container/90 dark:bg-surface-container/90 backdrop-blur-md border-t border-white/10 shadow-[0_-4px_20px_rgba(37,99,235,0.1)] fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-safe z-50 rounded-t-xl"
+    <!-- Floating AI Assistant Widget -->
+    <button
+      class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-tr from-secondary to-primary rounded-full glow-secondary flex items-center justify-center z-50 active:scale-90 transition-transform"
+      id="ai-assistant"
     >
-      <a
-        class="flex flex-col items-center justify-center text-secondary font-bold scale-110"
-        href="#"
+      <span
+        class="material-symbols-outlined text-on-primary-fixed text-[30px]"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >smart_toy</span
       >
-        <span
-          class="material-symbols-outlined"
-          data-icon="home_health"
-          style="font-variation-settings: &quot;FILL&quot; 1"
-          >home_health</span
-        >
-        <span class="font-label-md text-label-md">Home</span>
-      </a>
-      <a
-        class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-secondary transition-transform active:scale-90 duration-200"
-        href="#"
+    </button>
+    <!-- Bottom Navigation Bar -->
+    <div
+      class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+    >
+      <nav
+        class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
       >
-        <span class="material-symbols-outlined" data-icon="event_note"
-          >event_note</span
+        <button
+          class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+          data-nav="home"
         >
-        <span class="font-label-md text-label-md">Schedule</span>
-      </a>
-      <a
-        class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-secondary transition-transform active:scale-90 duration-200"
-        href="#"
-      >
-        <span class="material-symbols-outlined" data-icon="analytics"
-          >analytics</span
+          <span
+            class="material-symbols-outlined"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >home</span
+          >
+        </button>
+        <button
+          class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+          data-nav="schedule"
         >
-        <span class="font-label-md text-label-md">Health</span>
-      </a>
-      <a
-        class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-secondary transition-transform active:scale-90 duration-200"
-        href="#"
-      >
-        <span class="material-symbols-outlined" data-icon="more_horiz"
-          >more_horiz</span
+          <span class="material-symbols-outlined">calendar_today</span>
+        </button>
+        <button
+          class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+          data-nav="vitals"
         >
-        <span class="font-label-md text-label-md">Menu</span>
-      </a>
-    </nav>
-    <script>
-      // Simple interactive pulse for medical cards
-      document.querySelectorAll(".glass-card").forEach((card) => {
-        card.addEventListener("click", () => {
-          card.classList.add("brightness-110");
-          setTimeout(() => card.classList.remove("brightness-110"), 150);
-        });
-      });
+          <span class="material-symbols-outlined">vital_signs</span>
+        </button>
+        <button
+          class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+          data-nav="menu"
+          id="menu-btn"
+        >
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </nav>
+    </div>
 
-      // Floating AI FAB mini-interaction
-      const aiFab = document.querySelector(".animate-pulse-glow");
-      if (aiFab) {
-        aiFab.addEventListener("click", () => {
-          alert("AI Assistant is analyzing your latest vitals...");
-        });
-      }
-    </script>
-  </body>
-</html>
+{% endblock %}
