@@ -1,6 +1,8 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
 from functools import wraps
+from flask_cors import CORS
+from routes.ai_routes import ai_app
 from flask import Flask, get_flashed_messages, render_template, request, flash, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 #Imports the mysql.connector in order to handle database operations
@@ -10,12 +12,13 @@ from mysql.connector import Error
 app = Flask(__name__)
 admin_password = "admin123"
 hash_password = generate_password_hash(admin_password)
-# print("Store this in DB: ", hash_password)
+print("Store this in DB: ", hash_password)
 
 # Add this configuration to ensure HTML files process Jinja2 syntax
 app.jinja_env.add_extension('jinja2.ext.do')
 app.secret_key = 'medika_ai_secret_key'
-
+CORS(app)
+app.register_blueprint(ai_app)  # Register the AI routes under the /ai prefix
 # We define a function that checks if the connection to the database was a success or not
 def create_connection():
     try:
@@ -54,7 +57,7 @@ def initialize_db():
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             first_name VARCHAR(100) NOT NULL,
                             last_name VARCHAR(100) NOT NULL,
-                            date_of_birth VARCHAR(50) NOT NULL,
+                            date_of_birth DATE NOT NULL,
                             gender VARCHAR(10) NOT NULL,
                             nrc VARCHAR(20) UNIQUE NOT NULL,
                             phone VARCHAR(20) UNIQUE NOT NULL,
@@ -75,6 +78,7 @@ def initialize_db():
                             specialization VARCHAR(100) NOT NULL,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             has_registered BOOLEAN DEFAULT FALSE
+                            
                        )
      """)
         #SQL query to create appointments table if it does not exists
@@ -86,7 +90,8 @@ def initialize_db():
                             appointment_date DATE NOT NULL,
                             appointment_time TIME NOT NULL,
                             status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            INDEX(id, patient_id, doctor_id)
                        )
      """) 
      #    SQL query  to create admin table if it does not exists
@@ -116,6 +121,17 @@ def login_required(f):
         if not session.get('admin_logged_in'):
             flash("Please log in to access the admin dashboard.", "error")
             return redirect(url_for("adminLogin"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+def patient_required(f):
+    """Decorator: redirect to login if the patient is not authenticated."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('patient_logged_in'):
+            flash("Please log in to access the patient dashboard.", "error")
+            return redirect(url_for("login"))
         return f(*args, **kwargs)
     return decorated
 
@@ -247,6 +263,13 @@ def admin_dashboard():
           flash("An error occurred while processing your request. Please try again later.", "error")
           return render_template("admin_dashboard.html", stats=None)
 
+@app.route("/ai_ui", methods=["GET"])
+@patient_required
+def ai_ui():
+     """Renders the AI UI page. 
+     This page is intended to provide an interface for AI-related features and functionalities."""
+     return render_template("ai_ui.html")
+
 #Creates a route for the user login
 @app.route('/login', methods = ["POST", "GET"])
 def login():
@@ -309,6 +332,15 @@ def logout():
      session.clear()
      flash("Logout successfully.", "success")
      return redirect(url_for('login'))
+
+@app.route("/patient_dashboard", methods=["POST", "GET"])
+@patient_required
+def patient_dashboard():
+     """
+     Handles the patient dashboard data that when the patient submits their symptoms and other ailments
+     """
+     #
+     return render_template("patient_dashboard.html")
 
 @app.route('/signUp', methods=["POST", "GET"])
 def signUp():
