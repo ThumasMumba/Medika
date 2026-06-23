@@ -1,0 +1,866 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Patient Health Records | Medika</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#dbe1ff",
+              "tertiary-fixed-dim": "#4edea3",
+              "surface-bright": "#31394d",
+              "primary-fixed-dim": "#b4c5ff",
+              "surface-dim": "#0b1326",
+              "inverse-primary": "#0053db",
+              "tertiary-fixed": "#6ffbbe",
+              "secondary-fixed-dim": "#4cd7f6",
+              error: "#ffb4ab",
+              "surface-tint": "#b4c5ff",
+              "on-surface-variant": "#c3c6d7",
+              "surface-container-high": "#222a3d",
+              secondary: "#4cd7f6",
+              primary: "#b4c5ff",
+              "on-surface": "#dae2fd",
+              surface: "#0b1326",
+              "on-error-container": "#ffdad6",
+              "inverse-surface": "#dae2fd",
+              "surface-container": "#171f33",
+              "on-error": "#690005",
+              "on-tertiary": "#003824",
+              tertiary: "#4edea3",
+              "surface-container-highest": "#2d3449",
+              "on-secondary-fixed": "#001f26",
+              background: "#0b1326",
+              "on-tertiary-container": "#bdffdb",
+              "surface-variant": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "on-primary-container": "#eeefff",
+              "on-tertiary-fixed": "#002113",
+              "surface-container-low": "#131b2e",
+              "inverse-on-surface": "#283044",
+              "secondary-fixed": "#acedff",
+              "on-secondary": "#003640",
+              "on-secondary-container": "#00424e",
+              "on-primary-fixed-variant": "#003ea8",
+              "secondary-container": "#03b5d3",
+              "on-primary-fixed": "#00174b",
+              "outline-variant": "#434655",
+              outline: "#8d90a0",
+              "error-container": "#93000a",
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-tertiary-fixed-variant": "#005236",
+              "on-background": "#dae2fd",
+              "tertiary-container": "#007d55",
+              "on-primary": "#002a78",
+              "primary-container": "#2563eb",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              md: "24px",
+              lg: "40px",
+              base: "8px",
+              "margin-desktop": "48px",
+              xs: "4px",
+              gutter: "24px",
+              sm: "12px",
+              "margin-mobile": "16px",
+              xl: "64px",
+            },
+            fontFamily: {
+              "body-lg": ["Inter"],
+              "headline-lg-mobile": ["Outfit"],
+              "label-md": ["Inter"],
+              "body-md": ["Inter"],
+              "headline-lg": ["Outfit"],
+              caption: ["Inter"],
+              "headline-md": ["Outfit"],
+              "display-lg": ["Outfit"],
+            },
+            fontSize: {
+              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+              "headline-lg-mobile": [
+                "24px",
+                { lineHeight: "32px", fontWeight: "600" },
+              ],
+              "label-md": [
+                "14px",
+                {
+                  lineHeight: "20px",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "headline-lg": [
+                "32px",
+                {
+                  lineHeight: "40px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              caption: ["12px", { lineHeight: "16px", fontWeight: "400" }],
+              "headline-md": [
+                "24px",
+                { lineHeight: "32px", fontWeight: "500" },
+              ],
+              "display-lg": [
+                "48px",
+                {
+                  lineHeight: "56px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #0b1326;
+        color: #dae2fd;
+        -webkit-font-smoothing: antialiased;
+      }
+      .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .glass-card:hover {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(180, 197, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      }
+      .neomorph-inner {
+        box-shadow:
+          inset 2px 2px 5px rgba(0, 0, 0, 0.4),
+          inset -1px -1px 3px rgba(255, 255, 255, 0.05);
+      }
+      .neon-glow {
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(180, 197, 255, 0.2);
+        border-radius: 10px;
+      }
+      @keyframes pulse-slow {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+      .animate-pulse-slow {
+        animation: pulse-slow 4s infinite ease-in-out;
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="custom-scrollbar font-body-md overflow-x-hidden">
+    <!-- Background Atmospheric Effect -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full animate-pulse-slow"
+      ></div>
+      <div
+        class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[100px] rounded-full animate-pulse-slow"
+      ></div>
+    </div>
+    <!-- TopAppBar Shell -->
+    <nav
+      class="fixed top-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-md py-sm"
+    >
+      <div class="flex items-center gap-sm">
+        <div
+          class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-white/10 transition-transform active:scale-95"
+        >
+          <img
+            alt="Profile"
+            class="w-full h-full object-cover"
+            data-alt="A professional studio headshot of a patient user for a medical application, featuring a soft-lit, high-detail portrait against a clean, minimalist dark background. The lighting is ethereal and sophisticated with a slight cool blue tint to match a futuristic clinical aesthetic."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrwGocQFaNK4EPWPdg9LiZkOAnO5AsYLm0tdsCk7ehmTqwdUX99p3s1YhcplEwxBb2GSVS-AsYoaL8MjXZhndbv35PDLXhCymWfWITU9bTDGpKe37EGyIYN97cdKWokDrhH8-c0WucXzr3udXOyGj5YB50nqRNFRjsPbu3236LLb2LD-atiT5PF5M70cLX7cv51CyIGNX0Hgh3LejN5Tu9-jd9Xs61nPi5rugXQ_4ffw4OKku8qgP9yOjwzydCmoaZTcb6OzbzlA"
+          />
+        </div>
+        <h1
+          class="font-display-lg text-display-lg font-bold text-primary leading-none hidden md:block"
+        >
+          Medika
+        </h1>
+        <h1
+          class="font-headline-md text-headline-md font-bold text-primary md:hidden"
+        >
+          Medika
+        </h1>
+      </div>
+      <div class="flex items-center gap-md">
+        <button
+          class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95"
+          data-icon="search"
+        >
+          search
+        </button>
+        <button
+          class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95"
+          data-icon="notifications"
+        >
+          notifications
+        </button>
+      </div>
+    </nav>
+    <!-- Main Content Canvas -->
+    <main
+      class="relative z-10 pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto"
+    >
+      <!-- Header & Filter Section -->
+      <header class="mb-lg space-y-md">
+        <div
+          class="flex flex-col md:flex-row md:items-end justify-between gap-md"
+        >
+          <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
+              Medical Records
+            </h2>
+            <p class="text-on-surface-variant font-body-md">
+              Your clinical history, reports, and digital prescriptions in one
+              secure vault.
+            </p>
+          </div>
+          <div class="flex gap-sm">
+            <button
+              class="flex items-center gap-xs bg-primary-container text-on-primary-container px-md py-sm rounded-xl font-label-md transition-transform active:scale-95 shadow-lg neon-glow"
+            >
+              <span
+                class="material-symbols-outlined text-[20px]"
+                data-icon="upload_file"
+                >upload_file</span
+              >
+              Add New
+            </button>
+          </div>
+        </div>
+        <!-- Category Chips -->
+        <div class="flex gap-sm overflow-x-auto pb-2 custom-scrollbar">
+          <button
+            class="whitespace-nowrap px-md py-sm rounded-full bg-secondary-container/20 text-secondary border border-secondary/30 font-label-md transition-all"
+          >
+            All Records
+          </button>
+          <button
+            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+          >
+            Lab Reports
+          </button>
+          <button
+            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+          >
+            Imaging
+          </button>
+          <button
+            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+          >
+            Prescriptions
+          </button>
+          <button
+            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+          >
+            Vaccinations
+          </button>
+        </div>
+      </header>
+      <!-- Records Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <!-- Recent Activity / High Priority -->
+        <section class="lg:col-span-12">
+          <h3
+            class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
+          >
+            Recently Updated
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <!-- Feature Record 1 -->
+            <div
+              class="glass-card rounded-2xl p-md flex flex-col gap-md relative overflow-hidden group"
+            >
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-all"
+              ></div>
+              <div class="flex justify-between items-start">
+                <div class="flex gap-sm">
+                  <div
+                    class="w-12 h-12 rounded-xl bg-tertiary-container/20 text-tertiary flex items-center justify-center border border-tertiary/20"
+                  >
+                    <span class="material-symbols-outlined" data-icon="biotech"
+                      >biotech</span
+                    >
+                  </div>
+                  <div>
+                    <h4 class="font-headline-md text-on-surface">
+                      Full Blood Count
+                    </h4>
+                    <span
+                      class="text-caption text-on-surface-variant uppercase tracking-wider"
+                      >LAB REPORT • 24 OCT 2023</span
+                    >
+                  </div>
+                </div>
+                <span
+                  class="px-sm py-1 rounded-full bg-tertiary/20 text-tertiary text-[10px] font-bold border border-tertiary/30"
+                  >CRITICAL</span
+                >
+              </div>
+              <div class="flex-grow">
+                <p class="text-body-md text-on-surface-variant line-clamp-2">
+                  Comprehensive metabolic panel including glucose, calcium, and
+                  electrolytes. Results processed by Central Labs.
+                </p>
+              </div>
+              <div class="flex gap-sm pt-sm border-t border-white/5">
+                <button
+                  class="flex-1 py-sm rounded-lg bg-surface-container-highest text-primary font-label-md hover:bg-surface-variant transition-colors flex items-center justify-center gap-xs"
+                >
+                  <span
+                    class="material-symbols-outlined text-[18px]"
+                    data-icon="visibility"
+                    >visibility</span
+                  >
+                  View
+                </button>
+                <button
+                  class="w-12 h-10 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center border border-white/5"
+                >
+                  <span
+                    class="material-symbols-outlined text-[18px]"
+                    data-icon="download"
+                    >download</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Feature Record 2 -->
+            <div
+              class="glass-card rounded-2xl p-md flex flex-col gap-md relative overflow-hidden group"
+            >
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-secondary/10 transition-all"
+              ></div>
+              <div class="flex justify-between items-start">
+                <div class="flex gap-sm">
+                  <div
+                    class="w-12 h-12 rounded-xl bg-secondary-container/20 text-secondary flex items-center justify-center border border-secondary/20"
+                  >
+                    <span
+                      class="material-symbols-outlined"
+                      data-icon="radiology"
+                      >radiology</span
+                    >
+                  </div>
+                  <div>
+                    <h4 class="font-headline-md text-on-surface">
+                      Lumbar Spine MRI
+                    </h4>
+                    <span
+                      class="text-caption text-on-surface-variant uppercase tracking-wider"
+                      >IMAGING • 12 OCT 2023</span
+                    >
+                  </div>
+                </div>
+                <span
+                  class="px-sm py-1 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold border border-secondary/30"
+                  >STABLE</span
+                >
+              </div>
+              <div class="flex-grow">
+                <p class="text-body-md text-on-surface-variant line-clamp-2">
+                  High-resolution MRI of the lower back area. Provided with 3D
+                  reconstruction and radiologist notes.
+                </p>
+              </div>
+              <div class="flex gap-sm pt-sm border-t border-white/5">
+                <button
+                  class="flex-1 py-sm rounded-lg bg-surface-container-highest text-primary font-label-md hover:bg-surface-variant transition-colors flex items-center justify-center gap-xs"
+                >
+                  <span
+                    class="material-symbols-outlined text-[18px]"
+                    data-icon="visibility"
+                    >visibility</span
+                  >
+                  View
+                </button>
+                <button
+                  class="w-12 h-10 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center border border-white/5"
+                >
+                  <span
+                    class="material-symbols-outlined text-[18px]"
+                    data-icon="download"
+                    >download</span
+                  >
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Categorized List -->
+        <section class="lg:col-span-8 space-y-md">
+          <h3
+            class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
+          >
+            Detailed Records
+          </h3>
+          <!-- Category Group: Prescriptions -->
+          <div class="space-y-sm">
+            <div class="flex items-center gap-sm px-sm">
+              <span
+                class="material-symbols-outlined text-primary"
+                data-icon="prescriptions"
+                >prescriptions</span
+              >
+              <h4 class="font-headline-md text-on-surface">Prescriptions</h4>
+              <span
+                class="text-caption bg-surface-container-highest px-2 py-0.5 rounded-full text-on-surface-variant"
+                >12 total</span
+              >
+            </div>
+            <div class="space-y-2">
+              <!-- List Item 1 -->
+              <div
+                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
+              >
+                <div class="flex items-center gap-md">
+                  <div
+                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
+                  >
+                    <span
+                      class="material-symbols-outlined text-on-surface-variant"
+                      data-icon="medication"
+                      >medication</span
+                    >
+                  </div>
+                  <div>
+                    <p class="font-label-md text-on-surface">
+                      Amoxicillin 500mg
+                    </p>
+                    <p class="text-caption text-on-surface-variant">
+                      Dr. Aris Thorne • Sep 15, 2023
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-xs">
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="visibility"
+                      >visibility</span
+                    >
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="download"
+                      >download</span
+                    >
+                  </button>
+                </div>
+              </div>
+              <!-- List Item 2 -->
+              <div
+                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
+              >
+                <div class="flex items-center gap-md">
+                  <div
+                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
+                  >
+                    <span
+                      class="material-symbols-outlined text-on-surface-variant"
+                      data-icon="medication"
+                      >medication</span
+                    >
+                  </div>
+                  <div>
+                    <p class="font-label-md text-on-surface">Lisinopril 10mg</p>
+                    <p class="text-caption text-on-surface-variant">
+                      Dr. Aris Thorne • Aug 22, 2023
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-xs">
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="visibility"
+                      >visibility</span
+                    >
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="download"
+                      >download</span
+                    >
+                  </button>
+                </div>
+              </div>
+              <!-- List Item 3 -->
+              <div
+                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
+              >
+                <div class="flex items-center gap-md">
+                  <div
+                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
+                  >
+                    <span
+                      class="material-symbols-outlined text-on-surface-variant"
+                      data-icon="history_edu"
+                      >history_edu</span
+                    >
+                  </div>
+                  <div>
+                    <p class="font-label-md text-on-surface">
+                      Physiotherapy Referral
+                    </p>
+                    <p class="text-caption text-on-surface-variant">
+                      General Wellness Clinic • Jul 10, 2023
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-xs">
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="visibility"
+                      >visibility</span
+                    >
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[20px]"
+                      data-icon="download"
+                      >download</span
+                    >
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Category Group: Vaccinations -->
+          <div class="space-y-sm pt-md">
+            <div class="flex items-center gap-sm px-sm">
+              <span
+                class="material-symbols-outlined text-tertiary"
+                data-icon="vaccines"
+                >vaccines</span
+              >
+              <h4 class="font-headline-md text-on-surface">Vaccinations</h4>
+            </div>
+            <div
+              class="glass-card rounded-xl overflow-hidden border border-white/5"
+            >
+              <table class="w-full text-left font-body-md border-collapse">
+                <thead>
+                  <tr
+                    class="bg-surface-container-high/50 text-on-surface-variant text-[12px] uppercase tracking-wider"
+                  >
+                    <th class="px-md py-sm font-label-md">Vaccine</th>
+                    <th class="px-md py-sm font-label-md">Date</th>
+                    <th class="px-md py-sm font-label-md">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-md py-sm text-on-surface">
+                      COVID-19 Booster
+                    </td>
+                    <td class="px-md py-sm text-on-surface-variant">
+                      Dec 12, 2023
+                    </td>
+                    <td class="px-md py-sm">
+                      <button
+                        class="text-primary font-label-md hover:underline"
+                      >
+                        Certificate
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-md py-sm text-on-surface">
+                      Annual Influenza
+                    </td>
+                    <td class="px-md py-sm text-on-surface-variant">
+                      Nov 05, 2023
+                    </td>
+                    <td class="px-md py-sm">
+                      <button
+                        class="text-primary font-label-md hover:underline"
+                      >
+                        Download
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <!-- Sidebar Insights -->
+        <aside class="lg:col-span-4 space-y-gutter">
+          <!-- Health Insight Card -->
+          <div
+            class="glass-card rounded-2xl p-md border-primary/20 bg-primary/5"
+          >
+            <div class="flex items-center gap-sm mb-sm text-primary">
+              <span class="material-symbols-outlined" data-icon="lightbulb"
+                >lightbulb</span
+              >
+              <h5 class="font-label-md tracking-wider uppercase">
+                AI Health Insights
+              </h5>
+            </div>
+            <p
+              class="text-body-md text-on-surface-variant leading-relaxed mb-md"
+            >
+              Your latest
+              <span class="text-primary font-bold">Lab Reports</span> show a 12%
+              improvement in Vitamin D levels compared to June. Keep up your
+              current supplementation routine.
+            </p>
+            <div
+              class="h-32 w-full bg-surface-container-lowest rounded-xl relative overflow-hidden p-sm"
+            >
+              <!-- Mini Graph Representation -->
+              <div
+                class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-primary/20 to-transparent"
+              ></div>
+              <svg
+                class="w-full h-full text-primary"
+                preserveaspectratio="none"
+                viewbox="0 0 100 40"
+              >
+                <path
+                  d="M0 35 Q 25 30, 40 20 T 70 15 T 100 5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  vector-effect="non-scaling-stroke"
+                ></path>
+              </svg>
+              <div
+                class="absolute top-2 right-2 flex items-center gap-1 text-primary"
+              >
+                <span
+                  class="material-symbols-outlined text-xs"
+                  data-icon="trending_up"
+                  >trending_up</span
+                >
+                <span class="text-[10px] font-bold">+12%</span>
+              </div>
+            </div>
+          </div>
+          <!-- Secure Vault Status -->
+          <div class="glass-card rounded-2xl p-md">
+            <div class="flex items-center justify-between mb-md">
+              <div class="flex items-center gap-sm">
+                <span
+                  class="material-symbols-outlined text-on-surface-variant"
+                  data-icon="lock"
+                  >lock</span
+                >
+                <h5 class="font-label-md text-on-surface">Privacy Vault</h5>
+              </div>
+              <span
+                class="w-2 h-2 rounded-full bg-tertiary animate-pulse"
+              ></span>
+            </div>
+            <div class="space-y-sm">
+              <div class="flex justify-between text-caption">
+                <span class="text-on-surface-variant">Storage used</span>
+                <span class="text-on-surface">1.2 GB / 5 GB</span>
+              </div>
+              <div
+                class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"
+              >
+                <div
+                  class="h-full bg-primary rounded-full"
+                  style="width: 24%"
+                ></div>
+              </div>
+              <p
+                class="text-[11px] text-on-surface-variant mt-md text-center italic"
+              >
+                All documents are encrypted using AES-256 standards.
+              </p>
+            </div>
+          </div>
+          <!-- Doctor Access Card -->
+          <div class="glass-card rounded-2xl p-md border-white/5">
+            <h5 class="font-label-md text-on-surface mb-md">
+              Active Permissions
+            </h5>
+            <div class="space-y-sm">
+              <div class="flex items-center gap-sm p-sm bg-white/5 rounded-xl">
+                <div
+                  class="w-8 h-8 rounded-full overflow-hidden border border-white/10"
+                >
+                  <img
+                    alt="Doctor"
+                    class="w-full h-full object-cover"
+                    data-alt="A portrait of a senior male medical specialist in a clean white coat with a stethoscope around his neck, looking professional and trustworthy. The background is a blurred high-tech medical facility with cool ambient lighting and blue accents, reflecting a sci-fi sophisticated clinic environment."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsDW0iAKDZvybBM5aIl7FstQrZNSDnjrewk6m8UF69naqmVYmb7T-drCFTLKJxx8ll6QSMSX3WaYwU3NkOurQ6VBO16ZWAF_F-M2wemllpelHb1Bc90ypnnd6VW44T7dqtOaJvAgV0KYRoN4PewrJ_QiTusf5L_p0R-VSlAyEi1j0dnSrh2e8yt7UUZckBvsgKWR1IGlELt5zHO1dKMkG-kw_8T3_PPWzZs6RmurdFh6qGzJf1UybJ4u2i0fFMnelBORAd0vGz6Q"
+                  />
+                </div>
+                <div class="flex-grow">
+                  <p class="text-[12px] font-bold text-on-surface">
+                    Dr. Aris Thorne
+                  </p>
+                  <p class="text-[10px] text-on-surface-variant">
+                    Full Access • Cardiologist
+                  </p>
+                </div>
+                <button
+                  class="material-symbols-outlined text-error text-[18px]"
+                  data-icon="cancel"
+                >
+                  cancel
+                </button>
+              </div>
+              <button
+                class="w-full py-sm rounded-xl border border-dashed border-white/20 text-on-surface-variant text-[12px] hover:border-primary/50 hover:text-primary transition-all"
+              >
+                + Grant New Access
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <!-- BottomNavBar Shell -->
+    <nav
+      class="fixed bottom-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-t border-white/10 shadow-lg flex justify-around items-center h-16 px-md pb-safe"
+    >
+      <a
+        class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="dashboard"
+          >dashboard</span
+        >
+        <span class="font-label-md text-[10px]">Dashboard</span>
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="calendar_today"
+          >calendar_today</span
+        >
+        <span class="font-label-md text-[10px]">Appointments</span>
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary bg-secondary-container/20 rounded-full px-4 py-1 active:scale-90 transition-transform"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined"
+          data-icon="folder_shared"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >folder_shared</span
+        >
+        <span class="font-label-md text-[10px]">Records</span>
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="person">person</span>
+        <span class="font-label-md text-[10px]">Profile</span>
+      </a>
+    </nav>
+    <!-- FAB for quick action (only on Mobile typically, but included for accessibility) -->
+    <button
+      class="fixed bottom-20 right-6 w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-2xl flex items-center justify-center md:hidden z-50 neon-glow active:scale-90 transition-transform"
+    >
+      <span class="material-symbols-outlined text-[28px]" data-icon="add"
+        >add</span
+      >
+    </button>
+    <script>
+      // Micro-interactions and Tab Logic
+      document.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          const rect = btn.getBoundingClientRect();
+          const ripple = document.createElement("span");
+          ripple.style.left = `${e.clientX - rect.left}px`;
+          ripple.style.top = `${e.clientY - rect.top}px`;
+          ripple.style.position = "absolute";
+          ripple.style.width = "20px";
+          ripple.style.height = "20px";
+          ripple.style.background = "rgba(255,255,255,0.2)";
+          ripple.style.borderRadius = "50%";
+          ripple.style.transform = "scale(0)";
+          ripple.style.transition = "transform 0.4s ease-out, opacity 0.4s";
+          ripple.style.pointerEvents = "none";
+
+          btn.style.position = "relative";
+          btn.style.overflow = "hidden";
+          btn.appendChild(ripple);
+
+          setTimeout(() => {
+            ripple.style.transform = "scale(10)";
+            ripple.style.opacity = "0";
+          }, 10);
+
+          setTimeout(() => ripple.remove(), 500);
+        });
+      });
+    </script>
+  </body>
+</html>

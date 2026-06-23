@@ -1,0 +1,295 @@
+{% extends 'base.html' %} {% block title %}Profile Settings{% endblock %} {%
+block body %}
+<!-- Top App Bar -->
+<header
+  class="fixed top-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-md py-sm"
+>
+  <div class="flex items-center gap-sm">
+    <h1 class="font-display-lg text-headline-md font-bold text-primary">
+      Medika
+    </h1>
+  </div>
+  <div class="flex items-center gap-md">
+    <button
+      class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform"
+      data-icon="notifications"
+    >
+      notifications
+    </button>
+    <div
+      class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden"
+    >
+      <img
+        alt="Profile"
+        class="w-full h-full object-cover"
+        data-alt="A professional close-up portrait of a patient for a medical application. The lighting is soft and cinematic with a cool blue undertone. The subject is a middle-aged man with a friendly, calm expression, set against a blurred modern clinical background. The image has a high-end, clean aesthetic suitable for a premium health tech platform."
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-OENE4xtrAUzzBebb77_cIgG4llnryoCgKHaI4OHI0wSLwNurUKOjt_yhk9Gn5jyEfxcU6uN4EC56ZVwPIHdNZT5OSKKrMXeeOI6ASZmCZW3HwvC5EKC7SW6VYAkzC-BKiePgedglLAhlnZCaQ8k4AL7_fPdRDYmCsX0o3uC-o1CeeL3_2sEFIZvwIDk1vXGDvxC0SAApdxDRe0uwSQF43P6NrOHjOwaEwU9f-zkPOi4rNTc1crk4sy4n6Jlp3FZk3xGyWXT2dw"
+      />
+    </div>
+  </div>
+</header>
+<br><br><br>
+<main
+  class="max-w-5xl margin-top   mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-lg"
+>
+  <!-- Profile Header Section (Asymmetric Bento Style) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+    <!-- Avatar Upload Card -->
+    <div
+      class="md:col-span-1 glass-card rounded-xl p-md flex flex-col items-center justify-center space-y-md neon-glow-primary"
+    >
+      <div class="relative group cursor-pointer">
+        <div
+          class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-primary/20 p-1 overflow-hidden transition-transform group-hover:scale-105 duration-300"
+        >
+          <img
+            alt="Large Profile"
+            class="w-full h-full object-cover rounded-full"
+            data-alt="A detailed headshot of a mature male patient with silvering hair and a kind expression. He is wearing a simple grey crew neck shirt. The background is a minimalist, softly lit medical office with hints of high-tech monitors blurred in the distance. The overall mood is one of clinical excellence and patient trust, using a deep navy and cyan color palette."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGKrBMfXjyz78Ur1fXlZ9rB2mGm2_wNyEgKwVH40vNOZ17V9YDQR79KO8MyaSJL88eLfKHENePfwBOfuRSnIH4zAT6vMhV96mOjk1v-dnMVlJwFlibjfgsNisGjeeS9cN--OX2gVUHAPnDKiXatSLGIxTBUJPMtq7iZsA2OttkoSnTy8dbQD8TNtP9oCGrKJariZNjoWf3Va9y0RlaCnJmacSZvDvDklrXRc7mchtM-X6pJtKcmfX9SU75rD719fkjVB1WJEc7JQ"
+          />
+        </div>
+        <button
+          class="absolute bottom-1 right-1 bg-primary text-on-primary p-2 rounded-full shadow-lg hover:scale-110 active:scale-90 transition-all"
+        >
+          <span
+            class="material-symbols-outlined text-[20px]"
+            data-icon="photo_camera"
+            >photo_camera</span
+          >
+        </button>
+      </div>
+      <div class="text-center">
+        <p class="font-headline-md text-headline-md text-on-surface">
+         {{session['first_name']}} {{session['last_name']}}
+        </p>
+        <p class="font-body-md text-primary opacity-80">
+          Patient ID: {{session['patient_id']}}
+        </p>
+      </div>
+      <button
+        class="w-full py-2 px-4 rounded-lg bg-primary-container text-on-primary-container font-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+      >
+        <span class="material-symbols-outlined" data-icon="upload">upload</span>
+        Update Photo
+      </button>
+    </div>
+    <!-- Identity Details Card -->
+    <div
+      class="md:col-span-2 glass-card rounded-xl p-md flex flex-col justify-between"
+    >
+      <div
+        class="flex justify-between items-start border-b border-white/10 pb-sm mb-md"
+      >
+        <h2 class="font-headline-md text-headline-md text-on-surface">
+          Personal Information
+        </h2>
+        <button
+          class="text-secondary hover:underline font-label-md flex items-center gap-1"
+        >
+          <span class="material-symbols-outlined text-[18px]" data-icon="edit"
+            >edit</span
+          >
+          Edit Details
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-md gap-x-lg">
+        <div class="space-y-1">
+          <p
+            class="font-caption text-on-surface-variant uppercase tracking-wider"
+          >
+            Full Name
+          </p>
+          <p class="font-body-lg text-on-surface">{{session['first_name']}} {{session['last_name']}}</p>
+        </div>
+        <div class="space-y-1">
+          <p
+            class="font-caption text-on-surface-variant uppercase tracking-wider"
+          >
+            Blood Type
+          </p>
+          <div class="flex items-center gap-2">
+            <span
+              class="w-8 h-8 rounded-md bg-error/20 text-error flex items-center justify-center font-bold border border-error/30"
+              >O+</span
+            >
+            <p class="font-body-lg text-on-surface">Positive</p>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <p
+            class="font-caption text-on-surface-variant uppercase tracking-wider"
+          >
+            Date of Birth
+          </p>
+          <p class="font-body-lg text-on-surface">{{session['date_of_birth']}}</p>
+        </div>
+        <div class="space-y-1">
+          <p
+            class="font-caption text-on-surface-variant uppercase tracking-wider"
+          >
+            Phone Number
+          </p>
+          <p class="font-body-lg text-on-surface">{{session['phone']}}</p>
+        </div>
+        <div class="space-y-1 sm:col-span-2">
+          <p
+            class="font-caption text-on-surface-variant uppercase tracking-wider"
+          >
+            Home Address
+          </p>
+          <p class="font-body-lg text-on-surface">
+            {{session['address']}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Account Settings & Preferences -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+    <!-- Security Section -->
+    <section class="glass-card rounded-xl p-md space-y-md">
+      <h3
+        class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm"
+      >
+        <span
+          class="material-symbols-outlined text-primary"
+          data-icon="security"
+          >security</span
+        >
+        Security &amp; Access
+      </h3>
+      <div class="space-y-sm">
+        <button
+          class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
+        >
+          <div class="flex items-center gap-md">
+            <div
+              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20"
+            >
+              <span
+                class="material-symbols-outlined text-on-surface-variant group-hover:text-primary"
+                data-icon="lock"
+                >lock</span
+              >
+            </div>
+            <div class="text-left">
+              <p class="font-label-md text-on-surface">Password</p>
+              <p class="font-caption text-on-surface-variant">
+                Change password
+              </p>
+            </div>
+          </div>
+          <span
+            class="material-symbols-outlined text-on-surface-variant"
+            data-icon="chevron_right"
+            >chevron_right</span
+          >
+        </button>
+      </div>
+    </section>
+    <!-- Preferences Section -->
+    <section class="glass-card rounded-xl p-md space-y-md">
+      <h3
+        class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm"
+      >
+        <span
+          class="material-symbols-outlined text-secondary"
+          data-icon="settings"
+          >settings</span
+        >
+        App Preferences
+      </h3>
+      <div class="space-y-sm">
+        <button
+          class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
+        >
+          <div class="flex items-center gap-md">
+            <div
+              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20"
+            >
+              <span
+                class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary"
+                data-icon="language"
+                >language</span
+              >
+            </div>
+            <div class="text-left">
+              <p class="font-label-md text-on-surface">Language</p>
+              <p class="font-caption text-on-surface-variant">
+                English (United States)
+              </p>
+            </div>
+          </div>
+          <span
+            class="material-symbols-outlined text-on-surface-variant"
+            data-icon="chevron_right"
+            >chevron_right</span
+          >
+        </button>
+        <button
+          class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
+        >
+          <div class="flex items-center gap-md">
+            <div
+              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20"
+            >
+              <span
+                class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary"
+                data-icon="dark_mode"
+                >dark_mode</span
+              >
+            </div>
+            <div class="text-left">
+              <p class="font-label-md text-on-surface">Appearance</p>
+              <p class="font-caption text-on-surface-variant">
+                System Default (Dark)
+              </p>
+            </div>
+          </div>
+          <span
+            class="material-symbols-outlined text-on-surface-variant"
+            data-icon="chevron_right"
+            >chevron_right</span
+          >
+        </button>
+      </div>
+    </section>
+  </div>
+</main>
+<br><br><br><br>
+<!-- Bottom Navigation Bar -->
+<div
+  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+>
+  <nav
+    class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
+  >
+    <button
+      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      data-nav="home"
+    >
+      <span
+        class="material-symbols-outlined"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >home</span
+      >
+    </button>
+    <button
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+      data-nav="schedule"
+    >
+      <span class="material-symbols-outlined">calendar_today</span>
+    </button>
+    <button
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+      data-nav="menu"
+      id="menu-btn"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </nav>
+</div>
+</div>
+
+{% endblock %}

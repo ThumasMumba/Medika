@@ -39,7 +39,7 @@
         </div>
         <nav class="flex-1 space-y-2">
           <a
-            href="#"
+            href="{{url_for('patient_pro')}}"
             class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
           >
             <span
@@ -49,7 +49,7 @@
             <span class="font-label-md text-label-md">Profile</span>
           </a>
           <a
-            href="#"
+            href="{{url_for('patient_records') }}"
             class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
           >
             <span
@@ -143,37 +143,9 @@
               Your health recovery is on track for the month.
             </p>
           </div>
-          <!-- Health Score Circular Progress -->
-          <div class="relative w-20 h-20">
-            <svg class="w-full h-full transform -rotate-90">
-              <circle
-                class="text-white/10"
-                cx="40"
-                cy="40"
-                fill="transparent"
-                r="34"
-                stroke="currentColor"
-                stroke-width="6"
-              ></circle>
-              <circle
-                class="text-secondary drop-shadow-[0_0_8px_rgba(3,181,211,0.5)]"
-                cx="40"
-                cy="40"
-                fill="transparent"
-                r="34"
-                stroke="currentColor"
-                stroke-dasharray="213.6"
-                stroke-dashoffset="17"
-                stroke-width="6"
-              ></circle>
-            </svg>
             <div
               class="absolute inset-0 flex items-center justify-center flex-col"
             >
-              <span
-                class="font-headline-md text-[18px] leading-tight text-on-surface"
-                >92%</span
-              >
             </div>
           </div>
         </div>
@@ -195,9 +167,6 @@
           class="font-label-md text-label-md text-on-surface-variant flex items-center justify-between px-1"
         >
           TODAY'S FOCUS
-          <span class="material-symbols-outlined text-[16px]"
-            >arrow_forward</span
-          >
         </h2>
         <div class="flex overflow-x-auto gap-md hide-scrollbar pb-2">
           <!-- Next Visit Card -->
@@ -215,120 +184,15 @@
             </div>
             <div>
               <p class="font-label-md text-label-md text-on-surface">
-                {session['']}
+                Dr Thomas
               </p>
               <p class="font-caption text-caption text-secondary">
                 Cardiology • 2:30 PM
               </p>
             </div>
           </div>
-          <!-- Medication Tracker Card -->
-          <div class="glass-card min-w-[280px] rounded-2xl p-sm space-y-2">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-tertiary"
-                  >pill</span
-                >
-                <span class="font-label-md text-label-md text-on-surface"
-                  >Medication Tracker</span
-                >
-              </div>
-              <span class="font-caption text-caption text-tertiary"
-                >2/3 Done</span
-              >
-            </div>
-            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-              <div
-                class="bg-tertiary h-full rounded-full w-[66%] shadow-[0_0_10px_rgba(78,222,163,0.3)]"
-              ></div>
-            </div>
-          </div>
-        </div>
       </section>
-      <!-- Live Vitals Grid -->
-      <section class="grid grid-cols-2 gap-md">
-        <!-- Heart Rate Card -->
-        <div
-          class="glass-card rounded-2xl p-md space-y-base overflow-hidden relative"
-        >
-          <div class="flex justify-between items-center">
-            <span
-              class="material-symbols-outlined text-error"
-              style="font-variation-settings: &quot;FILL&quot; 1"
-              >favorite</span
-            >
-            <span class="font-caption text-caption text-on-surface-variant"
-              >BPM</span
-            >
-          </div>
-          <div>
-            <span
-              class="font-display-lg text-[32px] leading-tight text-on-surface"
-              id="heart-rate-value"
-              >78</span
-            >
-            <span class="text-error font-caption text-[10px] ml-1">▲ 2%</span>
-          </div>
-          <svg class="w-full h-10 mt-2" viewbox="0 0 100 40">
-            <path
-              class="vitals-path"
-              d="M0,35 Q10,10 20,30 T40,25 T60,35 T80,10 T100,30"
-              fill="none"
-              stroke="#ffb4ab"
-              stroke-width="2"
-            ></path>
-            <rect
-              fill="url(#grad1)"
-              height="40"
-              opacity="0.1"
-              width="100"
-            ></rect>
-            <defs>
-              <lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
-                <stop
-                  offset="0%"
-                  style="stop-color: #ffb4ab; stop-opacity: 1"
-                ></stop>
-                <stop
-                  offset="100%"
-                  style="stop-color: #ffb4ab; stop-opacity: 0"
-                ></stop>
-              </lineargradient>
-            </defs>
-          </svg>
-        </div>
-        <!-- Blood Pressure Card -->
-        <div
-          class="glass-card rounded-2xl p-md space-y-base overflow-hidden relative"
-        >
-          <div class="flex justify-between items-center">
-            <span
-              class="material-symbols-outlined text-secondary"
-              style="font-variation-settings: &quot;FILL&quot; 1"
-              >blood_pressure</span
-            >
-            <span class="font-caption text-caption text-on-surface-variant"
-              >mmHg</span
-            >
-          </div>
-          <div>
-            <span
-              class="font-display-lg text-[32px] leading-tight text-on-surface"
-              >118/72</span
-            >
-            <span class="text-tertiary font-caption text-[10px] ml-1"
-              >Stable</span
-            >
-          </div>
-          <div class="mt-4 flex gap-1 items-end h-6">
-            <div class="w-full bg-secondary/20 h-[40%] rounded-t-sm"></div>
-            <div class="w-full bg-secondary/40 h-[60%] rounded-t-sm"></div>
-            <div class="w-full bg-secondary/20 h-[50%] rounded-t-sm"></div>
-            <div class="w-full bg-secondary/60 h-[80%] rounded-t-sm"></div>
-            <div class="w-full bg-secondary/30 h-[45%] rounded-t-sm"></div>
-          </div>
-        </div>
-      </section>
+
       <!-- Quick Action Grid (2x2) -->
       <section class="grid grid-cols-2 gap-md">
         <button
@@ -341,8 +205,9 @@
               >calendar_add_on</span
             >
           </div>
-          <span class="font-label-md text-label-md text-on-surface"
-            >Book Visit</span
+          <span
+          class="font-label-md text-label-md text-on-surface"
+            ><a href="{{url_for('appointment')}}">Book Visit</a></span
           >
         </button>
         <button
@@ -386,87 +251,7 @@
           >
         </button>
       </section>
-      <!-- Appointments List -->
-      <section>
-        <h3 class="font-headline-md text-[18px] text-on-surface mb-4">
-          Upcoming Schedule
-        </h3>
-        <div class="flex flex-col gap-3">
-          <div class="glass-card p-4 rounded-2xl border-l-4 border-l-secondary">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 rounded-full overflow-hidden bg-surface-container"
-                >
-                  <img
-                    alt="Dr. Elena"
-                    class="w-full h-full object-cover"
-                    data-alt="A portrait of a highly professional female doctor with glasses and a calm demeanor, wearing a navy blue medical uniform. The lighting is soft and flattering, set in a clean, high-tech diagnostic room with subtle medical screens in the background. The mood is sophisticated and reassuring."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbeGnkXzyjU2So9IHjsjb9hK-TH-AAnU18b56TyoqX7-ujN7q5NbJVtze5O-ZYPUt-SWNp29gfnmF6yYN9ej1Z79OnMIaNHkneY4ww6Fsc_QbR0mOKXeKPQ_4IFV9UEd8wLj_9G3qpXWSkR1ocF8OrjiARa-hcAncIEwqA4ccQqPKyi2Sl4tSg7ldUXKS2nXg0bLNAbtxT0XCEzkgMpUubmTlqOd9FIrWrm7WJkDyjDPDQyxy3NEOk4AGWErhW8kcwtK7LJJMt1A"
-                  />
-                </div>
-                <div>
-                  <h5 class="text-sm font-bold">Dr {{session['doctor_fName'}}</h5>
-                  <p class="text-xs text-on-surface-variant">
-                    General Physician • Virtual
-                  </p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-bold text-on-surface">Tomorrow</p>
-                <p class="text-xs text-on-surface-variant">09:15 AM</p>
-              </div>
-            </div>
-            <div
-              class="w-10 h-10 rounded-full bg-tertiary/20 flex items-center justify-center text-tertiary pulse-animation"
-            >
-              <span class="material-symbols-outlined">videocam</span>
-            </div>
-          </div>
-          <button
-            class="mt-md w-full py-sm bg-tertiary text-on-tertiary-fixed font-label-md text-label-md rounded-xl hover:brightness-110 active:scale-[0.98] transition-all"
-          >
-            Join Virtual Room
-          </button>
-        </div>
-      </section>
-      <!-- Emergency Profile -->
-      <section
-        class="glass-card rounded-2xl p-md flex items-center justify-between"
-      >
-        <div class="flex items-center gap-sm">
-          <div
-            class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-error"
-              >emergency_home</span
-            >
-          </div>
-          <div>
-            <p class="font-label-md text-label-md text-on-surface">
-              Emergency Profile
-            </p>
-            <p class="font-caption text-caption text-on-surface-variant">
-              Blood: O+ | No Allergies
-            </p>
-          </div>
-        </div>
-        <span class="material-symbols-outlined text-on-surface-variant"
-          >chevron_right</span
-        >
-      </section>
     </main>
-    <!-- Floating AI Assistant Widget -->
-    <button
-      class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-tr from-secondary to-primary rounded-full glow-secondary flex items-center justify-center z-50 active:scale-90 transition-transform"
-      id="ai-assistant"
-    >
-      <span
-        class="material-symbols-outlined text-on-primary-fixed text-[30px]"
-        style="font-variation-settings: &quot;FILL&quot; 1"
-        >smart_toy</span
-      >
-    </button>
     <!-- Bottom Navigation Bar -->
     <div
       class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
@@ -489,12 +274,6 @@
           data-nav="schedule"
         >
           <span class="material-symbols-outlined">calendar_today</span>
-        </button>
-        <button
-          class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
-          data-nav="vitals"
-        >
-          <span class="material-symbols-outlined">vital_signs</span>
         </button>
         <button
           class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"

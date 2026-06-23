@@ -312,6 +312,7 @@ def login():
                 session['first_name'] = patient['first_name']
                 session['last_name'] = patient['last_name']
                 session['gender'] = patient['gender']
+                session['date_of_birth'] = patient['date_of_birth']
                 session['email'] = patient['email']
                 session['phone'] = patient['phone']
                 flash('Login successful! Welcome on board.', 'success')
@@ -342,7 +343,18 @@ def patient_dashboard():
      #
      return render_template("patient_dashboard.html")
 
+@app.route("/patient_pro", methods=["POST", "GET"])
+def patient_pro():
+     """Handles patient profile dashboard"""
+     return render_template("/patient_pro.html")
+
+@app.route("/patient_records", methods=['GET'])
+@patient_required
+def patient_records():
+     """Handles patient records dashboard"""
+     return render_template("/patient_records.html")
 @app.route('/signUp', methods=["POST", "GET"])
+
 def signUp():
      """Handles the sign up process for patients.
      It accepts both GET and POST requests.
@@ -459,6 +471,13 @@ def manage_patients():
      This route is a placeholder and should be implemented with the actual logic to manage patients in the system."""
      flash("Manage Patients functionality is not implemented yet.", "error")
      return redirect(url_for('admin_dashboard'))
+
+@app.route("/appointment", methods=['GET', 'POST'])
+@patient_required
+def appointment():
+     """Handles the creation of new appointments. 
+     This route is a placeholder and should be implemented with the actual logic to create appointments in the system."""
+     return render_template("appointment.html")
 
 @app.route("/system_settings", methods=["GET"])
 @login_required
