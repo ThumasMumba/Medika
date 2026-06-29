@@ -1,5 +1,83 @@
 {% extends 'base.html' %} {% block title %}Profile Settings{% endblock %} {%
 block body %}
+
+<!-- Navigation Drawer -->
+    <div
+      class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
+      id="drawer-overlay"
+    ></div>
+    <aside
+      class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full"
+      id="nav-drawer"
+    >
+      <div class="flex flex-col h-full p-md">
+        <div class="flex items-center gap-3 mb-xl">
+          <span
+            class="material-symbols-outlined text-primary text-3xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >clinical_notes</span
+          >
+          <span
+            class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+            >Medika</span
+          >
+        </div>
+        <nav class="flex-1 space-y-2">
+          <a
+            href="{{url_for('patient_pro')}}"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
+              >person</span
+            >
+            <span class="font-label-md text-label-md">Profile</span>
+          </a>
+          <a
+            href="{{url_for('patient_records') }}"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+              >description</span
+            >
+            <span class="font-label-md text-label-md">Health Records</span>
+          </a>
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
+              >calendar_month</span
+            >
+            <span class="font-label-md text-label-md">Appointments</span>
+          </button>
+          <a
+            href="#"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+              >settings</span
+            >
+            <span class="font-label-md text-label-md">Settings</span>
+        </a>
+        </nav>
+        <div class="mt-auto pt-md border-t border-white/10">
+          <a
+            href="{{url_for('logout')}}"
+            class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:scale-110 transition-transform"
+              >logout</span
+            >
+            <span class="font-label-md text-label-md font-bold">Logout</span>
+        </a>
+        </div>
+      </div>
+    </aside>
 <!-- Top App Bar -->
 <header
   class="fixed top-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-md py-sm"
@@ -265,7 +343,8 @@ block body %}
   <nav
     class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
   >
-    <button
+    <a
+      href="{{url_for('patient_dashboard')}}"
       class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
       data-nav="home"
     >
@@ -274,20 +353,21 @@ block body %}
         style="font-variation-settings: &quot;FILL&quot; 1"
         >home</span
       >
-    </button>
+</a>
     <button
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="schedule"
     >
       <span class="material-symbols-outlined">calendar_today</span>
     </button>
-    <button
+    <a
+      href="{{url_for('patient_dashboard')}}"
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="menu"
       id="menu-btn"
     >
       <span class="material-symbols-outlined">menu</span>
-    </button>
+  </a>
   </nav>
 </div>
 </div>

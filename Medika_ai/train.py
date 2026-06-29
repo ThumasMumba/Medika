@@ -19,6 +19,7 @@ What it saves to models/:
 """
 
 import os, json, joblib, pandas as pd
+import random
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -61,8 +62,138 @@ def join_symptoms(row):
             parts.append(v.replace("_"," ").lower())
     return " ".join(parts)
 
-df["text"]    = df.apply(join_symptoms, axis=1)
-df["disease"] = df[disease_col].str.strip()
+# Different ways patients naturally separate symptoms
+separators = [
+    " ",
+    ", ",
+    " and ",
+    ", and ",
+    "; "
+]
+
+rows = []
+
+for _, row in df.iterrows():
+    symptoms = []
+
+    for col in symptom_cols:
+        value = str(row[col]).strip()
+        if value.lower() not in ("nan", "none", ""):
+            symptoms.append(value.replace("_", " ").lower())
+
+    disease = row[disease_col].strip()
+
+    # Original full symptom list
+    separator = random.choice(separators)
+    rows.append({
+        "text": separator.join(symptoms),
+        "disease": disease
+    })
+
+    # Generate partial symptom combinations
+    for _ in range(8):
+        subset = random.sample(
+            symptoms,
+            random.randint(max(2, len(symptoms)//2), len(symptoms))
+        )
+
+        rows.append({
+            "text": " ".join(subset),
+            "disease": disease
+        })
+
+df = pd.DataFrame(rows)
+# Natural language templates to make the model more robust to different ways users might describe their symptoms.
+templates = [
+
+    # Direct statements
+    "{}",
+    "I have {}",
+    "I am having {}",
+    "I have been having {}",
+    "I am experiencing {}",
+    "I'm experiencing {}",
+    "My symptoms are {}",
+    "Symptoms include {}",
+    "The symptoms are {}",
+
+    # Feeling statements
+    "I feel {}",
+    "I have been feeling {}",
+    "I've been feeling {}",
+    "I don't feel well because of {}",
+    "I feel sick with {}",
+    "I am unwell and have {}",
+
+    # Time-based
+    "I have had {} since yesterday",
+    "I have had {} for two days",
+    "I have had {} for several days",
+    "I've had {} all day",
+    "The {} started this morning",
+    "The {} started yesterday",
+    "My {} has become worse",
+
+    # Asking for help
+    "Can you help me? I have {}",
+    "Can you tell me what {} means?",
+    "What could cause {}?",
+    "Should I be worried about {}?",
+    "I need help because I have {}",
+
+    # Concerned wording
+    "I'm worried because I have {}",
+    "I think something is wrong. I have {}",
+    "I think I may have {}",
+    "I think I'm suffering from {}",
+
+    # Doctor-style wording
+    "Patient presents with {}",
+    "Patient reports {}",
+    "Chief complaint is {}",
+    "Clinical symptoms include {}",
+
+    # Conversational
+    "Lately I've had {}",
+    "Recently I've been experiencing {}",
+    "For the last few days I've had {}",
+    "I've noticed {}",
+    "I'm suffering from {}",
+    "I've developed {}",
+
+    # Common chatbot language
+    "Can you diagnose {}?",
+    "Do these symptoms indicate anything? {}",
+    "What illness causes {}?",
+    "What disease causes {}?",
+    "What could this be: {}",
+
+    # Informal wording
+    "Got {}",
+    "Feeling {}",
+    "Dealing with {}",
+    "Having {} right now",
+    "Currently experiencing {}",
+
+    # Multiple symptom phrasing
+    "I have the following symptoms: {}",
+    "These are my symptoms: {}",
+    "My main symptoms are {}",
+    "My symptoms include {}",
+    "I have noticed {} recently"
+]
+
+extra = []
+
+random_templates = random.sample(templates, k=10)
+
+for t in random_templates:
+    extra.append({
+        "text": t.format(row["text"]),
+        "disease": row["disease"]
+    })
+
+df = pd.concat([df, pd.DataFrame(extra)], ignore_index=True)
 df = df[df["text"].str.len() > 0].reset_index(drop=True)
 
 print(f"          {len(df)} rows, {df['disease'].nunique()} diseases\n")
@@ -92,6 +223,8 @@ with open(os.path.join(MDL,"disease_info.json"),"w",encoding="utf-8") as f:
 print(f"          Saved disease_info.json for {len(info)} diseases\n")
 
 # ── 3. Train the model ────────────────────────────────────────────────────────
+# Shuffle the dataset before splitting. Ensures all augmented examples are well miexd
+df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 print("Step 3/4  Training classifier ...")
 X_train, X_test, y_train, y_test = train_test_split(
     df["text"], df["disease"], test_size=0.2, random_state=42, stratify=df["disease"]
@@ -101,10 +234,10 @@ pipe = Pipeline([
     # TF-IDF: turns symptom text into numbers the model can learn from.
     # ngram_range=(1,2) means it considers both single words ("fever") and
     # two-word phrases ("skin rash") as features.
-    ("tfidf", TfidfVectorizer(ngram_range=(1,2), max_features=8000, sublinear_tf=True)),
+    ("tfidf", TfidfVectorizer(ngram_range=(1,3), max_features=25000,min_df=2, max_df=0.95, sublinear_tf=True, strip_accents="unicode", lowercase=True)),
     # Logistic Regression: simple, fast, very accurate on this dataset (usually 95%+)
-    ("clf",   LogisticRegression(max_iter=1000, C=5.0, solver="lbfgs",
-                                  multi_class="multinomial", random_state=42))
+    ("clf",   LogisticRegression(max_iter=3000, C=8, solver="lbfgs",
+                                  multi_class="multinomial", random_state=42, class_weight="balanced"))
 ])
 
 pipe.fit(X_train, y_train)

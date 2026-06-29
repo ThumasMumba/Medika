@@ -316,94 +316,136 @@
       </div>
     </div>
     <script>
-      const chatFeed = document.getElementById("chat-feed");
-      const chatInput = document.getElementById("chat-input");
-      const aiTyping = document.getElementById("ai-typing");
+     const chatFeed = document.getElementById("chat-feed");
+const chatInput = document.getElementById("chat-input");
+const aiTyping = document.getElementById("ai-typing");
 
-      function scrollChat() {
-        chatFeed.scrollTo({
-          top: chatFeed.scrollHeight,
-          behavior: "smooth",
-        });
-      }
+function scrollChat() {
+  chatFeed.scrollTo({
+    top: chatFeed.scrollHeight,
+    behavior: "smooth",
+  });
+}
 
-      function createMessage(text, isUser = false) {
-        const container = document.createElement("div");
-        container.className = `flex flex-col gap-2 max-w-[85%] md:max-w-[70%] ${isUser ? "self-end" : "self-start"} animate-fade-in`;
+function createMessage(text, isUser = false) {
+  const container = document.createElement("div");
+  container.className = `flex flex-col gap-2 max-w-[85%] md:max-w-[70%] ${
+    isUser ? "self-end" : "self-start"
+  } animate-fade-in`;
 
-        const inner = document.createElement("div");
-        inner.className = isUser
-          ? "bg-primary p-4 rounded-2xl rounded-tr-none shadow-md text-white"
-          : "clinical-card p-4 rounded-2xl rounded-tl-none text-on-surface";
+  const inner = document.createElement("div");
+  inner.className = isUser
+    ? "bg-primary p-4 rounded-2xl rounded-tr-none shadow-md text-white"
+    : "clinical-card p-4 rounded-2xl rounded-tl-none text-on-surface";
 
-        const content = document.createElement("p");
-        content.className = "font-body-md text-body-md";
-        content.innerText = text;
+  const content = document.createElement("p");
+  content.className = "font-body-md text-body-md";
+  content.innerText = text;
 
-        const meta = document.createElement("span");
-        meta.className = `font-caption text-caption text-on-surface-variant px-1 ${isUser ? "self-end" : ""}`;
-        meta.innerText = isUser ? "You • Just now" : "Medika AI • Just now";
+  const meta = document.createElement("span");
+  meta.className = `font-caption text-caption text-on-surface-variant px-1 ${
+    isUser ? "self-end" : ""
+  }`;
+  meta.innerText = isUser ? "You • Just now" : "Medika AI • Just now";
 
-        inner.appendChild(content);
-        container.appendChild(inner);
-        container.appendChild(meta);
+  inner.appendChild(content);
+  container.appendChild(inner);
+  container.appendChild(meta);
 
-        return container;
-      }
+  return container;
+}
 
-      function handleSendMessage() {
-        const text = chatInput.value.trim();
-        if (!text) return;
+function showTyping(show) {
+  aiTyping.classList.toggle("hidden", !show);
+  scrollChat();
+}
 
-        chatFeed.insertBefore(createMessage(text, true), aiTyping);
-        chatInput.value = "";
-        scrollChat();
+function safe(val, fallback) {
+  return val === undefined || val === null ? fallback : val;
+}
 
-        showTyping(true);
+function formatAIResponse(data) {
+  const disease = safe(data?.disease, "Unknown");
+  const confidence = safe(data?.confidence, 0);
+  const advice = safe(data?.advice, "No advice available.");
 
-       showTyping(true);
+  let text =
+    `Condition: ${disease}\n\n` +
+    `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
+    `Advice: ${advice}`;
 
-fetch("/diagnose", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    symptoms: text,
-  }),
-})
-  .then((response) => response.json())
-  .then((data) => {
-    showTyping(false);
+  // Top predictions (uncertain mode)
+  if (Array.isArray(data?.top_predictions) && data.top_predictions.length) {
+    text += `\n\nTop possibilities:`;
+    data.top_predictions.forEach((p) => {
+      text += `\n• ${p.disease} (${(p.confidence * 100).toFixed(1)}%)`;
+    });
+  }
 
-    let responseText = "";
+  // Precautions
+  if (Array.isArray(data?.precautions) && data.precautions.length) {
+    text += `\n\nPrecautions:\n• ${data.precautions.join("\n• ")}`;
+  }
 
-    if (data.error) {
-      responseText = data.error;
-    } else {
-      responseText =
-        `Condition: ${data.disease}\n\n` +
-        `Confidence: ${(data.confidence * 100).toFixed(1)}%\n\n` +
-        `Advice: ${data.advice}`;
+  // Referral warning
+  if (data?.refer) {
+    text += `\n\n⚠ Professional medical attention is recommended.`;
+  }
 
-      if (data.precautions && data.precautions.length > 0) {
-        responseText +=
-          "\n\nPrecautions:\n• " +
-          data.precautions.join("\n• ");
-      }
+  // Context notes
+  if (Array.isArray(data?.context_notes) && data.context_notes.length) {
+    text += `\n\nPersonal notes:\n• ${data.context_notes.join("\n• ")}`;
+  }
 
-      if (data.refer) {
-        responseText +=
-          "\n\n⚠ Professional medical attention is recommended.";
-      }
+  // Warnings
+  if (Array.isArray(data?.warnings) && data.warnings.length) {
+    text += `\n\nWarnings:\n• ${data.warnings.join("\n• ")}`;
+  }
+
+  return text;
+}
+
+async function handleSendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  // 1. Show user message
+  chatFeed.insertBefore(createMessage(text, true), aiTyping);
+  chatInput.value = "";
+  scrollChat();
+
+  showTyping(true);
+
+  try {
+    const res = await fetch("/diagnose", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ symptoms: text }),
+    });
+
+   const response = await res.json();
+   showTyping(false);
+
+   console.log("AI RESPONSE:", response);
+
+    if (!res.ok) {
+        throw new Error(response.error || "Server error");
     }
+
+    // Extract the AI result
+    const ai = response.data || response;
+    console.log("AI OBJECT:", ai);
+    console.log("Disease:", ai.disease);
+    console.log("Confidence:", ai.confidence);
+
+    const responseText = formatAIResponse(ai);
 
     chatFeed.insertBefore(createMessage(responseText), aiTyping);
     scrollChat();
-  })
-  .catch((error) => {
-    console.error(error);
-
+  } catch (err) {
+    console.error(err);
     showTyping(false);
 
     chatFeed.insertBefore(
@@ -414,27 +456,15 @@ fetch("/diagnose", {
     );
 
     scrollChat();
-  });}
+  }
+}
 
-      function sendQuickMessage(label) {
-        chatInput.value = label;
-        handleSendMessage();
-      }
+// Enter key support
+chatInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") handleSendMessage();
+});
 
-      function showTyping(show) {
-        if (show) {
-          aiTyping.classList.remove("hidden");
-        } else {
-          aiTyping.classList.add("hidden");
-        }
-        scrollChat();
-      }
-
-      chatInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") handleSendMessage();
-      });
-
-      window.addEventListener("load", scrollChat);
+window.addEventListener("load", scrollChat);
     </script>
   </body>
 </html>

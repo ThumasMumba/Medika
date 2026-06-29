@@ -1,13 +1,14 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
 from functools import wraps
+from database import create_connection
+from mysql.connector import Error
 from flask_cors import CORS
 from routes.ai_routes import ai_app
 from flask import Flask, get_flashed_messages, render_template, request, flash, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 #Imports the mysql.connector in order to handle database operations
-import mysql.connector
-from mysql.connector import Error
+
 #Creating an instance of the flask class to initialize the system. Also a secret string used to encrypt session data and flash messages
 app = Flask(__name__)
 admin_password = "admin123"
@@ -20,27 +21,6 @@ app.secret_key = 'medika_ai_secret_key'
 CORS(app)
 app.register_blueprint(ai_app)  # Register the AI routes under the /ai prefix
 # We define a function that checks if the connection to the database was a success or not
-def create_connection():
-    try:
-         # Connects to the MYSQL database and store the results in the variable conn
-        connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            connection_timeout=10
-        )
-        
-        #in order to execute statements we are going to create a cursor which is a function
-        cursor = connection.cursor()
-
-        cursor.execute("CREATE DATABASE IF NOT EXISTS medika")
-        cursor.execute("USE medika")
-
-        return connection
-
-    except Error as e:
-        print(f"Database connection error: {e}")
-        return None
 
 #Initializes the database and ensures that all the required tables exists  
 
@@ -54,7 +34,7 @@ def initialize_db():
      #    SQL query to create patient table if it does not exist
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS patient(
-                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            patient_id INT AUTO_INCREMENT PRIMARY KEY,
                             first_name VARCHAR(100) NOT NULL,
                             last_name VARCHAR(100) NOT NULL,
                             date_of_birth DATE NOT NULL,
@@ -82,19 +62,21 @@ def initialize_db():
                        )
      """)
         #SQL query to create appointments table if it does not exists
-        cursor.execute("""
-                       CREATE TABLE IF NOT EXISTS appointments(
-                            id INT AUTO_INCREMENT PRIMARY KEY,
-                            patient_id INT NOT NULL,
-                            doctor_id INT NOT NULL,
-                            appointment_date DATE NOT NULL,
-                            appointment_time TIME NOT NULL,
-                            status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            INDEX(id, patient_id, doctor_id)
-                       )
-     """) 
-     #    SQL query  to create admin table if it does not exists
+        cursor.execute(
+             """
+            CREATE TABLE IF NOT EXISTS appointments(
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                patient_id INT NOT NULL,
+                doctor_id INT NOT NULL,
+                appointment_date DATE NOT NULL,
+                appointment_time TIME NOT NULL,
+    status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX(patient_id),
+    INDEX(doctor_id)
+)
+     """)
+        #    SQL query  to create admin table if it does not exists
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS admin(
                             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -290,6 +272,7 @@ def login():
         connection = create_connection()
         if connection is None:
             flash('Database connection error. Please try again later.', 'error')
+            
             return redirect(url_for('userLogin'))
 
         try:
@@ -297,7 +280,7 @@ def login():
 
             #SQL Query to verify patient credentials
             login_query = """
-            SELECT id, first_name, last_name, email, password, phone,
+            SELECT patient_id, first_name, last_name, email, password, phone,
              nrc, gender, date_of_birth
             FROM patient
             WHERE email = %s
@@ -308,7 +291,7 @@ def login():
             #Check if patient exists
             if patient and check_password_hash(patient['password'], password):
                 session['patient_logged_in'] = True
-                session['patient_id'] = patient['id']
+                session['patient_id'] = patient['patient_id']
                 session['first_name'] = patient['first_name']
                 session['last_name'] = patient['last_name']
                 session['gender'] = patient['gender']
@@ -323,6 +306,7 @@ def login():
 
         except Error as e:
             flash(f'Database error: {str(e)}', 'error')
+            print(f"Database error: {str(e)}")
             return render_template('/login.html')
       #GET request, show the login form
      return render_template('/login.html')
