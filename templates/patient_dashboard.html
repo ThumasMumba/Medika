@@ -1,21 +1,5 @@
 {% extends "base.html" %}
 {% block body %} 
-{#  {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %}
-    <div class="flash-container">
-      {% for category, message in messages %}
-      <div class="flash-message {{ category }}">
-        {{ message }}
-        <span
-          class="close-btn"
-          onclick="this.parentElement.style.display = 'none'"
-          >&times;</span
-        >
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %} {% endwith %} #}
-<!-- Navigation Drawer -->
     <div
       class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
       id="drawer-overlay"
@@ -147,13 +131,6 @@
             >
             </div>
           </div>
-        </div>
-        <div class="mt-md flex gap-3">
-          <button
-            class="bg-gradient-to-r from-primary to-secondary text-on-primary-fixed px-md py-sm rounded-xl font-label-md text-label-md glow-primary active:scale-95 transition-all"
-          >
-            View Insights
-          </button>
         </div>
         <!-- Decorative Glow Background -->
         <div

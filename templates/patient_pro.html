@@ -2,156 +2,227 @@
 block body %}
 
 <!-- Navigation Drawer -->
-    <div
-      class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
-      id="drawer-overlay"
-    ></div>
-    <aside
-      class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full"
-      id="nav-drawer"
-    >
-      <div class="flex flex-col h-full p-md">
-        <div class="flex items-center gap-3 mb-xl">
-          <span
-            class="material-symbols-outlined text-primary text-3xl"
-            style="font-variation-settings: &quot;FILL&quot; 1"
-            >clinical_notes</span
-          >
-          <span
-            class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
-            >Medika</span
-          >
-        </div>
-        <nav class="flex-1 space-y-2">
-          <a
-            href="{{url_for('patient_pro')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
-              >person</span
-            >
-            <span class="font-label-md text-label-md">Profile</span>
-          </a>
-          <a
-            href="{{url_for('patient_records') }}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
-              >description</span
-            >
-            <span class="font-label-md text-label-md">Health Records</span>
-          </a>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
-              >calendar_month</span
-            >
-            <span class="font-label-md text-label-md">Appointments</span>
-          </button>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
-              >settings</span
-            >
-            <span class="font-label-md text-label-md">Settings</span>
-        </a>
-        </nav>
-        <div class="mt-auto pt-md border-t border-white/10">
-          <a
-            href="{{url_for('logout')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined group-hover:scale-110 transition-transform"
-              >logout</span
-            >
-            <span class="font-label-md text-label-md font-bold">Logout</span>
-        </a>
-        </div>
-      </div>
-    </aside>
+<div
+  class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none transition-opacity duration-300"
+  id="drawer-overlay"
+></div>
+<aside
+  class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full transition-transform duration-300"
+  id="nav-drawer"
+>
+  <div class="flex flex-col h-full p-md">
+    <div class="flex items-center gap-3 mb-xl">
+      <span
+        class="material-symbols-outlined text-primary text-3xl"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >clinical_notes</span
+      >
+      <span
+        class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+        >Medika</span
+      >
+    </div>
+    <nav class="flex-1 space-y-2">
+      <a
+        href="{{ url_for('patient_pro') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl bg-primary/10 text-primary transition-colors group"
+      >
+        <span class="material-symbols-outlined">person</span>
+        <span class="font-label-md text-label-md">Profile</span>
+      </a>
+      <a
+        href="{{ url_for('patient_records') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+          >description</span
+        >
+        <span class="font-label-md text-label-md">Health Records</span>
+      </a>
+      <a
+        href="{{ url_for('appointment') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
+          >calendar_month</span
+        >
+        <span class="font-label-md text-label-md">Appointments</span>
+      </a>
+      <a
+        href="#"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+          >settings</span
+        >
+        <span class="font-label-md text-label-md">Settings</span>
+      </a>
+    </nav>
+    <div class="mt-auto pt-md border-t border-white/10">
+      <a
+        href="{{ url_for('logout') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined group-hover:scale-110 transition-transform"
+          >logout</span
+        >
+        <span class="font-label-md text-label-md font-bold">Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
 <!-- Top App Bar -->
 <header
-  class="fixed top-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-md py-sm"
+  class="fixed top-0 left-0 right-0 z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-margin-mobile md:px-margin-desktop py-sm"
 >
   <div class="flex items-center gap-sm">
+    <button
+      class="text-primary hover:bg-white/5 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+      id="menu-btn"
+      aria-label="Open menu"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
     <h1 class="font-display-lg text-headline-md font-bold text-primary">
       Medika
     </h1>
   </div>
-  <div class="flex items-center gap-md">
-    <button
-      class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform"
-      data-icon="notifications"
-    >
-      notifications
-    </button>
+  <div class="flex items-center gap-sm md:gap-md">
+    <!-- Notifications -->
+    <div class="relative">
+      <button
+        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 text-on-surface-variant active:scale-95 transition-all relative"
+        id="notif-btn"
+        aria-label="Notifications"
+      >
+        <span class="material-symbols-outlined">notifications</span>
+        {% if notifications and notifications|selectattr('read', 'equalto', false)|list|length > 0 %}
+        <span
+          class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"
+        ></span>
+        {% endif %}
+      </button>
+      <div
+        class="hidden absolute right-0 mt-sm w-80 max-w-[90vw] glass-card rounded-xl border border-white/10 shadow-xl overflow-hidden z-[80]"
+        id="notif-panel"
+      >
+        <div class="p-sm border-b border-white/10 flex items-center justify-between">
+          <p class="font-label-md text-on-surface font-bold">Notifications</p>
+          <span class="text-caption text-on-surface-variant">
+            {{ notifications|length if notifications else 0 }}
+          </span>
+        </div>
+        <div class="max-h-80 overflow-y-auto divide-y divide-white/5">
+          {% for n in notifications %}
+          <div class="p-sm flex items-start gap-sm {{ 'bg-primary/5' if not n.read else '' }}">
+            <span
+              class="material-symbols-outlined text-[20px] mt-0.5 {{ 'text-tertiary' if n.type == 'approved' else 'text-error' if n.type == 'rejected' else 'text-secondary' }}"
+              >{{ 'check_circle' if n.type == 'approved' else 'cancel' if n.type == 'rejected' else 'info' }}</span
+            >
+            <div class="flex-1 min-w-0">
+              <p class="font-body-md text-on-surface leading-snug">{{ n.message }}</p>
+              <p class="text-caption text-on-surface-variant mt-1">{{ n.created_at }}</p>
+            </div>
+          </div>
+          {% else %}
+          <div class="p-lg text-center">
+            <span class="material-symbols-outlined text-on-surface-variant text-3xl">notifications_off</span>
+            <p class="text-caption text-on-surface-variant mt-sm">You're all caught up</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
     <div
       class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden"
     >
       <img
-        alt="Profile"
+        alt="Profile photo"
         class="w-full h-full object-cover"
-        data-alt="A professional close-up portrait of a patient for a medical application. The lighting is soft and cinematic with a cool blue undertone. The subject is a middle-aged man with a friendly, calm expression, set against a blurred modern clinical background. The image has a high-end, clean aesthetic suitable for a premium health tech platform."
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-OENE4xtrAUzzBebb77_cIgG4llnryoCgKHaI4OHI0wSLwNurUKOjt_yhk9Gn5jyEfxcU6uN4EC56ZVwPIHdNZT5OSKKrMXeeOI6ASZmCZW3HwvC5EKC7SW6VYAkzC-BKiePgedglLAhlnZCaQ8k4AL7_fPdRDYmCsX0o3uC-o1CeeL3_2sEFIZvwIDk1vXGDvxC0SAApdxDRe0uwSQF43P6NrOHjOwaEwU9f-zkPOi4rNTc1crk4sy4n6Jlp3FZk3xGyWXT2dw"
+        src="{{ session.get('photo_url') or 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-OENE4xtrAUzzBebb77_cIgG4llnryoCgKHaI4OHI0wSLwNurUKOjt_yhk9Gn5jyEfxcU6uN4EC56ZVwPIHdNZT5OSKKrMXeeOI6ASZmCZW3HwvC5EKC7SW6VYAkzC-BKiePgedglLAhlnZCaQ8k4AL7_fPdRDYmCsX0o3uC-o1CeeL3_2sEFIZvwIDk1vXGDvxC0SAApdxDRe0uwSQF43P6NrOHjOwaEwU9f-zkPOi4rNTc1crk4sy4n6Jlp3FZk3xGyWXT2dw' }}"
       />
     </div>
   </div>
 </header>
-<br><br><br>
+
 <main
-  class="max-w-5xl margin-top   mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-lg"
+  class="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop pt-24 pb-32 md:pb-lg space-y-lg"
 >
-  <!-- Profile Header Section (Asymmetric Bento Style) -->
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="space-y-2">
+    {% for category, msg in messages %}
+    <div
+      class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+    >
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Profile Header Section -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
     <!-- Avatar Upload Card -->
     <div
-      class="md:col-span-1 glass-card rounded-xl p-md flex flex-col items-center justify-center space-y-md neon-glow-primary"
+      class="md:col-span-1 glass-card rounded-xl p-md flex flex-col items-center justify-center space-y-md"
     >
-      <div class="relative group cursor-pointer">
+      <form
+        id="photo-form"
+        action="#"
+        method="POST"
+        enctype="multipart/form-data"
+        class="relative group cursor-pointer"
+      >
         <div
           class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-primary/20 p-1 overflow-hidden transition-transform group-hover:scale-105 duration-300"
         >
           <img
-            alt="Large Profile"
+            alt="Profile photo"
             class="w-full h-full object-cover rounded-full"
-            data-alt="A detailed headshot of a mature male patient with silvering hair and a kind expression. He is wearing a simple grey crew neck shirt. The background is a minimalist, softly lit medical office with hints of high-tech monitors blurred in the distance. The overall mood is one of clinical excellence and patient trust, using a deep navy and cyan color palette."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGKrBMfXjyz78Ur1fXlZ9rB2mGm2_wNyEgKwVH40vNOZ17V9YDQR79KO8MyaSJL88eLfKHENePfwBOfuRSnIH4zAT6vMhV96mOjk1v-dnMVlJwFlibjfgsNisGjeeS9cN--OX2gVUHAPnDKiXatSLGIxTBUJPMtq7iZsA2OttkoSnTy8dbQD8TNtP9oCGrKJariZNjoWf3Va9y0RlaCnJmacSZvDvDklrXRc7mchtM-X6pJtKcmfX9SU75rD719fkjVB1WJEc7JQ"
+            src="{{ session.get('photo_url') or 'https://lh3.googleusercontent.com/aida-public/AB6AXuCGKrBMfXjyz78Ur1fXlZ9rB2mGm2_wNyEgKwVH40vNOZ17V9YDQR79KO8MyaSJL88eLfKHENePfwBOfuRSnIH4zAT6vMhV96mOjk1v-dnMVlJwFlibjfgsNisGjeeS9cN--OX2gVUHAPnDKiXatSLGIxTBUJPMtq7iZsA2OttkoSnTy8dbQD8TNtP9oCGrKJariZNjoWf3Va9y0RlaCnJmacSZvDvDklrXRc7mchtM-X6pJtKcmfX9SU75rD719fkjVB1WJEc7JQ' }}"
+            id="photo-preview"
           />
         </div>
-        <button
-          class="absolute bottom-1 right-1 bg-primary text-on-primary p-2 rounded-full shadow-lg hover:scale-110 active:scale-90 transition-all"
+        <label
+          for="photo-input"
+          class="absolute bottom-1 right-1 bg-primary text-on-primary p-2 rounded-full shadow-lg hover:scale-110 active:scale-90 transition-all cursor-pointer"
         >
-          <span
-            class="material-symbols-outlined text-[20px]"
-            data-icon="photo_camera"
-            >photo_camera</span
-          >
-        </button>
-      </div>
+          <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+        </label>
+        <input
+          type="file"
+          name="photo"
+          id="photo-input"
+          accept="image/*"
+          class="hidden"
+        />
+      </form>
       <div class="text-center">
         <p class="font-headline-md text-headline-md text-on-surface">
-         {{session['first_name']}} {{session['last_name']}}
+          {{ session.get('first_name', '') }} {{ session.get('last_name', '') }}
         </p>
         <p class="font-body-md text-primary opacity-80">
-          Patient ID: {{session['patient_id']}}
+          Patient ID: {{ session.get('patient_id', '—') }}
         </p>
       </div>
       <button
+        type="submit"
+        form="photo-form"
         class="w-full py-2 px-4 rounded-lg bg-primary-container text-on-primary-container font-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
       >
-        <span class="material-symbols-outlined" data-icon="upload">upload</span>
+        <span class="material-symbols-outlined">upload</span>
         Update Photo
       </button>
     </div>
+
     <!-- Identity Details Card -->
     <div
       class="md:col-span-2 glass-card rounded-xl p-md flex flex-col justify-between"
@@ -163,213 +234,313 @@ block body %}
           Personal Information
         </h2>
         <button
+          type="button"
+          id="open-edit-modal"
           class="text-secondary hover:underline font-label-md flex items-center gap-1"
         >
-          <span class="material-symbols-outlined text-[18px]" data-icon="edit"
-            >edit</span
-          >
+          <span class="material-symbols-outlined text-[18px]">edit</span>
           Edit Details
         </button>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-md gap-x-lg">
         <div class="space-y-1">
-          <p
-            class="font-caption text-on-surface-variant uppercase tracking-wider"
-          >
+          <p class="font-caption text-on-surface-variant uppercase tracking-wider">
             Full Name
           </p>
-          <p class="font-body-lg text-on-surface">{{session['first_name']}} {{session['last_name']}}</p>
+          <p class="font-body-lg text-on-surface">
+            {{ session.get('first_name', '') }} {{ session.get('last_name', '') }}
+          </p>
         </div>
         <div class="space-y-1">
-          <p
-            class="font-caption text-on-surface-variant uppercase tracking-wider"
-          >
+          <p class="font-caption text-on-surface-variant uppercase tracking-wider">
             Blood Type
           </p>
           <div class="flex items-center gap-2">
             <span
               class="w-8 h-8 rounded-md bg-error/20 text-error flex items-center justify-center font-bold border border-error/30"
-              >O+</span
+              >{{ session.get('blood_type', 'N/A') }}</span
             >
-            <p class="font-body-lg text-on-surface">Positive</p>
           </div>
         </div>
         <div class="space-y-1">
-          <p
-            class="font-caption text-on-surface-variant uppercase tracking-wider"
-          >
+          <p class="font-caption text-on-surface-variant uppercase tracking-wider">
             Date of Birth
           </p>
-          <p class="font-body-lg text-on-surface">{{session['date_of_birth']}}</p>
+          <p class="font-body-lg text-on-surface">{{ session.get('date_of_birth', '—') }}</p>
         </div>
         <div class="space-y-1">
-          <p
-            class="font-caption text-on-surface-variant uppercase tracking-wider"
-          >
+          <p class="font-caption text-on-surface-variant uppercase tracking-wider">
             Phone Number
           </p>
-          <p class="font-body-lg text-on-surface">{{session['phone']}}</p>
+          <p class="font-body-lg text-on-surface">{{ session.get('phone', '—') }}</p>
         </div>
         <div class="space-y-1 sm:col-span-2">
-          <p
-            class="font-caption text-on-surface-variant uppercase tracking-wider"
-          >
+          <p class="font-caption text-on-surface-variant uppercase tracking-wider">
             Home Address
           </p>
-          <p class="font-body-lg text-on-surface">
-            {{session['address']}}
-          </p>
+          <p class="font-body-lg text-on-surface">{{ session.get('address', '—') }}</p>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Account Settings & Preferences -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
     <!-- Security Section -->
     <section class="glass-card rounded-xl p-md space-y-md">
-      <h3
-        class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm"
-      >
-        <span
-          class="material-symbols-outlined text-primary"
-          data-icon="security"
-          >security</span
-        >
+      <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+        <span class="material-symbols-outlined text-primary">security</span>
         Security &amp; Access
       </h3>
       <div class="space-y-sm">
         <button
+          type="button"
+          id="open-password-modal"
           class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
         >
           <div class="flex items-center gap-md">
-            <div
-              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20"
-            >
-              <span
-                class="material-symbols-outlined text-on-surface-variant group-hover:text-primary"
-                data-icon="lock"
-                >lock</span
-              >
+            <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20">
+              <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">lock</span>
             </div>
             <div class="text-left">
               <p class="font-label-md text-on-surface">Password</p>
-              <p class="font-caption text-on-surface-variant">
-                Change password
-              </p>
+              <p class="font-caption text-on-surface-variant">Change password</p>
             </div>
           </div>
-          <span
-            class="material-symbols-outlined text-on-surface-variant"
-            data-icon="chevron_right"
-            >chevron_right</span
-          >
+          <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
         </button>
       </div>
     </section>
+
     <!-- Preferences Section -->
     <section class="glass-card rounded-xl p-md space-y-md">
-      <h3
-        class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm"
-      >
-        <span
-          class="material-symbols-outlined text-secondary"
-          data-icon="settings"
-          >settings</span
-        >
+      <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+        <span class="material-symbols-outlined text-secondary">settings</span>
         App Preferences
       </h3>
       <div class="space-y-sm">
-        <button
-          class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
-        >
+        <button class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group">
           <div class="flex items-center gap-md">
-            <div
-              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20"
-            >
-              <span
-                class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary"
-                data-icon="language"
-                >language</span
-              >
+            <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20">
+              <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary">language</span>
             </div>
             <div class="text-left">
               <p class="font-label-md text-on-surface">Language</p>
-              <p class="font-caption text-on-surface-variant">
-                English (United States)
-              </p>
+              <p class="font-caption text-on-surface-variant">English (United States)</p>
             </div>
           </div>
-          <span
-            class="material-symbols-outlined text-on-surface-variant"
-            data-icon="chevron_right"
-            >chevron_right</span
-          >
+          <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
         </button>
-        <button
-          class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group"
-        >
+        <button class="w-full flex items-center justify-between p-sm rounded-lg hover:bg-white/5 transition-colors group">
           <div class="flex items-center gap-md">
-            <div
-              class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20"
-            >
-              <span
-                class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary"
-                data-icon="dark_mode"
-                >dark_mode</span
-              >
+            <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-secondary/20">
+              <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary">dark_mode</span>
             </div>
             <div class="text-left">
               <p class="font-label-md text-on-surface">Appearance</p>
-              <p class="font-caption text-on-surface-variant">
-                System Default (Dark)
-              </p>
+              <p class="font-caption text-on-surface-variant">System Default (Dark)</p>
             </div>
           </div>
-          <span
-            class="material-symbols-outlined text-on-surface-variant"
-            data-icon="chevron_right"
-            >chevron_right</span
-          >
+          <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
         </button>
       </div>
     </section>
   </div>
 </main>
-<br><br><br><br>
-<!-- Bottom Navigation Bar -->
+
+<!-- Edit Details Modal -->
 <div
-  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+  class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
+  id="edit-modal"
 >
-  <nav
-    class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
-  >
+  <div class="glass-card rounded-xl w-full max-w-lg p-md md:p-lg space-y-md">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Edit Details</h3>
+      <button type="button" class="modal-close text-on-surface-variant hover:text-on-surface" data-target="edit-modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form action="#" method="POST" class="space-y-md">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div class="space-y-1">
+          <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="first_name">First Name</label>
+          <input id="first_name" name="first_name" type="text" value="{{ session.get('first_name', '') }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="last_name">Last Name</label>
+          <input id="last_name" name="last_name" type="text" value="{{ session.get('last_name', '') }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="phone">Phone Number</label>
+          <input id="phone" name="phone" type="tel" value="{{ session.get('phone', '') }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="blood_type">Blood Type</label>
+          <select id="blood_type" name="blood_type"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none">
+            {% for bt in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}
+            <option value="{{ bt }}" {{ 'selected' if session.get('blood_type') == bt else '' }}>{{ bt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="space-y-1 sm:col-span-2">
+          <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="address">Home Address</label>
+          <input id="address" name="address" type="text" value="{{ session.get('address', '') }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+        </div>
+      </div>
+      <div class="flex justify-end gap-sm pt-sm">
+        <button type="button" class="modal-close px-md py-2 rounded-lg text-on-surface-variant hover:bg-white/5" data-target="edit-modal">
+          Cancel
+        </button>
+        <button type="submit" class="px-md py-2 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div
+  class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
+  id="password-modal"
+>
+  <div class="glass-card rounded-xl w-full max-w-sm p-md md:p-lg space-y-md">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Change Password</h3>
+      <button type="button" class="modal-close text-on-surface-variant hover:text-on-surface" data-target="password-modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form action="#" method="POST" class="space-y-md">
+      <div class="space-y-1">
+        <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="current_password">Current Password</label>
+        <input id="current_password" name="current_password" type="password" required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+      </div>
+      <div class="space-y-1">
+        <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="new_password">New Password</label>
+        <input id="new_password" name="new_password" type="password" required minlength="8"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+      </div>
+      <div class="space-y-1">
+        <label class="text-caption text-on-surface-variant uppercase tracking-wider" for="confirm_password">Confirm New Password</label>
+        <input id="confirm_password" name="confirm_password" type="password" required minlength="8"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none" />
+      </div>
+      <div class="flex justify-end gap-sm pt-sm">
+        <button type="button" class="modal-close px-md py-2 rounded-lg text-on-surface-variant hover:bg-white/5" data-target="password-modal">
+          Cancel
+        </button>
+        <button type="submit" class="px-md py-2 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110">
+          Update Password
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar (Mobile) -->
+<div class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm md:hidden">
+  <nav class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]">
     <a
-      href="{{url_for('patient_dashboard')}}"
-      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      href="{{ url_for('patient_dashboard') }}"
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="home"
     >
-      <span
-        class="material-symbols-outlined"
-        style="font-variation-settings: &quot;FILL&quot; 1"
-        >home</span
-      >
-</a>
-    <button
+      <span class="material-symbols-outlined">home</span>
+    </a>
+    <a
+      href="{{ url_for('appointment') }}"
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="schedule"
     >
       <span class="material-symbols-outlined">calendar_today</span>
-    </button>
-    <a
-      href="{{url_for('patient_dashboard')}}"
-      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
-      data-nav="menu"
-      id="menu-btn"
+    </a>
+    <button
+      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      id="menu-btn-mobile"
+      aria-label="Open menu"
     >
-      <span class="material-symbols-outlined">menu</span>
-  </a>
+      <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1">menu</span>
+    </button>
   </nav>
 </div>
-</div>
 
+<script>
+  (function () {
+    // Photo preview on file select
+    const photoInput = document.getElementById("photo-input");
+    const photoPreview = document.getElementById("photo-preview");
+    if (photoInput && photoPreview) {
+      photoInput.addEventListener("change", () => {
+        const file = photoInput.files[0];
+        if (file) {
+          photoPreview.src = URL.createObjectURL(file);
+        }
+      });
+    }
+
+    // Modal open/close
+    const openEditBtn = document.getElementById("open-edit-modal");
+    const openPasswordBtn = document.getElementById("open-password-modal");
+    const editModal = document.getElementById("edit-modal");
+    const passwordModal = document.getElementById("password-modal");
+
+    const openModal = (modal) => {
+      if (!modal) return;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+    const closeModal = (modal) => {
+      if (!modal) return;
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    if (openEditBtn) openEditBtn.addEventListener("click", () => openModal(editModal));
+    if (openPasswordBtn) openPasswordBtn.addEventListener("click", () => openModal(passwordModal));
+
+    document.querySelectorAll(".modal-close").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        closeModal(document.getElementById(btn.dataset.target));
+      });
+    });
+    [editModal, passwordModal].forEach((modal) => {
+      if (!modal) return;
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal(modal);
+      });
+    });
+
+    // Notifications dropdown
+    const notifBtn = document.getElementById("notif-btn");
+    const notifPanel = document.getElementById("notif-panel");
+    if (notifBtn && notifPanel) {
+      notifBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notifPanel.classList.toggle("hidden");
+      });
+      document.addEventListener("click", (e) => {
+        if (!notifPanel.contains(e.target) && e.target !== notifBtn) {
+          notifPanel.classList.add("hidden");
+        }
+      });
+    }
+
+    // Mobile bottom-nav menu button also opens the drawer
+    const mobileMenuBtn = document.getElementById("menu-btn-mobile");
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.body.classList.toggle("drawer-open");
+        document.body.classList.toggle("drawer-closed");
+      });
+    }
+  })();
+</script>
 {% endblock %}
