@@ -426,7 +426,7 @@ def view_patients():
           
           #Selects all patients from the database ordered by registration date in descending order and limits the results to 20 per page based on the pagination parameters
           cursor.execute(
-               "SELECT id, first_name, last_name, email, password, phone, nrc, gender, date_of_birth, registration_date "
+               "SELECT patient_id, first_name, last_name, email, password, phone, nrc, gender, date_of_birth, registration_date "
                "FROM patient ORDER BY registration_date DESC LIMIT %s OFFSET %s",
                (per_page, offset),
           )
@@ -447,7 +447,7 @@ def view_patients():
      except Error as e:  
           print(f"Database error: {e}")
           flash("An error occurred while processing your request. Please try again later.", "error")
-     return render_template("admin_dashboard.html")
+     return redirect(url_for("admin_dashboard"))
 
 @app.route("/manage_patients", methods=["GET"])
 @login_required
