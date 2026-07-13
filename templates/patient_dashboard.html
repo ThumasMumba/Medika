@@ -109,6 +109,19 @@
     </nav>
     <!-- Main Content Canvas -->
     <main class="mt-20 px-margin-mobile space-y-md">
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="space-y-2 mb-md">
+    {% for category, msg in messages %}
+    <div
+      class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+    >
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
       <!-- Welcome Hero Section -->
       <section class="glass-card rounded-3xl p-md relative overflow-hidden">
         <div class="flex justify-between items-start z-10 relative">
