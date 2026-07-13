@@ -325,7 +325,8 @@ def patient_dashboard():
      Handles the patient dashboard data that when the patient submits their symptoms and other ailments
      """
      #
-     return render_template("patient_dashboard.html")
+     flash('Login successful! Welcome on board.', 'success')
+     return render_template('patient_dashboard.html')
 
 @app.route("/patient_pro", methods=["POST", "GET"])
 def patient_pro():
@@ -459,8 +460,7 @@ def manage_patients():
 @app.route("/appointment", methods=['GET', 'POST'])
 @patient_required
 def appointment():
-     """Handles the creation of new appointments. 
-     This route is a placeholder and should be implemented with the actual logic to create appointments in the system."""
+     """Handles the creation of new appointments. """
      return render_template("appointment.html")
 
 @app.route("/system_settings", methods=["GET"])

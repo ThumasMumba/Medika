@@ -1,87 +1,200 @@
-{% extends 'base.html'%}{% block body %}
-<!-- Navigation Drawer -->
+{% extends 'base.html' %} {% block title %}My Appointments{% endblock %} {%
+block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
+<span
+  class="px-sm py-xs bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+>
+  <span class="w-2 h-2 bg-on-surface-variant rounded-full animate-pulse"></span>
+  Pending
+</span>
+{% elif status == 'approved' %}
+<span
+  class="px-sm py-xs bg-tertiary/15 text-tertiary rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+>
+  <span class="material-symbols-outlined text-[14px]">check_circle</span>
+  Confirmed
+</span>
+{% elif status == 'rejected' %}
+<span
+  class="px-sm py-xs bg-error/15 text-error rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+>
+  <span class="material-symbols-outlined text-[14px]">cancel</span>
+  Rejected
+</span>
+{% else %}
+<span
+  class="px-sm py-xs bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+>
+  Cancelled
+</span>
+{% endif %} {% endmacro %} {% macro appointment_row(apt) %}
+<div
+  class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all group"
+  data-search="{{ apt.doctor.first_name }} {{ apt.doctor.last_name }} {{ apt.doctor.specialty }}"
+>
+  <div class="flex items-center gap-md">
     <div
-      class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
-      id="drawer-overlay"
-    ></div>
-    <aside
-      class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full"
-      id="nav-drawer"
+      class="w-12 h-12 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0"
     >
-      <div class="flex flex-col h-full p-md">
-        <div class="flex items-center gap-3 mb-xl">
-          <span
-            class="material-symbols-outlined text-primary text-3xl"
-            style="font-variation-settings: &quot;FILL&quot; 1"
-            >clinical_notes</span
+      {% if apt.doctor.photo_url %}
+      <img
+        class="w-full h-full object-cover"
+        src="{{ apt.doctor.photo_url }}"
+        alt="Dr. {{ apt.doctor.first_name }} {{ apt.doctor.last_name }}"
+      />
+      {% else %}
+      <span class="font-bold text-primary"
+        >{{ apt.doctor.first_name[0] }}{{ apt.doctor.last_name[0] }}</span
+      >
+      {% endif %}
+    </div>
+    <div>
+      <h4
+        class="font-bold text-on-surface group-hover:text-primary transition-colors"
+      >
+        Dr. {{ apt.doctor.first_name }} {{ apt.doctor.last_name }}
+      </h4>
+      <div class="flex items-center gap-sm mt-xs flex-wrap">
+        <span
+          class="px-xs py-0.5 bg-secondary-container/30 text-secondary text-[10px] font-bold uppercase rounded"
+        >
+          {{ apt.doctor.specialty }}
+        </span>
+        <span
+          class="text-on-surface-variant text-caption flex items-center gap-xs"
+        >
+          <span class="material-symbols-outlined text-[14px]"
+            >{{ 'videocam' if apt.mode == 'virtual' else 'location_on' }}</span
           >
-          <span
-            class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
-            >Medika</span
-          >
-        </div>
-        <nav class="flex-1 space-y-2">
-          <a
-            href="{{url_for('patient_pro')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
-              >person</span
-            >
-            <span class="font-label-md text-label-md">Profile</span>
-          </a>
-          <a
-            href="{{url_for('patient_records') }}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
-              >description</span
-            >
-            <span class="font-label-md text-label-md">Health Records</span>
-          </a>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
-              >calendar_month</span
-            >
-            <span class="font-label-md text-label-md">Appointments</span>
-          </button>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
-              >settings</span
-            >
-            <span class="font-label-md text-label-md">Settings</span>
-        </a>
-        </nav>
-        <div class="mt-auto pt-md border-t border-white/10">
-          <a
-            href="{{url_for('logout')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined group-hover:scale-110 transition-transform"
-              >logout</span
-            >
-            <span class="font-label-md text-label-md font-bold">Logout</span>
-        </a>
-        </div>
+          {{ 'Virtual' if apt.mode == 'virtual' else 'In-person' }}
+        </span>
+        {{ status_badge(apt.status) }}
       </div>
-    </aside>
+    </div>
+  </div>
+  <div class="flex items-center justify-between md:justify-end gap-lg">
+    <div class="text-right">
+      <p class="font-bold text-on-surface">
+        {{ apt.date.strftime('%b %d, %Y') }}
+      </p>
+      <p class="text-caption text-on-surface-variant">
+        {{ apt.time.strftime('%I:%M %p') }}
+      </p>
+    </div>
+    {% if apt.status in ['pending', 'approved'] %}
+    <div class="relative">
+      <button
+        class="row-menu-btn w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all"
+        data-id="{{ apt.id }}"
+      >
+        <span class="material-symbols-outlined">more_vert</span>
+      </button>
+      <div
+        class="row-menu hidden absolute right-0 mt-1 w-44 glass-card rounded-xl border border-white/10 shadow-xl overflow-hidden z-[75]"
+        id="row-menu-{{ apt.id }}"
+      >
+        <form action="#" method="POST">
+          <button
+            type="submit"
+            class="w-full text-left px-sm py-sm text-error hover:bg-error/10 font-label-md flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-[18px]"
+              >event_busy</span
+            >
+            Cancel appointment
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+<!-- Navigation Drawer -->
+<div
+  class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none transition-opacity duration-300"
+  id="drawer-overlay"
+></div>
+<aside
+  class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full transition-transform duration-300"
+  id="nav-drawer"
+>
+  <div class="flex flex-col h-full p-md">
+    <div class="flex items-center gap-3 mb-xl">
+      <span
+        class="material-symbols-outlined text-primary text-3xl"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >clinical_notes</span
+      >
+      <span
+        class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+        >Medika</span
+      >
+    </div>
+    <nav class="flex-1 space-y-2">
+      <a
+        href="{{ url_for('patient_pro') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
+          >person</span
+        >
+        <span class="font-label-md text-label-md">Profile</span>
+      </a>
+      <a
+        href="{{ url_for('patient_records') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+          >description</span
+        >
+        <span class="font-label-md text-label-md">Health Records</span>
+      </a>
+      <a
+        href="{{ url_for('appointment') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl bg-primary/10 text-primary transition-colors group"
+      >
+        <span class="material-symbols-outlined">calendar_month</span>
+        <span class="font-label-md text-label-md">Appointments</span>
+      </a>
+      <a
+        href="#"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+          >settings</span
+        >
+        <span class="font-label-md text-label-md">Settings</span>
+      </a>
+    </nav>
+    <div class="mt-auto pt-md border-t border-white/10">
+      <a
+        href="{{ url_for('logout') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined group-hover:scale-110 transition-transform"
+          >logout</span
+        >
+        <span class="font-label-md text-label-md font-bold">Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
 <!-- Top App Bar -->
 <header
   class="fixed top-0 left-0 md:left-[280px] right-0 z-50 bg-surface dark:bg-on-background shadow-sm flex justify-between items-center w-full px-sm py-xs md:px-md md:py-sm"
 >
   <div class="flex items-center gap-sm">
-    <button class="md:hidden text-primary">
+    <button
+      class="md:hidden text-primary w-10 h-10 flex items-center justify-center"
+      id="menu-btn"
+      aria-label="Open menu"
+    >
       <span class="material-symbols-outlined">menu</span>
     </button>
     <h1
@@ -92,8 +205,9 @@
   </div>
   <div class="hidden md:flex flex-1 max-w-md mx-xl relative">
     <input
+      id="search-input"
       class="w-full bg-surface-container-low border-none rounded-full px-lg py-xs text-on-surface placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary"
-      placeholder="Search patients or appointments..."
+      placeholder="Search by doctor or specialty..."
       type="text"
     />
     <span
@@ -102,48 +216,117 @@
     >
   </div>
   <div class="flex items-center gap-sm">
-    <button
-      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant"
-    >
-      <span class="material-symbols-outlined">search</span>
-    </button>
-    <button
-      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
-    >
-      <span class="material-symbols-outlined">notifications</span>
-      <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-    </button>
+    <div class="relative">
+      <button
+        id="notif-btn"
+        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
+        aria-label="Notifications"
+      >
+        <span class="material-symbols-outlined">notifications</span>
+        {% if notifications and notifications|selectattr('read', 'equalto',
+        false)|list|length > 0 %}
+        <span
+          class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"
+        ></span>
+        {% endif %}
+      </button>
+      <div
+        class="hidden absolute right-0 mt-sm w-80 max-w-[90vw] glass-card rounded-xl border border-white/10 shadow-xl overflow-hidden z-[80]"
+        id="notif-panel"
+      >
+        <div
+          class="p-sm border-b border-white/10 flex items-center justify-between"
+        >
+          <p class="font-label-md text-on-surface font-bold">Notifications</p>
+          <span class="text-caption text-on-surface-variant"
+            >{{ notifications|length if notifications else 0 }}</span
+          >
+        </div>
+        <div class="max-h-80 overflow-y-auto divide-y divide-white/5">
+          {% for n in notifications %}
+          <div
+            class="p-sm flex items-start gap-sm {{ 'bg-primary/5' if not n.read else '' }}"
+          >
+            <span
+              class="material-symbols-outlined text-[20px] mt-0.5 {{ 'text-tertiary' if n.type == 'approved' else 'text-error' if n.type == 'rejected' else 'text-secondary' }}"
+            >
+              {{ 'check_circle' if n.type == 'approved' else 'cancel' if n.type
+              == 'rejected' else 'info' }}
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-body-md text-on-surface leading-snug">
+                {{ n.message }}
+              </p>
+              <p class="text-caption text-on-surface-variant mt-1">
+                {{ n.created_at }}
+              </p>
+            </div>
+          </div>
+          {% else %}
+          <div class="p-lg text-center">
+            <span
+              class="material-symbols-outlined text-on-surface-variant text-3xl"
+              >notifications_off</span
+            >
+            <p class="text-caption text-on-surface-variant mt-sm">
+              You're all caught up
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </div>
 </header>
+
 <!-- Main Content -->
 <main
   class="pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop md:ml-[280px] min-h-screen"
 >
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="space-y-2 mb-md">
+    {% for category, msg in messages %}
+    <div
+      class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+    >
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
+
   <!-- Header Controls -->
   <div
     class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg"
   >
     <div class="flex items-center gap-md">
       <button
-        class="font-label-md text-label-md px-md py-sm active-tab text-primary"
+        class="tab-btn font-label-md text-label-md px-md py-sm active-tab text-primary"
+        data-tab="upcoming"
       >
         Upcoming
       </button>
       <button
-        class="font-label-md text-label-md px-md py-sm text-on-surface-variant hover:text-on-surface transition-colors"
+        class="tab-btn font-label-md text-label-md px-md py-sm text-on-surface-variant hover:text-on-surface transition-colors"
+        data-tab="past"
       >
         Past
       </button>
     </div>
     <button
-      class="glass-card px-md py-sm rounded-xl flex items-center gap-sm text-on-surface-variant hover:text-primary transition-all"
+      id="book-new-btn"
+      class="glass-card px-md py-sm rounded-xl flex items-center gap-sm text-primary hover:brightness-110 transition-all font-bold"
     >
-      <span class="material-symbols-outlined">tune</span>
-      <span class="font-label-md text-label-md">Filters</span>
+      <span class="material-symbols-outlined">add</span>
+      <span class="font-label-md text-label-md">Book New</span>
     </button>
   </div>
-  <!-- Bento Grid Layout -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+
+  <!-- UPCOMING TAB -->
+  <div id="tab-upcoming" class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+    {% set next_apt = upcoming_appointments|selectattr('status', 'equalto',
+    'approved')|first %} {% if next_apt %}
     <!-- Featured Upcoming Appointment Card -->
     <section
       class="lg:col-span-8 glass-card rounded-xl overflow-hidden relative group"
@@ -158,23 +341,31 @@
       </div>
       <div class="p-md md:p-lg flex flex-col md:flex-row gap-lg items-start">
         <div
-          class="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden relative border-2 border-primary/20"
+          class="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden relative border-2 border-primary/20 bg-primary/10 flex items-center justify-center shrink-0"
         >
+          {% if next_apt.doctor.photo_url %}
           <img
             class="w-full h-full object-cover"
-            data-alt="A portrait of a senior female cardiologist, Dr. Sarah Mitchell, with a kind and authoritative expression. She is wearing a dark blue medical scrub under a white clinical coat. The setting is a modern, high-tech cardiology lab with soft bokeh lighting from medical displays. The aesthetic is clean and futuristic with primary blue and white tones."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtVL-fDGsSeWJZOPXycyqLhZvsQKAM4L_rFx5f7YxIiPgBx3-ZAPS6i0yxncTl5SKxg7vCF_o3VMIEa-WYnND0ecachgP5xTXBzqMom-GSzdl9xIaxphi8A5k8UG30vL5RufKpCnfqQUYv4EIUUShaFeJnokwsjis0AKOKpeLeH5HBuEMgSjB1pmfz2dnjIui_BnQoxSgG4G8mucwbcRwF1LQDBDe52nkhU5vOwOjSpdInA-EOB0mEZEZVbyHjdBRWatuO033EfA"
+            src="{{ next_apt.doctor.photo_url }}"
+            alt="Dr. {{ next_apt.doctor.first_name }} {{ next_apt.doctor.last_name }}"
           />
+          {% else %}
+          <span class="font-bold text-primary text-2xl"
+            >{{ next_apt.doctor.first_name[0] }}{{ next_apt.doctor.last_name[0]
+            }}</span
+          >
+          {% endif %}
         </div>
         <div class="flex-1 space-y-md w-full">
           <div>
             <h2 class="font-headline-md text-headline-md text-on-surface">
-              Dr. Sarah Mitchell
+              Dr. {{ next_apt.doctor.first_name }} {{ next_apt.doctor.last_name
+              }}
             </h2>
             <p
               class="text-secondary font-medium uppercase tracking-wider text-caption"
             >
-              Senior Cardiologist
+              {{ next_apt.doctor.specialty }}
             </p>
           </div>
           <div class="grid grid-cols-2 gap-sm">
@@ -184,7 +375,9 @@
               >
               <div>
                 <p class="text-caption">Date</p>
-                <p class="font-bold text-on-surface">Oct 24, 2024</p>
+                <p class="font-bold text-on-surface">
+                  {{ next_apt.date.strftime('%b %d, %Y') }}
+                </p>
               </div>
             </div>
             <div class="flex items-center gap-sm text-on-surface-variant">
@@ -193,7 +386,9 @@
               >
               <div>
                 <p class="text-caption">Time</p>
-                <p class="font-bold text-on-surface">09:30 AM</p>
+                <p class="font-bold text-on-surface">
+                  {{ next_apt.time.strftime('%I:%M %p') }}
+                </p>
               </div>
             </div>
           </div>
@@ -203,11 +398,18 @@
             >
               Prepare for Check-in
             </button>
-            <button
-              class="neomorphic-button bg-surface-container-highest text-on-surface px-lg py-sm rounded-xl font-bold flex-1 md:flex-none transition-all hover:bg-surface-container-low active:scale-95"
+            <form
+              action="{{ url_for('cancel_appointment', appointment_id=next_apt.id) }}"
+              method="POST"
+              class="flex-1 md:flex-none"
             >
-              Reschedule
-            </button>
+              <button
+                type="submit"
+                class="w-full neomorphic-button bg-surface-container-highest text-on-surface px-lg py-sm rounded-xl font-bold transition-all hover:bg-surface-container-low active:scale-95"
+              >
+                Cancel
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -215,9 +417,10 @@
         class="h-2 w-full bg-gradient-to-r from-primary to-secondary opacity-30"
       ></div>
     </section>
-    <!-- Reminder & Action Column -->
+
+    <!-- Reminder & Book Column -->
     <div class="lg:col-span-4 flex flex-col gap-gutter">
-      <!-- Reminder Card -->
+      {% if next_apt.reminder %}
       <div
         class="glass-card rounded-xl p-md border-l-4 border-secondary vitals-glow"
       >
@@ -225,20 +428,13 @@
           <span class="material-symbols-outlined text-secondary">info</span>
           <h3 class="font-bold text-on-surface">Next Reminder</h3>
         </div>
-        <p class="text-on-surface-variant font-body-md mb-md">
-          <span class="text-secondary font-bold">Fasting required:</span>
-          Please do not eat or drink anything except water for 8 hours prior to
-          your blood test.
+        <p class="text-on-surface-variant font-body-md">
+          {{ next_apt.reminder }}
         </p>
-        <div
-          class="flex items-center justify-between text-caption text-on-surface-variant bg-surface-container/50 p-sm rounded-lg"
-        >
-          <span>Lab Location: A-12</span>
-          <span class="material-symbols-outlined text-sm">open_in_new</span>
-        </div>
       </div>
-      <!-- Book New Card -->
+      {% endif %}
       <button
+        id="book-new-btn-card"
         class="group glass-card rounded-xl p-md text-left flex flex-col items-center justify-center gap-sm border-dashed border-2 border-primary/30 hover:border-primary transition-all overflow-hidden relative py-lg"
       >
         <div
@@ -259,223 +455,349 @@
         </div>
       </button>
     </div>
-    <!-- Other Scheduled Visits List -->
+    {% else %}
+    <!-- Empty featured slot: no confirmed upcoming visit yet -->
+    <section
+      class="lg:col-span-12 glass-card rounded-xl p-lg flex flex-col items-center justify-center text-center gap-sm"
+    >
+      <span class="material-symbols-outlined text-primary text-4xl"
+        >event_available</span
+      >
+      <h2 class="font-headline-md text-headline-md text-on-surface">
+        No confirmed visit yet
+      </h2>
+      <p class="text-on-surface-variant font-body-md max-w-md">
+        Once a doctor approves your request it'll show up here as your next
+        visit.
+      </p>
+      <button
+        id="book-new-btn-empty"
+        class="mt-sm neomorphic-button bg-primary text-on-primary px-lg py-sm rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all"
+      >
+        Book an Appointment
+      </button>
+    </section>
+    {% endif %}
+
+    <!-- Upcoming List -->
     <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
       <div
         class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
       >
-        <h3 class="font-bold text-on-surface">Other Scheduled Visits</h3>
+        <h3 class="font-bold text-on-surface">All Upcoming Requests</h3>
         <span class="text-caption text-on-surface-variant"
-          >3 remaining this month</span
+          >{{ upcoming_appointments|length }} total</span
         >
       </div>
-      <div class="divide-y divide-white/5">
-        <!-- List Item 1 -->
-        <div
-          class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all group"
-        >
-          <div class="flex items-center gap-md">
-            <div class="w-12 h-12 rounded-full overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="A portrait of a male dermatologist in his 30s with short dark hair and a professional, friendly gaze. He is wearing light grey clinical scrubs. The background is a brightly lit, clean dermatology clinic with glass surfaces and soft teal accents. High-end clinical photography style with a soft-focus background."
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAniygZO9l6j7_QL-ud5M9Q_J2Sj869dGAyuuxC2c1ljhxQocyivBoY1pTEuo94dDoI0-3gmAHvRlwXTF8PJ_oN0F4HyC7BenXYZARSb0iVmK0RmMT6db_FeNBSIKZLHFW1voFALp3oslhjP6UIjzzttTytUkqO1ZgIRrmP2lX0mpb3sn27ffUG1m3ZtsEQdTiBDRr1d935lECUAXLkoIsE7vTJDabdBhGljNsOBjwn6Xs6fuFl_dCFrPcQ_PtQG9i8eM1IiuBDWQ"
-              />
-            </div>
-            <div>
-              <h4
-                class="font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Dr. David Lee
-              </h4>
-              <div class="flex items-center gap-sm mt-xs">
-                <span
-                  class="px-xs py-0.5 bg-tertiary-container/30 text-tertiary text-[10px] font-bold uppercase rounded"
-                  >Dermatology</span
-                >
-                <span
-                  class="text-on-surface-variant text-caption flex items-center gap-xs"
-                >
-                  <span class="material-symbols-outlined text-[14px]"
-                    >videocam</span
-                  >
-                  Virtual
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between md:justify-end gap-lg">
-            <div class="text-right">
-              <p class="font-bold text-on-surface">Oct 28</p>
-              <p class="text-caption text-on-surface-variant">02:15 PM</p>
-            </div>
-            <button
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all"
-            >
-              <span class="material-symbols-outlined">more_vert</span>
-            </button>
-          </div>
+      <div class="divide-y divide-white/5" id="upcoming-search-list">
+        {% for apt in upcoming_appointments %} {{ appointment_row(apt) }} {%
+        else %}
+        <div class="p-lg text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-3xl">calendar_month</span>
+          <p class="mt-sm">
+            No upcoming appointments. Book your first one above.
+          </p>
         </div>
-        <!-- List Item 2 -->
-        <div
-          class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all group"
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <!-- PAST TAB -->
+  <div id="tab-past" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+    <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
+      <div
+        class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
+      >
+        <h3 class="font-bold text-on-surface">Past Appointments</h3>
+        <span class="text-caption text-on-surface-variant"
+          >{{ past_appointments|length }} total</span
         >
-          <div class="flex items-center gap-md">
-            <div class="w-12 h-12 rounded-full overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="A portrait of a female physical therapist in her 50s with a warm and energetic personality. She has curly silver hair and is wearing a high-tech athletic polo shirt with a clinic logo. The background is a sunny, minimalist physical therapy gym with clean lines and plants. Soft natural lighting creates a calm yet professional medical ambiance."
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAhwSsk9Dfz88b2YT2WGFaM7UyEvUgXc1j6Adrltoi_Dm5fQosjVU23iuKPVNutNtUJEvpfN7h8L4wk5-gSHb87YbOyTG6jnuB2_PuS7hFxsUZrQy3vSSJ2dVnJ3xJzTYIeTGMHDxLx2Auv04oErt-XhRXNNkXP5Op3BorECISMkfBVYk9AsOxzP7cj95dKn4Am449RBOedmnzohwuKZBvLMZdOnRHkJhXUnc1xKYmKANKhR5l-OnGsStHcuI-6cKRD2q4a-kq-A"
-              />
-            </div>
-            <div>
-              <h4
-                class="font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Dr. Elena Rodriguez
-              </h4>
-              <div class="flex items-center gap-sm mt-xs">
-                <span
-                  class="px-xs py-0.5 bg-primary-container/30 text-primary text-[10px] font-bold uppercase rounded"
-                  >Physiotherapy</span
-                >
-                <span
-                  class="text-on-surface-variant text-caption flex items-center gap-xs"
-                >
-                  <span class="material-symbols-outlined text-[14px]"
-                    >location_on</span
-                  >
-                  In-person
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between md:justify-end gap-lg">
-            <div class="text-right">
-              <p class="font-bold text-on-surface">Nov 02</p>
-              <p class="text-caption text-on-surface-variant">10:00 AM</p>
-            </div>
-            <button
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all"
-            >
-              <span class="material-symbols-outlined">more_vert</span>
-            </button>
-          </div>
+      </div>
+      <div class="divide-y divide-white/5" id="past-search-list">
+        {% for apt in past_appointments %} {{ appointment_row(apt) }} {% else %}
+        <div class="p-lg text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-3xl">history</span>
+          <p class="mt-sm">No past appointments yet.</p>
         </div>
-        <!-- List Item 3 -->
-        <div
-          class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all group"
-        >
-          <div class="flex items-center gap-md">
-            <div class="w-12 h-12 rounded-full overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="A professional headshot of a young male ENT specialist in his late 20s. He is wearing a modern navy blue medical tunic. The background is a clean, sterile clinical exam room with high-end medical equipment softly blurred in the background. The lighting is crisp and even, highlighting clinical precision and high-tech care."
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJT8WwnQZqGdfJjzuRpfE4iIDoAAXor5NRzUP8hFJIoRPJuIrbEeR6111Kggh_v4wzA7nyn21zIYPhNt3x7HDN0TCQkiuJY_769HHXnCgwBIPLSk6uN4_WnXwfD12GBJxt9-ig7jDHJGCNdWVrBGyKDDQ5Kf_6ULEDPw0hIfwUvPe0UcxRb_uUdxcaH6XFGdSWjfug92_LQwK87mlrd5OlhVsHCyXglI8GUteOJj0Uso9iKEM7U337qoJ0n1s9h-3rOrlDGPuLag"
-              />
-            </div>
-            <div>
-              <h4
-                class="font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Dr. Ryan Thompson
-              </h4>
-              <div class="flex items-center gap-sm mt-xs">
-                <span
-                  class="px-xs py-0.5 bg-secondary-container/30 text-secondary text-[10px] font-bold uppercase rounded"
-                  >ENT Specialist</span
-                >
-                <span
-                  class="text-on-surface-variant text-caption flex items-center gap-xs"
-                >
-                  <span class="material-symbols-outlined text-[14px]"
-                    >videocam</span
-                  >
-                  Virtual
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between md:justify-end gap-lg">
-            <div class="text-right">
-              <p class="font-bold text-on-surface">Nov 15</p>
-              <p class="text-caption text-on-surface-variant">04:30 PM</p>
-            </div>
-            <button
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all"
-            >
-              <span class="material-symbols-outlined">more_vert</span>
-            </button>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </section>
   </div>
 </main>
-<!-- Bottom Navigation (Mobile Only) -->
-<br><br><br><br>
-<!-- Bottom Navigation Bar -->
+
+<!-- Book New Appointment Modal -->
 <div
-  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+  class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
+  id="book-modal"
+>
+  <div
+    class="glass-card rounded-xl w-full max-w-lg p-md md:p-lg space-y-md max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-headline-md text-on-surface">
+        Book an Appointment
+      </h3>
+      <button
+        type="button"
+        class="modal-close text-on-surface-variant hover:text-on-surface"
+        data-target="book-modal"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form
+      action="{{ url_for('book_appointment') }}"
+      method="POST"
+      class="space-y-md"
+    >
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="doctor_id"
+          >Doctor</label
+        >
+        <select
+          id="doctor_id"
+          name="doctor_id"
+          required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="" disabled selected>Choose a doctor</option>
+          {% for doc in doctors %}
+          <option value="{{ doc.id }}">
+            Dr. {{ doc.first_name }} {{ doc.last_name }} — {{ doc.specialty }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="date"
+            >Preferred Date</label
+          >
+          <input
+            id="date"
+            name="date"
+            type="date"
+            required
+            min="{{ today }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="time"
+            >Preferred Time</label
+          >
+          <input
+            id="time"
+            name="time"
+            type="time"
+            required
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="mode"
+          >Consultation Type</label
+        >
+        <select
+          id="mode"
+          name="mode"
+          required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="in_person">In-person</option>
+          <option value="virtual">Virtual</option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="reason"
+          >Reason for Visit</label
+        >
+        <textarea
+          id="reason"
+          name="reason"
+          rows="3"
+          required
+          placeholder="Briefly describe your symptoms or reason for the visit"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none resize-none"
+        ></textarea>
+      </div>
+      <p class="text-caption text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">info</span>
+        Your request goes to the doctor for approval — you'll be notified once
+        it's confirmed.
+      </p>
+      <div class="flex justify-end gap-sm pt-sm">
+        <button
+          type="button"
+          class="modal-close px-md py-2 rounded-lg text-on-surface-variant hover:bg-white/5"
+          data-target="book-modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-md py-2 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110"
+        >
+          Send Request
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<div
+  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm md:hidden"
 >
   <nav
     class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
   >
-    <a href="{{url_for('patient_dashboard')}}"
-      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+    <a
+      href="{{ url_for('patient_dashboard') }}"
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="home"
+    >
+      <span class="material-symbols-outlined">home</span>
+    </a>
+    <button
+      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      data-nav="schedule"
     >
       <span
         class="material-symbols-outlined"
         style="font-variation-settings: &quot;FILL&quot; 1"
-        >home</span
+        >calendar_today</span
       >
-</a>
-    <button
-      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
-      data-nav="schedule"
-    >
-      <span class="material-symbols-outlined">calendar_today</span>
     </button>
     <button
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
-      data-nav="menu"
-      id="menu-btn"
+      id="menu-btn-mobile"
+      aria-label="Open menu"
     >
       <span class="material-symbols-outlined">menu</span>
     </button>
   </nav>
 </div>
-<script>
-  // Simple micro-interaction for tabs
-  document.querySelectorAll("button.font-label-md").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("button.font-label-md").forEach((b) => {
-        b.classList.remove("active-tab", "text-primary");
-        b.classList.add("text-on-surface-variant");
-      });
-      btn.classList.add("active-tab", "text-primary");
-      btn.classList.remove("text-on-surface-variant");
-    });
-  });
 
-  // Search bar interaction
-  const searchInput = document.querySelector('input[type="text"]');
-  if (searchInput) {
-    searchInput.addEventListener("focus", () => {
-      searchInput.parentElement.classList.add("scale-[1.02]");
-      searchInput.parentElement.classList.replace(
-        "bg-surface-container-low",
-        "bg-surface-container",
+<script>
+  (function () {
+    // Tab switching
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const panels = {
+      upcoming: document.getElementById("tab-upcoming"),
+      past: document.getElementById("tab-past"),
+    };
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach((b) => {
+          b.classList.remove("active-tab", "text-primary");
+          b.classList.add("text-on-surface-variant");
+        });
+        btn.classList.add("active-tab", "text-primary");
+        btn.classList.remove("text-on-surface-variant");
+        const target = btn.dataset.tab;
+        Object.entries(panels).forEach(([key, el]) => {
+          if (!el) return;
+          el.classList.toggle("hidden", key !== target);
+        });
+      });
+    });
+
+    // Search filter (client-side, across visible list)
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+        document.querySelectorAll("[data-search]").forEach((row) => {
+          const match = row.dataset.search.toLowerCase().includes(q);
+          row.classList.toggle("hidden", !match);
+        });
+      });
+    }
+
+    // Book New modal (three triggers: header button, card, empty state)
+    const bookModal = document.getElementById("book-modal");
+    const openModal = (modal) => {
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    };
+    const closeModal = (modal) => {
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    };
+    ["book-new-btn", "book-new-btn-card", "book-new-btn-empty"].forEach(
+      (id) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener("click", () => openModal(bookModal));
+      },
+    );
+    document.querySelectorAll(".modal-close").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        closeModal(document.getElementById(btn.dataset.target)),
       );
     });
-    searchInput.addEventListener("blur", () => {
-      searchInput.parentElement.classList.remove("scale-[1.02]");
-      searchInput.parentElement.classList.replace(
-        "bg-surface-container",
-        "bg-surface-container-low",
-      );
+    if (bookModal) {
+      bookModal.addEventListener("click", (e) => {
+        if (e.target === bookModal) closeModal(bookModal);
+      });
+    }
+
+    // Per-row "more" menu
+    document.querySelectorAll(".row-menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById("row-menu-" + btn.dataset.id);
+        document.querySelectorAll(".row-menu").forEach((m) => {
+          if (m !== menu) m.classList.add("hidden");
+        });
+        if (menu) menu.classList.toggle("hidden");
+      });
     });
-  }
+    document.addEventListener("click", () => {
+      document
+        .querySelectorAll(".row-menu")
+        .forEach((m) => m.classList.add("hidden"));
+    });
+
+    // Notifications dropdown
+    const notifBtn = document.getElementById("notif-btn");
+    const notifPanel = document.getElementById("notif-panel");
+    if (notifBtn && notifPanel) {
+      notifBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notifPanel.classList.toggle("hidden");
+      });
+      document.addEventListener("click", (e) => {
+        if (!notifPanel.contains(e.target) && e.target !== notifBtn)
+          notifPanel.classList.add("hidden");
+      });
+    }
+
+    // Mobile bottom-nav menu also opens the drawer
+    const mobileMenuBtn = document.getElementById("menu-btn-mobile");
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.body.classList.toggle("drawer-open");
+        document.body.classList.toggle("drawer-closed");
+      });
+    }
+  })();
 </script>
 {% endblock %}
