@@ -187,7 +187,7 @@ block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
 
 <!-- Top App Bar -->
 <header
-  class="fixed top-0 left-0 md:left-[280px] right-0 z-50 bg-surface dark:bg-on-background shadow-sm flex justify-between items-center w-full px-sm py-xs md:px-md md:py-sm"
+  class="fixed top-0 left-0 right-0 z-50 bg-surface dark:bg-on-background shadow-sm flex justify-between items-center w-full px-sm py-xs md:px-md md:py-sm"
 >
   <div class="flex items-center gap-sm">
     <button
@@ -281,7 +281,7 @@ block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
 
 <!-- Main Content -->
 <main
-  class="pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop md:ml-[280px] min-h-screen"
+  class="pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop min-h-screen max-w-7xl mx-auto"
 >
   {% with messages = get_flashed_messages(with_categories=true) %} {% if
   messages %}
@@ -546,11 +546,7 @@ block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <form
-      action="#"
-      method="POST"
-      class="space-y-md"
-    >
+    <form action="#" method="POST" class="space-y-md">
       <div class="space-y-1">
         <label
           class="text-caption text-on-surface-variant uppercase tracking-wider"

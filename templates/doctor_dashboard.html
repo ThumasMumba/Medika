@@ -1,0 +1,607 @@
+{% extends 'base.html' %} {% block title %}Doctor Dashboard{% endblock %} {%
+block body %} {% macro appointment_request_row(apt) %} {% with messages =
+get_flashed_messages(with_categories=true) %} {% if messages %}
+<div class="space-y-2 mb-md">
+  {% for category, msg in messages %}
+  <div
+    class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+  >
+    {{ msg }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %} {% endwith %}
+<div
+  class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all"
+>
+  <div class="flex items-center gap-md">
+    <div
+      class="w-12 h-12 rounded-full overflow-hidden bg-secondary/20 flex items-center justify-center shrink-0"
+    >
+      <span class="font-bold text-secondary"
+        >{{ apt.patient.first_name[0] }}{{ apt.patient.last_name[0] }}</span
+      >
+    </div>
+    <div>
+      <h4 class="font-bold text-on-surface">
+        {{ apt.patient.first_name }} {{ apt.patient.last_name }}
+      </h4>
+      <div class="flex items-center gap-sm mt-xs flex-wrap">
+        <span
+          class="text-on-surface-variant text-caption flex items-center gap-xs"
+        >
+          <span class="material-symbols-outlined text-[14px]"
+            >{{ 'videocam' if apt.mode == 'virtual' else 'location_on' }}</span
+          >
+          {{ 'Virtual' if apt.mode == 'virtual' else 'In-person' }}
+        </span>
+        <span
+          class="px-sm py-xs bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+        >
+          <span
+            class="w-2 h-2 bg-on-surface-variant rounded-full animate-pulse"
+          ></span>
+          Pending
+        </span>
+      </div>
+      {% if apt.reason %}
+      <p
+        class="text-caption text-on-surface-variant mt-xs max-w-md line-clamp-2"
+      >
+        {{ apt.reason }}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="flex items-center justify-between md:justify-end gap-lg">
+    <div class="text-right">
+      <p class="font-bold text-on-surface">
+        {{ apt.date.strftime('%b %d, %Y') }}
+      </p>
+      <p class="text-caption text-on-surface-variant">
+        {{ apt.time.strftime('%I:%M %p') }}
+      </p>
+    </div>
+    <div class="flex items-center gap-xs">
+      <form
+        action="{{ url_for('doctor.reject_appointment', appointment_id=apt.id) }}"
+        method="POST"
+      >
+        <button
+          type="submit"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-error/10 hover:bg-error/20 text-error transition-all"
+          aria-label="Reject appointment"
+          title="Reject"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </form>
+      <form
+        action="{{ url_for('doctor.accept_appointment', appointment_id=apt.id) }}"
+        method="POST"
+      >
+        <button
+          type="submit"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-tertiary/10 hover:bg-tertiary/20 text-tertiary transition-all"
+          aria-label="Accept appointment"
+          title="Accept"
+        >
+          <span class="material-symbols-outlined">check</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endmacro %} {% macro schedule_row(apt) %}
+<div
+  class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all"
+>
+  <div class="flex items-center gap-md">
+    <div
+      class="w-12 h-12 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0"
+    >
+      <span class="font-bold text-primary"
+        >{{ apt.patient.first_name[0] }}{{ apt.patient.last_name[0] }}</span
+      >
+    </div>
+    <div>
+      <h4 class="font-bold text-on-surface">
+        {{ apt.patient.first_name }} {{ apt.patient.last_name }}
+      </h4>
+      <span
+        class="text-on-surface-variant text-caption flex items-center gap-xs mt-xs"
+      >
+        <span class="material-symbols-outlined text-[14px]"
+          >{{ 'videocam' if apt.mode == 'virtual' else 'location_on' }}</span
+        >
+        {{ 'Virtual' if apt.mode == 'virtual' else 'In-person' }}
+      </span>
+    </div>
+  </div>
+  <div class="flex items-center justify-between md:justify-end gap-lg">
+    <div class="text-right">
+      <p class="font-bold text-on-surface">
+        {{ apt.date.strftime('%b %d, %Y') }}
+      </p>
+      <p class="text-caption text-on-surface-variant">
+        {{ apt.time.strftime('%I:%M %p') }}
+      </p>
+    </div>
+    <span
+      class="px-sm py-xs bg-tertiary/15 text-tertiary rounded-full text-caption font-bold flex items-center gap-xs w-fit"
+    >
+      <span class="material-symbols-outlined text-[14px]">check_circle</span>
+      Confirmed
+    </span>
+    <button
+      type="button"
+      class="add-record-btn w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all"
+      data-action="{{ url_for('doctor.add_record', appointment_id=apt.id) }}"
+      data-patient-name="{{ apt.patient.first_name }} {{ apt.patient.last_name }}"
+      data-appointment-date="{{ apt.date.strftime('%Y-%m-%d') }}"
+      aria-label="Add medical record"
+      title="Add Record"
+    >
+      <span class="material-symbols-outlined">note_add</span>
+    </button>
+  </div>
+</div>
+{% endmacro %}
+
+<!-- Navigation Drawer -->
+<div
+  class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none transition-opacity duration-300"
+  id="drawer-overlay"
+></div>
+<aside
+  class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full transition-transform duration-300"
+  id="nav-drawer"
+>
+  <div class="flex flex-col h-full p-md">
+    <div class="flex items-center gap-3 mb-xl">
+      <span
+        class="material-symbols-outlined text-primary text-3xl"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >clinical_notes</span
+      >
+      <span
+        class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+        >Medika</span
+      >
+    </div>
+    <div class="flex items-center gap-sm mb-lg p-sm rounded-xl bg-white/5">
+      <div
+        class="w-10 h-10 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0"
+      >
+        {% if photo_url %}
+        <img
+          class="w-full h-full object-cover"
+          src="{{ photo_url }}"
+          alt="Dr. {{ first_name }} {{ last_name }}"
+        />
+        {% else %}
+        <span class="font-bold text-primary"
+          >{{session['first_name'] }}{{ session['last_name']}}</span
+        >
+        {% endif %}
+      </div>
+      <div class="min-w-0">
+        <p class="font-bold text-on-surface truncate">
+          Dr. {{ session['first_name'] }} {{ session['last_name'] }}
+        </p>
+        <p class="text-caption text-on-surface-variant truncate">
+          {{ session['specialization'] }}
+        </p>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-2">
+      <a
+        href="{{ url_for('doctor_dashboard') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl bg-primary/10 text-primary transition-colors group"
+      >
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="font-label-md text-label-md">Dashboard</span>
+      </a>
+      <a
+        href="#"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
+          >calendar_month</span
+        >
+        <span class="font-label-md text-label-md">My Schedule</span>
+      </a>
+      <a
+        href="#"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+          >settings</span
+        >
+        <span class="font-label-md text-label-md">Settings</span>
+      </a>
+    </nav>
+    <div class="mt-auto pt-md border-t border-white/10">
+      <a
+        href="{{ url_for('doctor_logout') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined group-hover:scale-110 transition-transform"
+          >logout</span
+        >
+        <span class="font-label-md text-label-md font-bold">Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- Top App Bar -->
+<header
+  class="fixed top-0 left-0 right-0 z-50 bg-surface dark:bg-on-background shadow-sm flex justify-between items-center w-full px-sm py-xs md:px-md md:py-sm"
+>
+  <div class="flex items-center gap-sm">
+    <button
+      class="md:hidden text-primary w-10 h-10 flex items-center justify-center"
+      id="menu-btn"
+      aria-label="Open menu"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1
+      class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim"
+    >
+      Dashboard
+    </h1>
+  </div>
+  <div class="flex items-center gap-sm">
+    <button
+      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
+      aria-label="Notifications"
+    >
+      <span class="material-symbols-outlined">notifications</span>
+      {% if pending_appointments and pending_appointments|length > 0 %}
+      <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+      {% endif %}
+    </button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main
+  class="pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop min-h-screen max-w-7xl mx-auto"
+>
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="space-y-2 mb-md">
+    {% for category, msg in messages %}
+    <div
+      class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+    >
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
+
+  <div class="mb-lg">
+    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
+      Welcome back, Dr. {{ session['first_name'] }} {{ session['last_name'] }}
+    </h2>
+    <p class="text-on-surface-variant font-body-md">
+      Review incoming requests and keep track of your confirmed visits.
+    </p>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-md mb-lg">
+    <div class="glass-card rounded-xl p-md flex items-center gap-md">
+      <div
+        class="w-12 h-12 rounded-xl bg-on-surface-variant/10 text-on-surface-variant flex items-center justify-center"
+      >
+        <span class="material-symbols-outlined">hourglass_empty</span>
+      </div>
+      <div>
+        <p class="text-caption text-on-surface-variant">Pending requests</p>
+        <p class="font-headline-md text-on-surface font-bold">
+          {{ pending_appointments|length }}
+        </p>
+      </div>
+    </div>
+    <div class="glass-card rounded-xl p-md flex items-center gap-md">
+      <div
+        class="w-12 h-12 rounded-xl bg-tertiary/15 text-tertiary flex items-center justify-center"
+      >
+        <span class="material-symbols-outlined">event_upcoming</span>
+      </div>
+      <div>
+        <p class="text-caption text-on-surface-variant">Upcoming visits</p>
+        <p class="font-headline-md text-on-surface font-bold">
+          {{ upcoming_appointments|length }}
+        </p>
+      </div>
+    </div>
+    <div class="glass-card rounded-xl p-md flex items-center gap-md">
+      <div
+        class="w-12 h-12 rounded-xl bg-primary/15 text-primary flex items-center justify-center"
+      >
+        <span class="material-symbols-outlined">today</span>
+      </div>
+      <div>
+        <p class="text-caption text-on-surface-variant">Today's visits</p>
+        <p class="font-headline-md text-on-surface font-bold">
+          {{ todays_appointments|length }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+    <!-- Pending requests -->
+    <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
+      <div
+        class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
+      >
+        <h3 class="font-bold text-on-surface">Pending Requests</h3>
+        <span class="text-caption text-on-surface-variant"
+          >{{ pending_appointments|length }} awaiting your response</span
+        >
+      </div>
+      <div class="divide-y divide-white/5">
+        {% for apt in pending_appointments %} {{ appointment_request_row(apt) }}
+        {% else %}
+        <div class="p-lg text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-3xl">task_alt</span>
+          <p class="mt-sm">No pending requests right now.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Upcoming confirmed schedule -->
+    <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
+      <div
+        class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
+      >
+        <h3 class="font-bold text-on-surface">Upcoming Schedule</h3>
+        <span class="text-caption text-on-surface-variant"
+          >{{ upcoming_appointments|length }} confirmed</span
+        >
+      </div>
+      <div class="divide-y divide-white/5">
+        {% for apt in upcoming_appointments %} {{ schedule_row(apt) }} {% else
+        %}
+        <div class="p-lg text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-3xl">calendar_month</span>
+          <p class="mt-sm">No confirmed visits scheduled yet.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Add Record Modal (shared, filled in by JS per row) -->
+<div
+  class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
+  id="record-modal"
+>
+  <div
+    class="glass-card rounded-xl w-full max-w-lg p-md md:p-lg space-y-md max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="font-headline-md text-headline-md text-on-surface">
+          Add Medical Record
+        </h3>
+        <p
+          class="text-caption text-on-surface-variant"
+          id="record-modal-patient"
+        >
+          For patient
+        </p>
+      </div>
+      <button
+        type="button"
+        class="modal-close text-on-surface-variant hover:text-on-surface"
+        data-target="record-modal"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="record-form" action="#" method="POST" class="space-y-md">
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="category"
+          >Record Type</label
+        >
+        <select
+          id="category"
+          name="category"
+          required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="note">Clinical Note</option>
+          <option value="prescription">Prescription</option>
+          <option value="lab_report">Lab Report</option>
+          <option value="vaccination">Vaccination</option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="title"
+          >Title</label
+        >
+        <input
+          id="title"
+          name="title"
+          type="text"
+          required
+          placeholder="e.g. Amoxicillin 500mg, Full Blood Count"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        />
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="record_date"
+            >Date</label
+          >
+          <input
+            id="record_date"
+            name="record_date"
+            type="date"
+            required
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="severity_tag"
+            >Status Tag (optional)</label
+          >
+          <input
+            id="severity_tag"
+            name="severity_tag"
+            type="text"
+            placeholder="e.g. Critical, Stable"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="description"
+          >Notes / Description</label
+        >
+        <textarea
+          id="description"
+          name="description"
+          rows="3"
+          placeholder="Findings, dosage instructions, results, etc."
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none resize-none"
+        ></textarea>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="file_url"
+          >Attachment Link (optional)</label
+        >
+        <input
+          id="file_url"
+          name="file_url"
+          type="url"
+          placeholder="Link to scanned report or document"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        />
+      </div>
+      <div class="flex justify-end gap-sm pt-sm">
+        <button
+          type="button"
+          class="modal-close px-md py-2 rounded-lg text-on-surface-variant hover:bg-white/5"
+          data-target="record-modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-md py-2 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110"
+        >
+          Save Record
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<div
+  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+>
+  <nav
+    class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
+  >
+    <button
+      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      data-nav="dashboard"
+    >
+      <span
+        class="material-symbols-outlined"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >dashboard</span
+      >
+    </button>
+    <button
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+      id="menu-btn-mobile"
+      aria-label="Open menu"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+  (function () {
+    ["menu-btn", "menu-btn-mobile"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document.body.classList.toggle("drawer-open");
+          document.body.classList.toggle("drawer-closed");
+        });
+      }
+    });
+
+    // Add Record modal: one shared modal, filled in per row
+    const recordModal = document.getElementById("record-modal");
+    const recordForm = document.getElementById("record-form");
+    const recordPatientLabel = document.getElementById("record-modal-patient");
+    const recordDateInput = document.getElementById("record_date");
+
+    const openModal = (modal) => {
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    };
+    const closeModal = (modal) => {
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    };
+
+    document.querySelectorAll(".add-record-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (recordForm) recordForm.action = btn.dataset.action;
+        if (recordPatientLabel)
+          recordPatientLabel.textContent = "For " + btn.dataset.patientName;
+        if (recordDateInput)
+          recordDateInput.value = btn.dataset.appointmentDate || "";
+        openModal(recordModal);
+      });
+    });
+
+    document.querySelectorAll(".modal-close").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        closeModal(document.getElementById(btn.dataset.target)),
+      );
+    });
+    if (recordModal) {
+      recordModal.addEventListener("click", (e) => {
+        if (e.target === recordModal) closeModal(recordModal);
+      });
+    }
+  })();
+</script>
+{% endblock %}

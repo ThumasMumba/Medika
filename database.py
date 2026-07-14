@@ -29,6 +29,9 @@ def get_cursor(connection):
     """
     return connection.cursor(dictionary=True)
 
+
+
+
 def close_connection(connection, cursor=None):
     """
     Safely closes cursor and connection.

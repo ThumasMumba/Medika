@@ -1,5 +1,6 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
+from datetime import date, timedelta
 from functools import wraps
 from database import create_connection
 from mysql.connector import Error
@@ -11,9 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 #Creating an instance of the flask class to initialize the system. Also a secret string used to encrypt session data and flash messages
 app = Flask(__name__)
-admin_password = "admin123"
-hash_password = generate_password_hash(admin_password)
-print("Store this in DB: ", hash_password)
+# print("Store this in DB: ", hash_password)
 
 # Add this configuration to ensure HTML files process Jinja2 syntax
 app.jinja_env.add_extension('jinja2.ext.do')
@@ -50,15 +49,15 @@ def initialize_db():
         #SLQ query that creates a table for doctors if it does not exists
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS doctors(
-                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            doctor_id INT AUTO_INCREMENT PRIMARY KEY,
                             first_name VARCHAR(100) NOT NULL,
+                            gender VARCHAR(4) NOT NULL,
                             last_name VARCHAR(100) NOT NULL,
                             email VARCHAR(100) UNIQUE NOT NULL,
                             phone VARCHAR(20) UNIQUE NOT NULL,
                             specialization VARCHAR(100) NOT NULL,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             has_registered BOOLEAN DEFAULT FALSE
-                            
                        )
      """)
         #SQL query to create appointments table if it does not exists
@@ -338,8 +337,8 @@ def patient_pro():
 def patient_records():
      """Handles patient records dashboard"""
      return render_template("/patient_records.html")
-@app.route('/signUp', methods=["POST", "GET"])
 
+@app.route('/signUp', methods=["POST", "GET"])
 def signUp():
      """Handles the sign up process for patients.
      It accepts both GET and POST requests.
@@ -471,7 +470,239 @@ def system_settings():
      flash("System Settings functionality is not implemented yet.", "error")
      return redirect(url_for('admin_dashboard'))
 
+def _to_time(value):
+    """mysql-connector returns TIME columns as datetime.timedelta, not
+    datetime.time, so `apt.time.strftime(...)` in the template would fail.
+    Normalize to a real `time` object here so templates can call strftime
+    directly."""
+    if isinstance(value, timedelta):
+        total_seconds = int(value.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return time_cls(hour=hours % 24, minute=minutes, second=seconds) # type: ignore #type ignore
+    return value
+ 
+ 
+def _row_to_appointment(row):
+    """Reshape a flat SQL row (from a JOIN with patients) into the nested
+    structure the templates expect: apt.patient.first_name, etc."""
+    return {
+        "id": row["id"],
+        "date": row["date"],
+        "time": _to_time(row["time"]),
+        "mode": row["mode"],
+        "reason": row.get("reason"),
+        "status": row["status"],
+        "patient": {
+            "first_name": row["patient_first_name"],
+            "last_name": row["patient_last_name"],
+        },
+    }
+ 
 
+@app.route('/doctor_signUp', methods=["POST", "GET"])
+def doctor_signUp():
+     """Handles the sign up process for doctors.
+     It accepts both GET and POST requests.
+     On a GET request, it renders the sign-up form.
+     On a POST request, it processes the form data, validates it, and if valid, inserts the new doctor record into the database.
+     """
+     #Check if the form submission method is POST request
+     if request.method == "POST":
+          #Extract form data
+          first_name = request.form.get("fName")
+          last_name = request.form.get("lName")
+          gender = request.form.get("gender")
+          email = request.form.get("email")
+          phone_number = request.form.get("phone_number")
+          password = request.form.get("password")
+          specialization = request.form.get("specialization")
 
+          #Check if fields are not empty before inserting into the database
+          if not all([first_name, last_name, gender, email, phone_number, password, specialization]):
+               flash("Please fill in all the required fields.", 'error')
+               return redirect(url_for("doctor_signUp"))
+          
+     # Get a database connection then insert into the doctors table
+          connection = create_connection()
+          if connection is None:
+               flash("Failed to connect to the database. Please try again later.", 'error')
+               return render_template("doctor_signUp.html")
+          try:
+               cursor = connection.cursor()
+               #SQL query to check if doctor with the same email, phone number or NRC already exists
+               cursor.execute("SELECT * FROM doctors WHERE email = %s OR phone = %s", (email, phone_number))
+               existing_doctor = cursor.fetchone()
+               if existing_doctor:
+                    flash("A doctor with the same email, phone number, or NRC already exists.", "error")
+                    return redirect(url_for("doctor_signUp"))
+               #SQL query to insert new doctor record into the database
+          #     Hash the password before inserting it
+               hash_password = generate_password_hash(password)
+               insert_query = """
+                  INSERT INTO doctors
+                         (first_name, last_name, gender, email, phone, password, specialization)
+                         VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+               #Exceptions are handled in case of any database errors during the insertion process
+               cursor.execute(insert_query, (first_name, last_name, gender, email, phone_number, hash_password, specialization))
+               connection.commit()
+               flash("You have successfully signed up!", 'success')
+               return redirect(url_for("doctor_dashboard"))
+          except Error as e:
+               print(f"Database error: {e}")
+               flash("An error occurred while processing your request. Please try again later.", 'error')
+     return render_template("doctor_signUp.html")
+
+def doctor_login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session.get("doctor_id"):
+            flash("Please sign in to continue.", "error")
+            return redirect(url_for("doctor_login"))
+        return view(*args, **kwargs)
+ 
+    return wrapped
+ 
+# ---------------------------------------------------------------------------
+# Auth
+# ---------------------------------------------------------------------------
+ 
+@app.route("/doctor_login", methods=["GET", "POST"])
+def doctor_login():
+    connection = create_connection()
+    if request.method == "GET":
+        return render_template("doctor_login.html")
+ 
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+ 
+    if not email or not password:
+        flash("Please enter your email and password.", "error")
+        return redirect(url_for("doctor_login"))
+     
+    try:
+        # Added buffered=True to prevent results from locking the pipeline
+        cursor = connection.cursor(dictionary=True, buffered=True)
+        cursor.execute(
+            "SELECT doctor_id, first_name, last_name, password, phone, specialization "
+            "FROM doctors WHERE email = %s",
+            (email,),
+        )
+        doctor = cursor.fetchone()
+        if doctor and check_password_hash(doctor["password"], password):
+            session.clear()
+            session["doctor_id"] = doctor["doctor_id"]
+            session["email"] = doctor["email"]
+            session["password"] = doctor["password"]
+            flash(f"Welcome back, Dr. {doctor['last_name']}.", "success")
+            return redirect(url_for("doctor_dashboard"))
+        else:
+            flash("Invalid email or password.", "error")
+            return redirect(url_for("doctor_login"))
+    except Error as e:
+        print(f"Database error: {e}")
+        flash("An error occurred while processing your request. Please try again later.", "error")
+    finally:
+         connection.close()
+    return render_template("doctor_login.html")
+ 
+ 
+@app.route("/logout")
+def doctor_logout():
+    session.pop("doctor_id", None)
+    flash("You've been signed out.", "success")
+    return redirect(url_for("doctor_login"))
+ 
+ 
+# ---------------------------------------------------------------------------
+# Dashboard
+# ---------------------------------------------------------------------------
+ 
+@app.route("/doctor_dashboard")
+
+def doctor_dashboard():
+    # Create a connection first
+    connection = create_connection()
+    pending_appointments = []
+    upcoming_appointments = []
+    todays_appointments = []
+    try:
+        if connection is None:
+            flash("Database connection error. Please try again later.", "error")
+            return redirect(url_for("doctor_login"))
+        cursor = connection.cursor(dictionary=True, buffered=True)
+        cursor.execute(
+            "SELECT doctor_id, first_name, last_name, specialization, phone "
+            "FROM doctors WHERE doctor_id = %s",
+            (session.get("doctor_id"),)
+        )
+        doctor = cursor.fetchone()
+          
+        base_query = """
+                    SELECT
+                         a.id, a.date, a.time, a.mode, a.reason, a.status,
+                         p.first_name AS patient_first_name,
+                         p.last_name  AS patient_last_name
+                    FROM appointments a
+                    JOIN patients p ON p.id = a.patient_id
+                    WHERE a.doctor_id = %s AND a.status = %s
+                    ORDER BY a.date ASC, a.time ASC
+               """
+          
+        cursor.execute(base_query, (session.get("doctor_id"), "pending"))
+        pending_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
+          
+        cursor.execute(base_query, (session.get("doctor_id"), "approved"))
+        upcoming_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
+        
+    except Error as e:
+         print(f"Dashboard query error: {e}")  
+    finally:
+         connection.close()     
+         
+    todays_appointments = [
+         apt for apt in upcoming_appointments if apt["date"] == date.today()
+            ]
+    return render_template(
+        "doctor_dashboard.html",
+        doctor=doctor,
+        pending_appointments=pending_appointments,
+        upcoming_appointments=upcoming_appointments,
+        todays_appointments=todays_appointments,
+    )
+ 
+ 
+# ---------------------------------------------------------------------------
+# Accept / Reject
+# ---------------------------------------------------------------------------
+ 
+@app.route("/appointment/<int:appointment_id>/accept", methods=["POST"])
+@doctor_login_required
+def accept_appointment(appointment_id):
+    _update_appointment_status(appointment_id, "approved")
+    flash("Appointment confirmed.", "success")
+    return redirect(url_for("doctor_dashboard"))
+ 
+ 
+@app.route("/appointment/<int:appointment_id>/reject", methods=["POST"])
+@doctor_login_required
+def reject_appointment(appointment_id):
+    _update_appointment_status(appointment_id, "rejected")
+    flash("Appointment rejected.", "success")
+    return redirect(url_for("doctor_dashboard"))
+ 
+ 
+def _update_appointment_status(appointment_id, new_status):
+    doctor_id = session["doctor_id"]
+    connection = create_connection()
+    with get_dict_cursor(connection, commit=True) as cursor: # type: ignore
+        # Scope the UPDATE to this doctor's own id so one doctor can
+        # never accept/reject another doctor's appointment via a
+        # crafted request.
+        cursor.execute(
+            "UPDATE appointments SET status = %s "
+            "WHERE id = %s AND doctor_id = %s",
+            (new_status, appointment_id, doctor_id),
+        )
 if __name__ == '__main__':
      app.run(debug=True)

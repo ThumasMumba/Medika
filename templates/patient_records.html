@@ -1,519 +1,522 @@
- {% extends 'base.html' %}{% block body %}
- <!-- Navigation Drawer -->
-    <div
-      class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none"
-      id="drawer-overlay"
-    ></div>
-    <aside
-      class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full"
-      id="nav-drawer"
-    >
-      <div class="flex flex-col h-full p-md">
-        <div class="flex items-center gap-3 mb-xl">
-          <span
-            class="material-symbols-outlined text-primary text-3xl"
-            style="font-variation-settings: &quot;FILL&quot; 1"
-            >clinical_notes</span
-          >
-          <span
-            class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
-            >Medika</span
-          >
-        </div>
-        <nav class="flex-1 space-y-2">
-          <a
-            href="{{url_for('patient_pro')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
-              >person</span
-            >
-            <span class="font-label-md text-label-md">Profile</span>
-          </a>
-          <a
-            href="{{url_for('patient_records') }}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
-              >description</span
-            >
-            <span class="font-label-md text-label-md">Health Records</span>
-          </a>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
-              >calendar_month</span
-            >
-            <span class="font-label-md text-label-md">Appointments</span>
-          </button>
-          <a
-            href="#"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
-              >settings</span
-            >
-            <span class="font-label-md text-label-md">Settings</span>
-        </a>
-        </nav>
-        <div class="mt-auto pt-md border-t border-white/10">
-          <a
-            href="{{url_for('logout')}}"
-            class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined group-hover:scale-110 transition-transform"
-              >logout</span
-            >
-            <span class="font-label-md text-label-md font-bold">Logout</span>
-        </a>
-        </div>
-      </div>
-    </aside>
-    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      <div
-        class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full animate-pulse-slow"
-      ></div>
-      <div
-        class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[100px] rounded-full animate-pulse-slow"
-      ></div>
+{% extends 'base.html' %} {% block title %}Health Records{% endblock %} {%
+block body %} {% set category_colors = {
+  'lab_report': { 'bg': 'bg-tertiary-container/20', 'text': 'text-tertiary', 'border': 'border-tertiary/20', 'pill': 'bg-tertiary/20 border-tertiary/30' },
+  'prescription': { 'bg': 'bg-primary/10', 'text': 'text-primary', 'border': 'border-primary/20', 'pill': 'bg-primary/20 border-primary/30' },
+  'vaccination': { 'bg': 'bg-secondary-container/20', 'text': 'text-secondary', 'border': 'border-secondary/20', 'pill': 'bg-secondary/20 border-secondary/30' },
+  'note': { 'bg': 'bg-surface-container-highest', 'text': 'text-on-surface-variant', 'border': 'border-white/10', 'pill': 'bg-surface-container-highest border-white/10' }
+} %}
+
+<!-- Navigation Drawer -->
+<div
+  class="fixed inset-0 bg-surface-dim/60 backdrop-blur-md z-[60] opacity-0 pointer-events-none transition-opacity duration-300"
+  id="drawer-overlay"
+></div>
+<aside
+  class="fixed top-0 left-0 h-full w-[280px] z-[70] glass-card border-r border-white/10 -translate-x-full transition-transform duration-300"
+  id="nav-drawer"
+>
+  <div class="flex flex-col h-full p-md">
+    <div class="flex items-center gap-3 mb-xl">
+      <span
+        class="material-symbols-outlined text-primary text-3xl"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >clinical_notes</span
+      >
+      <span
+        class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+        >Medika</span
+      >
     </div>
-    <!-- TopAppBar Shell -->
-    <nav
-      class="fixed top-0 w-full z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-md py-sm"
-    >
-      <div class="flex items-center gap-sm">
-        <div
-          class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-white/10 transition-transform active:scale-95"
+    <nav class="flex-1 space-y-2">
+      <a
+        href="{{ url_for('patient_pro') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform"
+          >person</span
         >
-          <img
-            alt="Profile"
-            class="w-full h-full object-cover"
-            data-alt="A professional studio headshot of a patient user for a medical application, featuring a soft-lit, high-detail portrait against a clean, minimalist dark background. The lighting is ethereal and sophisticated with a slight cool blue tint to match a futuristic clinical aesthetic."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrwGocQFaNK4EPWPdg9LiZkOAnO5AsYLm0tdsCk7ehmTqwdUX99p3s1YhcplEwxBb2GSVS-AsYoaL8MjXZhndbv35PDLXhCymWfWITU9bTDGpKe37EGyIYN97cdKWokDrhH8-c0WucXzr3udXOyGj5YB50nqRNFRjsPbu3236LLb2LD-atiT5PF5M70cLX7cv51CyIGNX0Hgh3LejN5Tu9-jd9Xs61nPi5rugXQ_4ffw4OKku8qgP9yOjwzydCmoaZTcb6OzbzlA"
-          />
-        </div>
-        <h1
-          class="font-display-lg text-display-lg font-bold text-primary leading-none hidden md:block"
+        <span class="font-label-md text-label-md">Profile</span>
+      </a>
+      <a
+        href="{{ url_for('patient_records') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl bg-primary/10 text-primary transition-colors group"
+      >
+        <span class="material-symbols-outlined">description</span>
+        <span class="font-label-md text-label-md">Health Records</span>
+      </a>
+      <a
+        href="{{ url_for('appointment') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform"
+          >calendar_month</span
         >
-          Medika
-        </h1>
-        <h1
-          class="font-headline-md text-headline-md font-bold text-primary md:hidden"
+        <span class="font-label-md text-label-md">Appointments</span>
+      </a>
+      <a
+        href="#"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
+          >settings</span
         >
-          Medika
-        </h1>
-      </div>
-      <div class="flex items-center gap-md">
-        <button
-          class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95"
-          data-icon="search"
-        >
-          search
-        </button>
-        <button
-          class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95"
-          data-icon="notifications"
-        >
-          notifications
-        </button>
-      </div>
+        <span class="font-label-md text-label-md">Settings</span>
+      </a>
     </nav>
-    <!-- Main Content Canvas -->
-    <main
-      class="relative z-10 pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto"
-    >
-      <!-- Header & Filter Section -->
-      <header class="mb-lg space-y-md">
-        <div
-          class="flex flex-col md:flex-row md:items-end justify-between gap-md"
+    <div class="mt-auto pt-md border-t border-white/10">
+      <a
+        href="{{ url_for('logout') }}"
+        class="w-full flex items-center gap-md p-sm rounded-xl text-error hover:bg-error/10 transition-colors group"
+      >
+        <span
+          class="material-symbols-outlined group-hover:scale-110 transition-transform"
+          >logout</span
         >
-          <div>
-            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
-              Medical Records
-            </h2>
-            <p class="text-on-surface-variant font-body-md">
-              Your clinical history, reports, and digital prescriptions in one
-              secure vault.
+        <span class="font-label-md text-label-md font-bold">Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- Ambient background -->
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+  <div
+    class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full animate-pulse-slow"
+  ></div>
+  <div
+    class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[100px] rounded-full animate-pulse-slow"
+  ></div>
+</div>
+
+<!-- Top App Bar -->
+<header
+  class="fixed top-0 left-0 right-0 z-50 bg-surface dark:bg-on-background shadow-sm flex justify-between items-center w-full px-sm py-xs md:px-md md:py-sm"
+>
+  <div class="flex items-center gap-sm">
+    <button
+      class="md:hidden text-primary w-10 h-10 flex items-center justify-center"
+      id="menu-btn"
+      aria-label="Open menu"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1
+      class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim"
+    >
+      Health Records
+    </h1>
+  </div>
+  <div class="hidden md:flex flex-1 max-w-md mx-xl relative">
+    <input
+      id="search-input"
+      class="w-full bg-surface-container-low border-none rounded-full px-lg py-xs text-on-surface placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary"
+      placeholder="Search records..."
+      type="text"
+    />
+    <span
+      class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant"
+      >search</span
+    >
+  </div>
+  <div class="flex items-center gap-sm">
+    <button
+      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
+      aria-label="Notifications"
+    >
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main
+  class="relative z-10 pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop min-h-screen max-w-7xl mx-auto"
+>
+  <!-- Header & Filter Section -->
+  <div class="mb-lg space-y-md">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
+        Medical Records
+      </h2>
+      <p class="text-on-surface-variant font-body-md">
+        Your clinical history, reports, and digital prescriptions — added by
+        your doctor after each visit.
+      </p>
+    </div>
+    <!-- Category Chips -->
+    <div class="flex gap-sm overflow-x-auto pb-2 custom-scrollbar">
+      <button
+        class="record-filter-btn whitespace-nowrap px-md py-sm rounded-full bg-secondary-container/20 text-secondary border border-secondary/30 font-label-md transition-all active-filter"
+        data-filter="all"
+      >
+        All Records
+      </button>
+      <button
+        class="record-filter-btn whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+        data-filter="lab_report"
+      >
+        Lab Reports
+      </button>
+      <button
+        class="record-filter-btn whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+        data-filter="prescription"
+      >
+        Prescriptions
+      </button>
+      <button
+        class="record-filter-btn whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+        data-filter="vaccination"
+      >
+        Vaccinations
+      </button>
+      <button
+        class="record-filter-btn whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
+        data-filter="note"
+      >
+        Clinical Notes
+      </button>
+    </div>
+  </div>
+
+  {% if not records %}
+  <!-- Empty state: no records yet -->
+  <div
+    class="glass-card rounded-xl p-lg flex flex-col items-center justify-center text-center gap-sm"
+  >
+    <span class="material-symbols-outlined text-primary text-4xl"
+      >folder_open</span
+    >
+    <h3 class="font-headline-md text-headline-md text-on-surface">
+      No records yet
+    </h3>
+    <p class="text-on-surface-variant font-body-md max-w-md">
+      Once your doctor examines you and logs findings, prescriptions, lab
+      results, or vaccinations, they'll show up here.
+    </p>
+  </div>
+  {% else %}
+  <!-- Records Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+    <!-- Recently Updated -->
+    {% if recent_records %}
+    <section class="lg:col-span-12" data-record-group="all">
+      <h3
+        class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
+      >
+        Recently Updated
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+        {% for record in recent_records %} {% set colors =
+        category_colors[record.category] %}
+        <div
+          class="glass-card rounded-2xl p-md flex flex-col gap-md relative overflow-hidden group"
+          data-record-category="{{ record.category }}"
+        >
+          <div
+            class="absolute top-0 right-0 w-32 h-32 {{ colors.bg }} rounded-full blur-3xl -mr-16 -mt-16 opacity-40 group-hover:opacity-70 transition-all"
+          ></div>
+          <div class="flex justify-between items-start">
+            <div class="flex gap-sm">
+              <div
+                class="w-12 h-12 rounded-xl {{ colors.bg }} {{ colors.text }} flex items-center justify-center border {{ colors.border }}"
+              >
+                <span class="material-symbols-outlined">{{ record.icon }}</span>
+              </div>
+              <div>
+                <h4 class="font-headline-md text-on-surface">
+                  {{ record.title }}
+                </h4>
+                <span
+                  class="text-caption text-on-surface-variant uppercase tracking-wider"
+                  >{{ record.category_label }} • {{
+                  record.record_date.strftime('%d %b %Y') }}</span
+                >
+              </div>
+            </div>
+            {% if record.severity_tag %}
+            <span
+              class="px-sm py-1 rounded-full {{ colors.pill }} {{ colors.text }} text-[10px] font-bold border uppercase"
+              >{{ record.severity_tag }}</span
+            >
+            {% endif %}
+          </div>
+          {% if record.description %}
+          <div class="flex-grow">
+            <p class="text-body-md text-on-surface-variant line-clamp-2">
+              {{ record.description }}
             </p>
           </div>
-         
+          {% endif %}
+          <p class="text-caption text-on-surface-variant">
+            Dr. {{ record.doctor.first_name }} {{ record.doctor.last_name }}
+          </p>
         </div>
-        <!-- Category Chips -->
-        <div class="flex gap-sm overflow-x-auto pb-2 custom-scrollbar">
-          <button
-            class="whitespace-nowrap px-md py-sm rounded-full bg-secondary-container/20 text-secondary border border-secondary/30 font-label-md transition-all"
-          >
-            All Records
-          </button>
-          <button
-            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
-          >
-            Lab Reports
-          </button>
-          <button
-            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
-          >
-            Prescriptions
-          </button>
-          <button
-            class="whitespace-nowrap px-md py-sm rounded-full bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-all font-label-md"
-          >
-            Vaccinations
-          </button>
-        </div>
-      </header>
-      <!-- Records Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        <!-- Recent Activity / High Priority -->
-        <section class="lg:col-span-12">
-          <h3
-            class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
-          >
-            Recently Updated
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-            <!-- Feature Record 1 -->
-            <div
-              class="glass-card rounded-2xl p-md flex flex-col gap-md relative overflow-hidden group"
-            >
-              <div
-                class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-all"
-              ></div>
-              <div class="flex justify-between items-start">
-                <div class="flex gap-sm">
-                  <div
-                    class="w-12 h-12 rounded-xl bg-tertiary-container/20 text-tertiary flex items-center justify-center border border-tertiary/20"
-                  >
-                    <span class="material-symbols-outlined" data-icon="biotech"
-                      >biotech</span
-                    >
-                  </div>
-                  <div>
-                    <h4 class="font-headline-md text-on-surface">
-                      Full Blood Count
-                    </h4>
-                    <span
-                      class="text-caption text-on-surface-variant uppercase tracking-wider"
-                      >LAB REPORT • 24 OCT 2023</span
-                    >
-                  </div>
-                </div>
-                <span
-                  class="px-sm py-1 rounded-full bg-tertiary/20 text-tertiary text-[10px] font-bold border border-tertiary/30"
-                  >CRITICAL</span
-                >
-              </div>
-              <div class="flex-grow">
-                <p class="text-body-md text-on-surface-variant line-clamp-2">
-                  Comprehensive metabolic panel including glucose, calcium, and
-                  electrolytes. Results processed by Central Labs.
-                </p>
-              </div>
-            </div>
-            <!-- Feature Record 2 -->
-            <div
-              class="glass-card rounded-2xl p-md flex flex-col gap-md relative overflow-hidden group"
-            >
-              <div
-                class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-secondary/10 transition-all"
-              ></div>
-              <div class="flex justify-between items-start">
-                <div class="flex gap-sm">
-                  <div
-                    class="w-12 h-12 rounded-xl bg-secondary-container/20 text-secondary flex items-center justify-center border border-secondary/20"
-                  >
-                    <span
-                      class="material-symbols-outlined"
-                      data-icon="radiology"
-                      >radiology</span
-                    >
-                  </div>
-                  <div>
-                    <h4 class="font-headline-md text-on-surface">
-                      Lumbar Spine MRI
-                    </h4>
-                    <span
-                      class="text-caption text-on-surface-variant uppercase tracking-wider"
-                      >IMAGING • 12 OCT 2023</span
-                    >
-                  </div>
-                </div>
-                <span
-                  class="px-sm py-1 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold border border-secondary/30"
-                  >STABLE</span
-                >
-              </div>
-              <div class="flex-grow">
-                <p class="text-body-md text-on-surface-variant line-clamp-2">
-                  High-resolution MRI of the lower back area. Provided with 3D
-                  reconstruction and radiologist notes.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section><br><br><br>
-        <!-- Categorized List -->
-        <section class="lg:col-span-8 space-y-md">
-          <h3
-            class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
-          >
-            Detailed Records
-          </h3>
-          <!-- Category Group: Prescriptions -->
-          <div class="space-y-sm">
-            <div class="flex items-center gap-sm px-sm">
-              <span
-                class="material-symbols-outlined text-primary"
-                data-icon="prescriptions"
-                >prescriptions</span
-              >
-              <h4 class="font-headline-md text-on-surface">Prescriptions</h4>
-              <span
-                class="text-caption bg-surface-container-highest px-2 py-0.5 rounded-full text-on-surface-variant"
-                >12 total</span
-              >
-            </div>
-            <div class="space-y-2">
-              <!-- List Item 1 -->
-              <div
-                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
-              >
-                <div class="flex items-center gap-md">
-                  <div
-                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
-                  >
-                    <span
-                      class="material-symbols-outlined text-on-surface-variant"
-                      data-icon="medication"
-                      >medication</span
-                    >
-                  </div>
-                  <div>
-                    <p class="font-label-md text-on-surface">
-                      Amoxicillin 500mg
-                    </p>
-                    <p class="text-caption text-on-surface-variant">
-                      Dr. Aris Thorne • Sep 15, 2023
-                    </p>
-                  </div>
-                </div>
-                <div class="flex gap-xs">
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="visibility"
-                      >visibility</span
-                    >
-                  </button>
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="download"
-                      >download</span
-                    >
-                  </button>
-                </div>
-              </div>
-              <!-- List Item 2 -->
-              <div
-                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
-              >
-                <div class="flex items-center gap-md">
-                  <div
-                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
-                  >
-                    <span
-                      class="material-symbols-outlined text-on-surface-variant"
-                      data-icon="medication"
-                      >medication</span
-                    >
-                  </div>
-                  <div>
-                    <p class="font-label-md text-on-surface">Lisinopril 10mg</p>
-                    <p class="text-caption text-on-surface-variant">
-                      Dr. Aris Thorne • Aug 22, 2023
-                    </p>
-                  </div>
-                </div>
-                <div class="flex gap-xs">
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="visibility"
-                      >visibility</span
-                    >
-                  </button>
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="download"
-                      >download</span
-                    >
-                  </button>
-                </div>
-              </div>
-              <!-- List Item 3 -->
-              <div
-                class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1"
-              >
-                <div class="flex items-center gap-md">
-                  <div
-                    class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
-                  >
-                    <span
-                      class="material-symbols-outlined text-on-surface-variant"
-                      data-icon="history_edu"
-                      >history_edu</span
-                    >
-                  </div>
-                  <div>
-                    <p class="font-label-md text-on-surface">
-                      Physiotherapy Referral
-                    </p>
-                    <p class="text-caption text-on-surface-variant">
-                      General Wellness Clinic • Jul 10, 2023
-                    </p>
-                  </div>
-                </div>
-                <div class="flex gap-xs">
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="visibility"
-                      >visibility</span
-                    >
-                  </button>
-                  <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span
-                      class="material-symbols-outlined text-[20px]"
-                      data-icon="download"
-                      >download</span
-                    >
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Category Group: Vaccinations -->
-          <div class="space-y-sm pt-md">
-            <div class="flex items-center gap-sm px-sm">
-              <span
-                class="material-symbols-outlined text-tertiary"
-                data-icon="vaccines"
-                >vaccines</span
-              >
-              <h4 class="font-headline-md text-on-surface">Vaccinations</h4>
-            </div>
-            <div
-              class="glass-card rounded-xl overflow-hidden border border-white/5"
-            >
-              <table class="w-full text-left font-body-md border-collapse">
-                <thead>
-                  <tr
-                    class="bg-surface-container-high/50 text-on-surface-variant text-[12px] uppercase tracking-wider"
-                  >
-                    <th class="px-md py-sm font-label-md">Vaccine</th>
-                    <th class="px-md py-sm font-label-md">Date</th>
-                    <th class="px-md py-sm font-label-md">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-md py-sm text-on-surface">
-                      Coming Soon
-                    </td>
-                    <td class="px-md py-sm text-on-surface-variant">
-                      Coming Soon
-                    </td>
-                    <td class="px-md py-sm">
-                      <button
-                        class="text-primary font-label-md hover:underline"
-                      >
-                        Coming Soon
-                      </button>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-md py-sm text-on-surface">
-                     Coming Soon
-                    </td>
-                    <td class="px-md py-sm text-on-surface-variant">
-                      Coming Soon
-                    </td>
-                    <td class="px-md py-sm">
-                      <button
-                        class="text-primary font-label-md hover:underline"
-                      >
-                        Coming Soon
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-        <!-- Sidebar Insights -->
-        <aside class="lg:col-span-4 space-y-gutter">
-         
-        
-         
-          </div>
-        </aside>
+        {% endfor %}
       </div>
-    </main>
+    </section>
+    {% endif %}
 
-   <br><br><br><br>
-<!-- Bottom Navigation Bar -->
+    <!-- Categorized Lists -->
+    <section class="lg:col-span-8 space-y-md">
+      <h3
+        class="font-label-md text-primary mb-md tracking-widest uppercase opacity-70"
+      >
+        Detailed Records
+      </h3>
+
+      {% for category, label in [('prescription', 'Prescriptions'),
+      ('lab_report', 'Lab Reports'), ('note', 'Clinical Notes')] %} {% set
+      group = records_by_category.get(category, []) %} {% if group %}
+      <div class="space-y-sm" data-record-group="{{ category }}">
+        <div class="flex items-center gap-sm px-sm">
+          <span
+            class="material-symbols-outlined {{ category_colors[category].text }}"
+            >{{ group[0].icon }}</span
+          >
+          <h4 class="font-headline-md text-on-surface">{{ label }}</h4>
+          <span
+            class="text-caption bg-surface-container-highest px-2 py-0.5 rounded-full text-on-surface-variant"
+            >{{ group|length }} total</span
+          >
+        </div>
+        <div class="space-y-2">
+          {% for record in group %}
+          <div
+            class="glass-card rounded-xl p-sm flex items-center justify-between hover:translate-x-1 transition-transform"
+            data-record-category="{{ record.category }}"
+          >
+            <div class="flex items-center gap-md">
+              <div
+                class="neomorph-inner w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-lowest border border-white/5"
+              >
+                <span class="material-symbols-outlined text-on-surface-variant"
+                  >{{ record.icon }}</span
+                >
+              </div>
+              <div>
+                <p class="font-label-md text-on-surface">{{ record.title }}</p>
+                <p class="text-caption text-on-surface-variant">
+                  Dr. {{ record.doctor.first_name }} {{ record.doctor.last_name
+                  }} • {{ record.record_date.strftime('%b %d, %Y') }}
+                </p>
+                {% if record.description %}
+                <p
+                  class="text-caption text-on-surface-variant mt-1 max-w-md line-clamp-2"
+                >
+                  {{ record.description }}
+                </p>
+                {% endif %}
+              </div>
+            </div>
+            {% if record.file_url %}
+            <a
+              href="{{ record.file_url }}"
+              target="_blank"
+              rel="noopener"
+              class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all shrink-0"
+              aria-label="Open attachment"
+            >
+              <span class="material-symbols-outlined text-[20px]"
+                >download</span
+              >
+            </a>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %} {% endfor %}
+    </section>
+
+    <!-- Vaccinations table -->
+    <section class="lg:col-span-12 space-y-sm" data-record-group="vaccination">
+      {% set vaccinations = records_by_category.get('vaccination', []) %} {% if
+      vaccinations %}
+      <div class="flex items-center gap-sm px-sm">
+        <span class="material-symbols-outlined text-secondary">vaccines</span>
+        <h4 class="font-headline-md text-on-surface">Vaccinations</h4>
+        <span
+          class="text-caption bg-surface-container-highest px-2 py-0.5 rounded-full text-on-surface-variant"
+          >{{ vaccinations|length }} total</span
+        >
+      </div>
+      <div class="glass-card rounded-xl overflow-hidden border border-white/5">
+        <table class="w-full text-left font-body-md border-collapse">
+          <thead>
+            <tr
+              class="bg-surface-container-high/50 text-on-surface-variant text-[12px] uppercase tracking-wider"
+            >
+              <th class="px-md py-sm font-label-md">Vaccine</th>
+              <th class="px-md py-sm font-label-md">Date</th>
+              <th class="px-md py-sm font-label-md">Administered By</th>
+              <th class="px-md py-sm font-label-md">Record</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for record in vaccinations %}
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-md py-sm text-on-surface">{{ record.title }}</td>
+              <td class="px-md py-sm text-on-surface-variant">
+                {{ record.record_date.strftime('%b %d, %Y') }}
+              </td>
+              <td class="px-md py-sm text-on-surface-variant">
+                Dr. {{ record.doctor.first_name }} {{ record.doctor.last_name }}
+              </td>
+              <td class="px-md py-sm">
+                {% if record.file_url %}
+                <a
+                  href="{{ record.file_url }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-primary font-label-md hover:underline"
+                  >View</a
+                >
+                {% else %}
+                <span class="text-on-surface-variant">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- Sidebar Insights -->
+    <aside class="lg:col-span-4 space-y-gutter">
+      <div class="glass-card rounded-2xl p-md space-y-md">
+        <h3
+          class="font-label-md text-primary tracking-widest uppercase opacity-70"
+        >
+          Records Summary
+        </h3>
+        <div class="flex items-center justify-between">
+          <span class="text-on-surface-variant font-body-md">Total records</span>
+          <span class="font-bold text-on-surface">{{ summary.total }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-on-surface-variant font-body-md">Prescriptions</span>
+          <span class="font-bold text-on-surface"
+            >{{ summary.prescriptions }}</span
+          >
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-on-surface-variant font-body-md">Lab reports</span>
+          <span class="font-bold text-on-surface">{{ summary.lab_reports }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-on-surface-variant font-body-md">Vaccinations</span>
+          <span class="font-bold text-on-surface"
+            >{{ summary.vaccinations }}</span
+          >
+        </div>
+        {% if summary.last_updated %}
+        <div class="pt-sm border-t border-white/10">
+          <p class="text-caption text-on-surface-variant">
+            Last updated {{ summary.last_updated.strftime('%b %d, %Y') }}
+          </p>
+        </div>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+  {% endif %}
+</main>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
 <div
-  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm"
+  class="fixed bottom-md left-0 w-full z-50 flex justify-around items-center px-md py-sm md:hidden"
 >
   <nav
     class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
   >
     <a
-     href="{{url_for('patient_dashboard')}}"
-      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      href="{{ url_for('patient_dashboard') }}"
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="home"
     >
-      <span
-        class="material-symbols-outlined"
-        style="font-variation-settings: &quot;FILL&quot; 1"
-        >home</span
-      >
-  </a>
-    <button
+      <span class="material-symbols-outlined">home</span>
+    </a>
+    <a
+      href="{{ url_for('appointment') }}"
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       data-nav="schedule"
     >
       <span class="material-symbols-outlined">calendar_today</span>
-    </button>
+    </a>
     <button
-      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
-      data-nav="menu"
-      id="menu-btn"
+      class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
+      id="menu-btn-mobile"
+      aria-label="Open menu"
     >
-      <span class="material-symbols-outlined">menu</span>
+      <span
+        class="material-symbols-outlined"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >menu</span
+      >
     </button>
   </nav>
 </div>
+
+<script>
+  (function () {
+    // Category chip filtering
+    const filterBtns = document.querySelectorAll(".record-filter-btn");
+    const groups = document.querySelectorAll(
+      "[data-record-group], [data-record-category]",
+    );
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterBtns.forEach((b) => {
+          b.classList.remove(
+            "active-filter",
+            "bg-secondary-container/20",
+            "text-secondary",
+            "border",
+            "border-secondary/30",
+          );
+          b.classList.add(
+            "bg-surface-container-highest",
+            "text-on-surface-variant",
+          );
+        });
+        btn.classList.add(
+          "active-filter",
+          "bg-secondary-container/20",
+          "text-secondary",
+          "border",
+          "border-secondary/30",
+        );
+        btn.classList.remove(
+          "bg-surface-container-highest",
+          "text-on-surface-variant",
+        );
+        const filter = btn.dataset.filter;
+        groups.forEach((el) => {
+          const group = el.dataset.recordGroup;
+          const cat = el.dataset.recordCategory;
+          const match =
+            filter === "all" || group === filter || cat === filter || group === "all";
+          el.classList.toggle("hidden", !match);
+        });
+      });
+    });
+
+    // Mobile drawer toggle
+    ["menu-btn", "menu-btn-mobile"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document.body.classList.toggle("drawer-open");
+          document.body.classList.toggle("drawer-closed");
+        });
+      }
+    });
+  })();
+</script>
 {% endblock %}

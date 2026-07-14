@@ -1,0 +1,160 @@
+{% extends 'base.html' %} {% block title %}Doctor Login{% endblock %} {% block
+body %}
+<!-- Ambient background -->
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+  <div
+    class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full animate-pulse-slow"
+  ></div>
+  <div
+    class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[100px] rounded-full animate-pulse-slow"
+  ></div>
+</div>
+
+<main
+  class="relative z-10 min-h-screen w-full flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl"
+>
+  <div class="w-full max-w-md space-y-lg">
+    <!-- Brand -->
+    <div class="flex flex-col items-center gap-sm text-center">
+      <span
+        class="material-symbols-outlined text-primary text-4xl"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >clinical_notes</span
+      >
+      <span
+        class="font-headline-lg text-headline-lg font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+        >Medika</span
+      >
+      <p class="text-on-surface-variant font-body-md">
+        Doctor Portal — sign in to manage your appointment requests
+      </p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="glass-card rounded-2xl p-lg space-y-md">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="space-y-2">
+        {% for category, msg in messages %}
+        <div
+          class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
+        >
+          {{ msg }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <form
+        action="{{ url_for('doctor_login') }}"
+        method="POST"
+        class="space-y-md"
+      >
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="email"
+            >Email</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]"
+              >mail</span
+            >
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              placeholder="you@medika.com"
+              class="w-full bg-surface-container-low border border-white/10 rounded-lg pl-[40px] pr-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+            />
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="password"
+            >Password</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]"
+              >lock</span
+            >
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              class="w-full bg-surface-container-low border border-white/10 rounded-lg pl-[40px] pr-[40px] py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              class="absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+              aria-label="Show password"
+            >
+              <span
+                class="material-symbols-outlined text-[20px]"
+                id="toggle-password-icon"
+                >visibility</span
+              >
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <label
+            class="flex items-center gap-2 text-caption text-on-surface-variant"
+          >
+            <input
+              type="checkbox"
+              name="remember"
+              class="rounded border-white/20 bg-surface-container-low text-primary focus:ring-primary"
+            />
+            Keep me signed in
+          </label>
+          <a href="#" class="text-caption text-primary hover:underline"
+            >Forgot password?</a
+          >
+        </div>
+        <button
+          type="submit"
+          class="neomorphic-button w-full bg-primary text-on-primary px-lg py-sm rounded-xl font-bold transition-all hover:brightness-110 active:scale-95"
+        >
+          Sign In
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-caption text-on-surface-variant">
+      Not a doctor?
+      <a href="{{ url_for('login') }}" class="text-primary hover:underline"
+        >Go to patient login</a
+      >
+    </p>
+  </div>
+</main>
+
+<script>
+  (function () {
+    const toggleBtn = document.getElementById("toggle-password");
+    const pwInput = document.getElementById("password");
+    const icon = document.getElementById("toggle-password-icon");
+    if (toggleBtn && pwInput && icon) {
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = pwInput.type === "password";
+        pwInput.type = isHidden ? "text" : "password";
+        icon.textContent = isHidden ? "visibility_off" : "visibility";
+        toggleBtn.setAttribute(
+          "aria-label",
+          isHidden ? "Hide password" : "Show password",
+        );
+      });
+    }
+  })();
+</script>
+{% endblock %}

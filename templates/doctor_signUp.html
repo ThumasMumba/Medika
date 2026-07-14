@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MedikaAI User Sign In</title>
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Symbols for Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                primary: "#2563eb",
+                dark: "#0f172a", // Deep navy background from image
+                card: "#1e293b", // Slightly lighter navy for form card
+                input: "#1e293b", // Match card or slightly darker
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              custom: "8px", // ROUND_EIGHT from design system
+            },
+          },
+        },
+      };
+    </script>
+    <style data-purpose="custom-styling">
+      body {
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* Specific styling for the date picker icon color in modern browsers */
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg);
+        cursor: pointer;
+      }
+      /* Custom scrollbar for a cleaner mobile look */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="bg-brand-dark min-h-screen flex flex-col">
+    <!-- BEGIN: MainHeader -->
+    <header
+      class="bg-white border-b border-gray-100 sticky top-0 z-50 px-4 py-3 flex items-center justify-between"
+      data-purpose="site-header"
+    >
+      <div class="flex items-center gap-2">
+        <!-- Medika Brand Logo -->
+        <span class="text-brand-primary font-bold text-xl tracking-tight"
+          >Medika</span
+        >
+      </div>
+      <!-- Desktop Navigation (Hidden on small mobile but kept for structure) -->
+      <nav
+        class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600"
+      >
+        <a
+          class="hover:text-brand-primary transition-colors"
+          href="{{url_for('index')}}"
+          >Home</a
+        >
+        <a class="hover:text-brand-primary transition-colors" href="#">
+          How it works
+        </a>
+        <a class="hover:text-brand-primary transition-colors" href="#">
+          Support
+        </a>
+      </nav>
+      <div class="flex items-center">
+        <button
+          class="bg-brand-primary text-white px-5 py-2 rounded-custom text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm"
+        >
+          Sign In
+        </button>
+      </div>
+    </header>
+    <!-- END: MainHeader -->
+    <!-- BEGIN: MainContent -->
+    <main
+      class="flex-grow flex items-center justify-center p-4 md:p-8"
+      data-purpose="sign-in-section"
+    >
+      <!-- Registration Card -->
+      <div
+        class="w-full max-w-lg bg-[#111827]/80 backdrop-blur-sm border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl"
+        data-purpose="registration-card"
+      >
+        <div class="mb-8">
+          <h1
+            class="text-[#38bdf8] text-2xl md:text-3xl font-bold tracking-tight"
+          >
+            MedikaAI User sign up
+          </h1>
+        </div>
+        <!-- Registration Form -->
+        <form
+          action="{{url_for('doctor_signUp')}}"
+          class="space-y-5"
+          id="registration-form"
+          method="POST"
+        >
+          <!-- Row: Name -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label
+                class="block text-sm font-medium text-slate-300"
+                for="first-name"
+                >First name</label
+              >
+              <input
+                class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder:text-slate-500 transition-all"
+                id="first_name"
+                name="fName"
+                placeholder="John"
+                type="text"
+                required=""
+              />
+            </div>
+            <div class="space-y-1.5">
+              <label
+                class="block text-sm font-medium text-slate-300"
+                for="last-name"
+                >Last name</label
+              >
+              <input
+                class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder:text-slate-500 transition-all"
+                id="last_name"
+                name="lName"
+                placeholder="Doe"
+                type="text"
+                required=""
+              />
+            </div>
+          </div>
+          <!-- Email -->
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300" for="email"
+              >Email</label
+            >
+            <input
+              class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder:text-slate-500 transition-all"
+              id="email"
+              name="email"
+              placeholder="john.doe@example.com"
+              type="email"
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+              required=""
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300" for="phone"
+              >Phone</label
+            >
+            <input
+              class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder:text-slate-500 transition-all"
+              id="phone"
+              name="phone_number"
+              pattern="\d{10}"
+              placeholder="0971402677"
+              required=""
+              type="tel"
+            />
+          </div>
+          <!-- Specialization -->
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300" for="specialization"
+              >Specialization</label
+            >
+            <input
+              class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder:text-slate-500 transition-all"
+              id="specialization"
+              name="specialization"
+              placeholder="e.g., Cardiology"
+              type="text"
+              required=""
+            />
+          </div>
+
+          <!-- Password -->
+          <div class="space-y-1.5">
+            <label
+              class="block text-sm font-medium text-slate-300"
+              for="password"
+              >Password</label
+            >
+            <div class="relative">
+              <input
+                class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary transition-all block p-2.5"
+                id="password"
+                name="password"
+                type="password"
+                required=""
+              />
+            </div>
+          </div>
+          <!-- Gender -->
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300" for="gender"
+              >Gender</label
+            >
+            <select
+              class="w-full bg-[#1e293b] border-slate-700 text-white rounded-lg focus:ring-brand-primary focus:border-brand-primary transition-all p-2.5"
+              id="gender"
+              name="gender"
+              required=""
+            >
+              <option disabled="" selected="" value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <!-- Form Submission Button -->
+          <div class="pt-6">
+            <button
+              class="w-full bg-brand-primary hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-custom transition-all transform active:scale-[0.98] shadow-lg shadow-blue-900/20 justify-center inline-flex items-center gap-2"
+              type="submit"
+            >
+              Complete Registration
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+    <!-- END: MainContent -->
+    <!-- BEGIN: Footer -->
+    <footer
+      class="p-6 text-center text-slate-500 text-xs"
+      data-purpose="site-footer"
+    >
+      <p class="">
+        © 2026 MedikaAI Clinical Management System. All rights reserved.
+      </p>
+    </footer>
+    <!-- END: Footer -->
+  </body>
+</html>
