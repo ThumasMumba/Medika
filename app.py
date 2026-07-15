@@ -1,6 +1,8 @@
 # Imports the required classes to build the application
 # render_templates: used to render HTML  templates for the pages
-from datetime import date, timedelta
+from datetime import  date, timedelta
+from contextlib import contextmanager
+import datetime
 from functools import wraps
 from database import create_connection
 from mysql.connector import Error
@@ -50,9 +52,10 @@ def initialize_db():
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS doctors(
                             doctor_id INT AUTO_INCREMENT PRIMARY KEY,
-                            first_name VARCHAR(100) NOT NULL,
+                            doctor_first_name VARCHAR(100) NOT NULL,
                             gender VARCHAR(4) NOT NULL,
-                            last_name VARCHAR(100) NOT NULL,
+                            password VARCHAR(30),
+                            doctor_last_name VARCHAR(100) NOT NULL,
                             email VARCHAR(100) UNIQUE NOT NULL,
                             phone VARCHAR(20) UNIQUE NOT NULL,
                             specialization VARCHAR(100) NOT NULL,
@@ -61,19 +64,38 @@ def initialize_db():
                        )
      """)
         #SQL query to create appointments table if it does not exists
-        cursor.execute(
-             """
-            CREATE TABLE IF NOT EXISTS appointments(
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                patient_id INT NOT NULL,
-                doctor_id INT NOT NULL,
-                appointment_date DATE NOT NULL,
-                appointment_time TIME NOT NULL,
-    status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX(patient_id),
-    INDEX(doctor_id)
-)
+        cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS appointments (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    patient_id INT NOT NULL,
+                    doctor_id INT NOT NULL,
+                    appointment_date DATE NOT NULL,
+                    appointment_time TIME NOT NULL,
+                    mode ENUM('in_person', 'virtual') NOT NULL DEFAULT 'in_person',
+                    reason TEXT,
+                    status ENUM('pending', 'approved', 'rejected', 'cancelled') NOT NULL DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (patient_id) REFERENCES patient(patient_id),
+                    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
+                    INDEX(patient_id),
+                    INDEX(doctor_id),
+                    INDEX(status)
+                    );
+  """)
+        #SQL query to create notifications table if it does not exists
+        cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS notifications (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    recipient_type ENUM('patient', 'doctor') NOT NULL,
+                    recipient_id INT NOT NULL,
+                    appointment_id INT,
+                    type ENUM('booked', 'approved', 'rejected', 'cancelled') NOT NULL,
+                    message VARCHAR(255) NOT NULL,
+                    read_flag BOOLEAN NOT NULL DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+                    INDEX(recipient_type, recipient_id, read_flag)
+                    );
      """)
         #    SQL query  to create admin table if it does not exists
         cursor.execute("""
@@ -456,11 +478,209 @@ def manage_patients():
      flash("Manage Patients functionality is not implemented yet.", "error")
      return redirect(url_for('admin_dashboard'))
 
-@app.route("/appointment", methods=['GET', 'POST'])
+####  HELPER FUNCTIONS  ####
+
+@contextmanager
+def get_dict_cursor(connection, commit=False):
+    cursor = connection.cursor(dictionary=True, buffered=True)
+    try:
+        yield cursor
+        if commit:
+            connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        cursor.close()
+        connection.close()
+
+def _row_to_appointment(row, include="doctor"):
+    """include='doctor' for patient-facing views, 'patient' for doctor-facing views."""
+    apt = {
+        "id": row["id"],
+        "date": row["date"],
+        "time": _to_time(row["time"]),
+        "mode": row["mode"],
+        "reason": row.get("reason"),
+        "status": row["status"],
+    }
+    if include == "doctor":
+        apt["doctor"] = {
+            "first_name": row["doctor_first_name"],
+            "last_name": row["doctor_last_name"],
+            "specialty": row["specialization"],
+            "photo_url": row.get("photo_url"),
+        }
+    else:
+        apt["patient"] = {
+            "first_name": row["patient_first_name"],
+            "last_name": row["patient_last_name"],
+        }
+    return apt
+
+def create_notification(cursor, recipient_type, recipient_id, appointment_id, ntype, message):
+    cursor.execute(
+        "INSERT INTO notifications (recipient_type, recipient_id, appointment_id, type, message) "
+        "VALUES (%s, %s, %s, %s, %s)",
+        (recipient_type, recipient_id, appointment_id, ntype, message),
+    )
+
+def get_notifications(cursor, recipient_type, recipient_id, limit=20):
+    cursor.execute(
+        "SELECT id, type, message, read_flag AS `read`, created_at "
+        "FROM notifications WHERE recipient_type = %s AND recipient_id = %s "
+        "ORDER BY created_at DESC LIMIT %s",
+        (recipient_type, recipient_id, limit),
+    )
+    return cursor.fetchall()
+
+
+@app.route("/appointment", methods=["GET", "POST"])
 @patient_required
 def appointment():
-     """Handles the creation of new appointments. """
-     return render_template("appointment.html")
+    connection = create_connection()
+    if connection is None:
+        flash("Database connection error. Please try again later.", "error")
+        return redirect(url_for("patient_dashboard"))
+
+    if request.method == "POST":
+        doctor_id = request.form.get("doctor_id", type=int)
+        date_str = request.form.get("date", "").strip()
+        time_str = request.form.get("time", "").strip()
+        mode = request.form.get("mode", "").strip()
+        reason = request.form.get("reason", "").strip()
+
+        errors = []
+        try:
+            apt_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+            if apt_date < date.today():
+                errors.append("Date can't be in the past.")
+        except ValueError:
+            errors.append("Invalid date.")
+        try:
+            apt_time = datetime.datetime.strptime(time_str, "%H:%M").time()
+        except ValueError:
+            errors.append("Invalid time.")
+        if mode not in ("in_person", "virtual"):
+            errors.append("Invalid consultation type.")
+        if not reason:
+            errors.append("Please provide a reason for the visit.")
+        if not doctor_id:
+            errors.append("Please choose a doctor.")
+
+        if errors:
+            for e in errors:
+                flash(e, "error")
+            return redirect(url_for("appointment"))
+
+        try:
+               cursor = connection.cursor(dictionary=True, buffered=True)
+                # confirm the doctor actually exists before trusting the id
+               cursor.execute("SELECT doctor_id FROM doctors WHERE doctor_id = %s", (doctor_id,))
+               if cursor.fetchone() is None:
+                    flash("Selected doctor not found.", "error")
+                    return redirect(url_for("appointment"))
+
+               cursor.execute(
+                    "INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, mode, reason, status) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, 'pending')",
+                    (session.get("patient_id"), doctor_id, apt_date, apt_time, mode, reason),
+               )
+               new_id = cursor.lastrowid
+
+               cursor.execute(
+                    "SELECT first_name, last_name FROM patient WHERE patient_id = %s", (session.get("patient_id"),)
+               )
+               patient = cursor.fetchone()
+
+               create_notification(
+                    cursor, "doctor", doctor_id, new_id, "booked",
+                    f"New appointment request from {patient['first_name']} {patient['last_name']} "
+                    f"on {apt_date.strftime('%b %d, %Y')} at {apt_time.strftime('%I:%M %p')}."
+               )
+
+               flash("Appointment request sent. You'll be notified once it's confirmed.", "success")
+               return redirect(url_for("appointment"))
+        except Error as e:
+             print(f"Database error: {e}")
+             flash("An error occurred while processing your request. Please try again later.", "error")
+             return redirect(url_for("appointment"))
+
+    # GET
+    try:
+        cursor = connection.cursor(dictionary=True, buffered=True)
+        cursor.execute(
+            "SELECT doctor_id AS id, doctor_first_name, doctor_last_name, specialization "
+            "FROM doctors ORDER BY doctor_last_name"
+        )
+        doctors = cursor.fetchall()
+
+        base_query = """
+            SELECT appointment_id, appointment_date, appointment_time, mode, reason, status,
+                   doctor_first_name AS doctor_first_name, doctor_last_name AS doctor_last_name,
+                   specialization
+            FROM appointments a
+            JOIN doctors d ON d.doctor_id = a.doctor_id
+            WHERE a.patient_id = %s AND {condition}
+            ORDER BY appointment_date ASC, appointment_time ASC
+        """
+        cursor.execute(
+            base_query.format(condition="a.status IN ('pending','approved')"),
+            (session.get("patient_id"),),
+        )
+        upcoming_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
+
+        cursor.execute(
+            base_query.format(condition="a.status IN ('rejected','cancelled')"),
+            (session.get("patient_id"),),
+        )
+        past_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
+
+        notifications = get_notifications(cursor, "patient", session.get("patient_id"))
+
+        return render_template(
+               "appointment.html",
+               doctor=doctors,
+               upcoming_appointments=upcoming_appointments,
+               past_appointments=past_appointments,
+               notifications=notifications,
+               today=date.today().isoformat(),
+          )
+    except Error as e:
+            print(f"GET: try block")
+            print(f"Database error: {e}")
+            flash("An error occurred while processing your request. Please try again later.", "error")
+            return redirect(url_for("patient_dashboard"))
+
+@app.route("/appointment/<int:appointment_id>/cancel", methods=["POST"])
+@patient_required
+def cancel_appointment(appointment_id):
+    patient_id = session["patient_id"]
+    connection = create_connection()
+    try:
+         
+       cursor = connection.cursor(dictionary=True, buffered=True)
+       cursor.execute(
+            "UPDATE appointments SET status = 'cancelled' "
+            "WHERE id = %s AND patient_id = %s AND status IN ('pending','approved')",
+            (appointment_id, patient_id),
+        )
+       if cursor.rowcount:
+            cursor.execute(
+                "SELECT doctor_id FROM appointments WHERE id = %s", (appointment_id,)
+            )
+            row = cursor.fetchone()
+            if row:
+                create_notification(
+                    cursor, "doctor", row["doctor_id"], appointment_id, "cancelled",
+                    "A patient cancelled their appointment."
+                              )
+       flash("Appointment cancelled.", "success")
+       return redirect(url_for("appointment"))
+    except Error as e:
+          print(f"Database error: {e}")
+          flash("An error occurred while processing your request. Please try again later.", "error")
+          return redirect(url_for("appointment"))     
 
 @app.route("/system_settings", methods=["GET"])
 @login_required
@@ -483,23 +703,6 @@ def _to_time(value):
     return value
  
  
-def _row_to_appointment(row):
-    """Reshape a flat SQL row (from a JOIN with patients) into the nested
-    structure the templates expect: apt.patient.first_name, etc."""
-    return {
-        "id": row["id"],
-        "date": row["date"],
-        "time": _to_time(row["time"]),
-        "mode": row["mode"],
-        "reason": row.get("reason"),
-        "status": row["status"],
-        "patient": {
-            "first_name": row["patient_first_name"],
-            "last_name": row["patient_last_name"],
-        },
-    }
- 
-
 @app.route('/doctor_signUp', methods=["POST", "GET"])
 def doctor_signUp():
      """Handles the sign up process for doctors.
@@ -510,8 +713,8 @@ def doctor_signUp():
      #Check if the form submission method is POST request
      if request.method == "POST":
           #Extract form data
-          first_name = request.form.get("fName")
-          last_name = request.form.get("lName")
+          doctor_first_name = request.form.get("fName")
+          doctor_last_name = request.form.get("lName")
           gender = request.form.get("gender")
           email = request.form.get("email")
           phone_number = request.form.get("phone_number")
@@ -519,7 +722,7 @@ def doctor_signUp():
           specialization = request.form.get("specialization")
 
           #Check if fields are not empty before inserting into the database
-          if not all([first_name, last_name, gender, email, phone_number, password, specialization]):
+          if not all([doctor_first_name, doctor_last_name, gender, email, phone_number, password, specialization]):
                flash("Please fill in all the required fields.", 'error')
                return redirect(url_for("doctor_signUp"))
           
@@ -541,10 +744,16 @@ def doctor_signUp():
                hash_password = generate_password_hash(password)
                insert_query = """
                   INSERT INTO doctors
-                         (first_name, last_name, gender, email, phone, password, specialization)
+                         (doctor_first_name, doctor_last_name, gender, email, phone, password, specialization)
                          VALUES (%s, %s, %s, %s, %s, %s, %s)"""
                #Exceptions are handled in case of any database errors during the insertion process
-               cursor.execute(insert_query, (first_name, last_name, gender, email, phone_number, hash_password, specialization))
+               cursor.execute(insert_query, (doctor_first_name, doctor_last_name, gender, email, phone_number, hash_password, specialization))
+               session['doctor_logged_in'] = True
+               session['doctor_id'] = cursor.lastrowid # Gets the auto-incremented id
+               session['doctor_first_name'] = doctor_first_name
+               session['doctor_last_name'] = doctor_last_name
+               session['email'] = email
+               session['specialization'] = specialization
                connection.commit()
                flash("You have successfully signed up!", 'success')
                return redirect(url_for("doctor_dashboard"))
@@ -567,55 +776,80 @@ def doctor_login_required(view):
 # Auth
 # ---------------------------------------------------------------------------
  
-@app.route("/doctor_login", methods=["GET", "POST"])
+#Creates a route for the doctor login
+@app.route('/doctor_login', methods = ["POST", "GET"])
 def doctor_login():
-    connection = create_connection()
-    if request.method == "GET":
-        return render_template("doctor_login.html")
- 
-    email = request.form.get("email", "").strip().lower()
-    password = request.form.get("password", "")
- 
-    if not email or not password:
-        flash("Please enter your email and password.", "error")
-        return redirect(url_for("doctor_login"))
-     
-    try:
-        # Added buffered=True to prevent results from locking the pipeline
-        cursor = connection.cursor(dictionary=True, buffered=True)
-        cursor.execute(
-            "SELECT doctor_id, first_name, last_name, password, phone, specialization "
-            "FROM doctors WHERE email = %s",
-            (email,),
-        )
-        doctor = cursor.fetchone()
-        if doctor and check_password_hash(doctor["password"], password):
-            session.clear()
-            session["doctor_id"] = doctor["doctor_id"]
-            session["email"] = doctor["email"]
-            session["password"] = doctor["password"]
-            flash(f"Welcome back, Dr. {doctor['last_name']}.", "success")
-            return redirect(url_for("doctor_dashboard"))
-        else:
-            flash("Invalid email or password.", "error")
-            return redirect(url_for("doctor_login"))
-    except Error as e:
-        print(f"Database error: {e}")
-        flash("An error occurred while processing your request. Please try again later.", "error")
-    finally:
-         connection.close()
-    return render_template("doctor_login.html")
+     """"
+     Handles the login process for doctors.
+     It accepts both GET and POST requests.
+     """
+     if request.method == 'POST':
+        #Get login credentials from the form
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        #Check if the fields are not empty
+        if not email or not password:
+            flash('Please enter both email and password', "error")
+            return redirect(url_for('doctor_login'))
+
+        connection = create_connection()
+        if connection is None:
+            flash('Database connection error. Please try again later.', 'error')
+            
+            return redirect(url_for('doctor_login'))
+
+        try:
+            cursor = connection.cursor(dictionary=True, buffered=True)
+
+            #SQL Query to verify doctor credentials
+            login_query = """
+            SELECT doctor_id, doctor_first_name, doctor_last_name, email, password, phone,
+             gender, specialization
+            FROM doctors
+            WHERE email = %s
+            """
+            cursor.execute(login_query, (email,))
+            #Get the doctor record
+            doctor = cursor.fetchone()
+            #Check if doctor exists
+            if doctor and check_password_hash(doctor['password'], password):
+                session['doctor_logged_in'] = True
+                session['doctor_id'] = doctor['doctor_id']
+                session['doctor_first_name'] = doctor['doctor_first_name']
+                session['doctor_last_name'] = doctor['doctor_last_name']
+                session['gender'] = doctor['gender']
+                session['email'] = doctor['email']
+                session['phone'] = doctor['phone']
+                session['specialization'] = doctor['specialization']
+                flash('Login successful! Welcome on board.', 'success')
+                return redirect(url_for('doctor_dashboard'))
+            else:
+                flash('No doctor found with that email and password.', 'error')
+                return redirect(url_for('doctor_login'))
+
+        except Error as e:
+            flash(f'Database error: ', 'error')
+            print(f"Database error: {str(e)}")
+            return render_template('doctor_login.html')
+      #GET request, show the login form
+     return render_template('doctor_login.html')
  
  
 @app.route("/logout")
 def doctor_logout():
     session.pop("doctor_id", None)
+    session.pop("doctor_logged_in", None)
+    session.pop("doctor_first_name", None)
+    session.pop("doctor_last_name", None)
+    session.pop("email", None)
+    session.pop("specialization", None)
     flash("You've been signed out.", "success")
     return redirect(url_for("doctor_login"))
  
  
 # ---------------------------------------------------------------------------
-# Dashboard
+# Doctor Dashboard
 # ---------------------------------------------------------------------------
  
 @app.route("/doctor_dashboard")
@@ -623,6 +857,7 @@ def doctor_logout():
 def doctor_dashboard():
     # Create a connection first
     connection = create_connection()
+    doctor = None
     pending_appointments = []
     upcoming_appointments = []
     todays_appointments = []
@@ -632,7 +867,7 @@ def doctor_dashboard():
             return redirect(url_for("doctor_login"))
         cursor = connection.cursor(dictionary=True, buffered=True)
         cursor.execute(
-            "SELECT doctor_id, first_name, last_name, specialization, phone "
+            "SELECT doctor_id, doctor_first_name, doctor_last_name, specialization, phone "
             "FROM doctors WHERE doctor_id = %s",
             (session.get("doctor_id"),)
         )
@@ -640,13 +875,13 @@ def doctor_dashboard():
           
         base_query = """
                     SELECT
-                         a.id, a.date, a.time, a.mode, a.reason, a.status,
-                         p.first_name AS patient_first_name,
-                         p.last_name  AS patient_last_name
+                         appointment_id, appointment_date, appointment_time, mode, reason, status,
+                         first_name AS first_name,
+                         last_name  AS last_name
                     FROM appointments a
-                    JOIN patients p ON p.id = a.patient_id
+                    JOIN patient p ON p.patient_id = a.patient_id
                     WHERE a.doctor_id = %s AND a.status = %s
-                    ORDER BY a.date ASC, a.time ASC
+                    ORDER BY a.appointment_date ASC, a.appointment_time ASC
                """
           
         cursor.execute(base_query, (session.get("doctor_id"), "pending"))

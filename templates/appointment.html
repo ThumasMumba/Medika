@@ -546,7 +546,7 @@ block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <form action="#" method="POST" class="space-y-md">
+    <form action="{{url_for('appointment')}}" method="POST" class="space-y-md">
       <div class="space-y-1">
         <label
           class="text-caption text-on-surface-variant uppercase tracking-wider"
@@ -560,9 +560,9 @@ block body %} {% macro status_badge(status) %} {% if status == 'pending' %}
           class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
         >
           <option value="" disabled selected>Choose a doctor</option>
-          {% for doc in doctors %}
+          {% for doc in doctor %}
           <option value="{{ doc.id }}">
-            Dr. {{ doc.first_name }} {{ doc.last_name }} — {{ doc.specialty }}
+            Dr. {{ doc.first_name }} {{ doc.last_name }} — {{ doc.specialization }}
           </option>
           {% endfor %}
         </select>

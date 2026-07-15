@@ -177,17 +177,17 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         <img
           class="w-full h-full object-cover"
           src="{{ photo_url }}"
-          alt="Dr. {{ first_name }} {{ last_name }}"
+          alt="Dr. {{ doctor_first_name }} {{ doctor_last_name }}"
         />
         {% else %}
         <span class="font-bold text-primary"
-          >{{session['first_name'] }}{{ session['last_name']}}</span
+          >{{session['doctor_first_name'] }}{{ session['doctor_last_name']}}</span
         >
         {% endif %}
       </div>
       <div class="min-w-0">
         <p class="font-bold text-on-surface truncate">
-          Dr. {{ session['first_name'] }} {{ session['last_name'] }}
+          Dr. {{ session['doctor_first_name'] }} {{ session['doctor_last_name'] }}
         </p>
         <p class="text-caption text-on-surface-variant truncate">
           {{ session['specialization'] }}
@@ -288,7 +288,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
 
   <div class="mb-lg">
     <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
-      Welcome back, Dr. {{ session['first_name'] }} {{ session['last_name'] }}
+      Welcome back, Dr. {{ session['doctor_first_name'] }} {{ session['doctor_last_name'] }}
     </h2>
     <p class="text-on-surface-variant font-body-md">
       Review incoming requests and keep track of your confirmed visits.
