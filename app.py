@@ -326,9 +326,9 @@ def login():
                 return redirect(url_for('login'))
 
         except Error as e:
-            flash(f'Database error: {str(e)}', 'error')
+            flash(f'Database error: ', 'error')
             print(f"Database error: {str(e)}")
-            return render_template('/login.html')
+            return render_template('login.html')
       #GET request, show the login form
      return render_template('/login.html')
 
@@ -496,27 +496,27 @@ def get_dict_cursor(connection, commit=False):
 
 def _row_to_appointment(row, include="doctor"):
     """include='doctor' for patient-facing views, 'patient' for doctor-facing views."""
-    apt = {
+    appointment = {
         "id": row["id"],
-        "date": row["date"],
-        "time": _to_time(row["time"]),
+        "appointment_date": row["appointment_date"],
+        "appointment_time": _to_time(row["appointment_time"]),
         "mode": row["mode"],
         "reason": row.get("reason"),
         "status": row["status"],
     }
     if include == "doctor":
-        apt["doctor"] = {
+        appointment["doctor"] = {
             "first_name": row["doctor_first_name"],
             "last_name": row["doctor_last_name"],
             "specialty": row["specialization"],
             "photo_url": row.get("photo_url"),
         }
     else:
-        apt["patient"] = {
+        appointment["patient"] = {
             "first_name": row["patient_first_name"],
             "last_name": row["patient_last_name"],
         }
-    return apt
+    return appointment
 
 def create_notification(cursor, recipient_type, recipient_id, appointment_id, ntype, message):
     cursor.execute(

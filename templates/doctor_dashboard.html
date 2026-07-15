@@ -529,23 +529,26 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
   <nav
     class="bg-surface-container/60 backdrop-blur-lg border border-white/10 rounded-full w-[90%] mx-auto flex justify-around items-center py-sm shadow-[0_0_30px_rgba(3,181,211,0.2)]"
   >
-    <button
+    <a
+      href="{{ url_for('doctor_dashboard') }}"
       class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] active:scale-90 transition-transform"
       data-nav="dashboard"
     >
       <span
+        
         class="material-symbols-outlined"
         style="font-variation-settings: &quot;FILL&quot; 1"
         >dashboard</span
       >
-    </button>
-    <button
+</a>
+    <a
+      href="#"
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
       id="menu-btn-mobile"
       aria-label="Open menu"
     >
       <span class="material-symbols-outlined">menu</span>
-    </button>
+</a>
   </nav>
 </div>
 
