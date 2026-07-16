@@ -187,7 +187,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
       </div>
       <div class="min-w-0">
         <p class="font-bold text-on-surface truncate">
-          Dr. {{ session['doctor_first_name'] }} {{ session['doctor_last_name'] }}
+          Dr. {{ session['doctor_last_name'] }}
         </p>
         <p class="text-caption text-on-surface-variant truncate">
           {{ session['specialization'] }}

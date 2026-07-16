@@ -54,7 +54,7 @@ def initialize_db():
                             doctor_id INT AUTO_INCREMENT PRIMARY KEY,
                             doctor_first_name VARCHAR(100) NOT NULL,
                             gender VARCHAR(4) NOT NULL,
-                            password VARCHAR(30),
+                            password VARCHAR(255),
                             doctor_last_name VARCHAR(100) NOT NULL,
                             email VARCHAR(100) UNIQUE NOT NULL,
                             phone VARCHAR(20) UNIQUE NOT NULL,
@@ -853,7 +853,7 @@ def doctor_logout():
 # ---------------------------------------------------------------------------
  
 @app.route("/doctor_dashboard")
-
+@doctor_login_required
 def doctor_dashboard():
     # Create a connection first
     connection = create_connection()

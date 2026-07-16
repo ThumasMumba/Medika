@@ -164,19 +164,6 @@
 
       drawerOverlay.addEventListener("click", toggleDrawer);
 
-      // Simulate real-time Heart Rate updates
-      const hrValueElement = document.getElementById("heart-rate-value");
-      setInterval(() => {
-        if (!hrValueElement) return;
-        const currentHR = parseInt(hrValueElement.innerText);
-        const fluctuation = Math.floor(Math.random() * 5) - 2; // -2 to +2
-        let nextHR = currentHR + fluctuation;
-
-        if (nextHR < 70) nextHR = 72;
-        if (nextHR > 95) nextHR = 90;
-
-        hrValueElement.innerText = nextHR;
-      }, 3000);
 
       // Tab Switching Logic (except menu which triggers drawer)
       const navButtons = document.querySelectorAll("[data-nav]");

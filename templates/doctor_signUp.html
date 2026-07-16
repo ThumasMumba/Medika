@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>MedikaAI User Sign In</title>
+    <title>MedikaAI Doctor Sign In</title>
     <!-- Tailwind CSS v3 CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Google Fonts: Inter -->
@@ -100,6 +100,8 @@
       </div>
     </header>
     <!-- END: MainHeader -->
+
+
     <!-- BEGIN: MainContent -->
     <main
       class="flex-grow flex items-center justify-center p-4 md:p-8"
@@ -112,11 +114,11 @@
       >
         <div class="mb-8">
           <h1
-            class="text-[#38bdf8] text-2xl md:text-3xl font-bold tracking-tight"
+            class="text-[#38bdf8] text-2xl md:text-3xl font-bold text-center md:p-1 tracking-tight"
           >
-            MedikaAI User sign up
+            MedikaAI Doctor sign up
           </h1>
-        </div>
+       </div>
         <!-- Registration Form -->
         <form
           action="{{url_for('doctor_signUp')}}"

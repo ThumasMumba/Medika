@@ -162,13 +162,8 @@
         <nav class="hidden md:flex gap-sm ml-xl">
           <a
             class="text-primary font-semibold border-b-2 border-primary py-xs font-body-base text-body-base"
-            href="#"
+            href="{{url_for('admin_dashboard')}}"
             >Dashboard</a
-          >
-          <a
-            class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-xs rounded font-body-base text-body-base"
-            href="#"
-            >Schedules</a
           >
           <a
             class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-xs py-xs rounded font-body-base text-body-base"
@@ -178,17 +173,6 @@
         </nav>
       </div>
       <div class="flex items-center gap-xs md:gap-sm">
-        <div class="relative hidden lg:block">
-          <span
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            >search</span
-          >
-          <input
-            class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-sm focus:ring-2 focus:ring-primary-container/20 w-64"
-            placeholder="Search patients..."
-            type="text"
-          />
-        </div>
         <button
           class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
         >
@@ -385,7 +369,7 @@
           <h1
             class="font-display-stat text-display-stat-mobile md:text-display-stat text-on-surface"
           >
-            Welcome Back, Admin
+            Welcome Back, {{session['admin_username']}}!
           </h1>
           <p
             class="font-body-base text-body-sm md:text-body-base text-on-surface-variant mt-xs"
@@ -489,199 +473,11 @@
             </a>
           </div>
         </section>
-        <!-- Two-Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-10 gap-sm md:gap-lg">
-          <!-- Recent Appointments (70%) -->
-          <div
-            class="lg:col-span-7 bg-surface-container-lowest rounded-xl tonal-elevation overflow-hidden"
-          >
-            <div
-              class="p-md border-b border-surface-container-highest flex justify-between items-center"
-            >
-              <h2 class="font-headline-md text-headline-md text-on-surface">
-                Recent Appointments
-              </h2>
-              <button
-                class="text-primary font-semibold text-body-sm hover:underline"
-              >
-                View Schedule
-              </button>
-            </div>
-            <div class="divide-y divide-surface-container-highest">
-              <!-- Row 1 -->
-              <div
-                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
-              >
-                <div class="flex items-center gap-sm md:gap-md">
-                  <div
-                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold text-sm md:text-base"
-                  >
-                    SJ
-                  </div>
-                  <div>
-                    <h4
-                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
-                    >
-                      Sarah Jenkins
-                    </h4>
-                    <p
-                      class="text-[12px] md:text-body-sm text-on-surface-variant"
-                    >
-                      General Consultation
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-sm md:gap-lg">
-                  <span
-                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
-                    >09:30 AM</span
-                  >
-                  <button
-                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span class="material-symbols-outlined">more_vert</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Row 2 -->
-              <div
-                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
-              >
-                <div class="flex items-center gap-sm md:gap-md">
-                  <div
-                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-bold text-sm md:text-base"
-                  >
-                    MC
-                  </div>
-                  <div>
-                    <h4
-                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
-                    >
-                      Michael Chen
-                    </h4>
-                    <p
-                      class="text-[12px] md:text-body-sm text-on-surface-variant"
-                    >
-                      Annual Physical
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-sm md:gap-lg">
-                  <span
-                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
-                    >10:45 AM</span
-                  >
-                  <button
-                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span class="material-symbols-outlined">more_vert</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Row 3 -->
-              <div
-                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
-              >
-                <div class="flex items-center gap-sm md:gap-md">
-                  <div
-                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold text-sm md:text-base"
-                  >
-                    ER
-                  </div>
-                  <div>
-                    <h4
-                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
-                    >
-                      Elena Rodriguez
-                    </h4>
-                    <p
-                      class="text-[12px] md:text-body-sm text-on-surface-variant"
-                    >
-                      Follow-up Visit
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-sm md:gap-lg">
-                  <span
-                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
-                    >01:15 PM</span
-                  >
-                  <button
-                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span class="material-symbols-outlined">more_vert</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Row 4 -->
-              <div
-                class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors group"
-              >
-                <div class="flex items-center gap-sm md:gap-md">
-                  <div
-                    class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-sm md:text-base"
-                  >
-                    DW
-                  </div>
-                  <div>
-                    <h4
-                      class="font-body-base text-body-sm md:text-body-base font-semibold text-on-surface"
-                    >
-                      David Wilson
-                    </h4>
-                    <p
-                      class="text-[12px] md:text-body-sm text-on-surface-variant"
-                    >
-                      Specialist Referral
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-sm md:gap-lg">
-                  <span
-                    class="px-2 md:px-sm py-1 bg-surface-container-high rounded-full text-[12px] md:text-body-sm text-on-surface-variant font-medium whitespace-nowrap"
-                    >03:00 PM</span
-                  >
-                  <button
-                    class="opacity-100 md:opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
-                  >
-                    <span class="material-symbols-outlined">more_vert</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+           
           <!-- Right Column (30%) -->
           <div
             class="lg:col-span-3 flex flex-col gap-sm md:gap-lg mb-20 md:mb-0"
           >
-            <!-- Data Insight Card -->
-            <div
-              class="bg-surface-container-lowest p-md rounded-xl tonal-elevation"
-            >
-              <div class="flex items-center gap-xs mb-sm">
-                <span
-                  class="material-symbols-outlined text-primary"
-                  style="font-variation-settings: &quot;FILL&quot; 1"
-                  >insights</span
-                >
-                <h3 class="font-headline-md text-sm text-on-surface">
-                  Data Insight
-                </h3>
-              </div>
-              <p
-                class="text-body-sm text-on-surface-variant mb-md leading-relaxed"
-              >
-                Patient intake has increased by
-                <span class="text-secondary font-bold">12%</span> this week.
-                Consider opening an additional slot for morning consultations to
-                maintain wait-time efficiency.
-              </p>
-              <div
-                class="h-1 bg-surface-container-high rounded-full overflow-hidden"
-              >
-                <div class="h-full bg-secondary w-3/4"></div>
-              </div>
-            </div>
             <!-- Marketing/Image Card -->
             <div
               class="relative rounded-xl overflow-hidden tonal-elevation group h-[240px] md:h-[280px]"
@@ -719,7 +515,7 @@
     </main>
     <!-- Bottom Navigation Bar (Mobile only) -->
     <div
-      class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-surface-container-highest z-50 flex items-center justify-around px-sm"
+      class="md: hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-surface-container-highest z-50 flex items-center justify-around px-sm"
     >
       <a
         class="flex flex-col items-center gap-1 text-primary"
@@ -739,13 +535,7 @@
         <span class="material-symbols-outlined">group</span>
         <span class="text-[10px]">Patients</span>
       </a>
-      <a
-        class="flex flex-col items-center gap-1 text-on-surface-variant"
-        href="#"
-      >
-        <span class="material-symbols-outlined">calendar_today</span>
-        <span class="text-[10px]">Apps</span>
-      </a>
+     
       <a
         class="flex flex-col items-center gap-1 text-on-surface-variant"
         href="#"
