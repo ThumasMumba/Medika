@@ -294,7 +294,7 @@ def login():
         if connection is None:
             flash('Database connection error. Please try again later.', 'error')
             
-            return redirect(url_for('userLogin'))
+            return redirect(url_for('login'))
 
         try:
             cursor = connection.cursor(dictionary=True, buffered=True)
@@ -493,13 +493,12 @@ def get_dict_cursor(connection, commit=False):
     finally:
         cursor.close()
         connection.close()
-
 def _row_to_appointment(row, include="doctor"):
     """include='doctor' for patient-facing views, 'patient' for doctor-facing views."""
     appointment = {
-        "id": row["id"],
-        "appointment_date": row["appointment_date"],
-        "appointment_time": _to_time(row["appointment_time"]),
+        "id": row["appointment_id"],
+        "date": row["appointment_date"],
+        "time": _to_time(row["appointment_time"]),
         "mode": row["mode"],
         "reason": row.get("reason"),
         "status": row["status"],
@@ -513,8 +512,8 @@ def _row_to_appointment(row, include="doctor"):
         }
     else:
         appointment["patient"] = {
-            "first_name": row["patient_first_name"],
-            "last_name": row["patient_last_name"],
+            "first_name": row["first_name"],
+            "last_name": row["last_name"],
         }
     return appointment
 
@@ -651,36 +650,41 @@ def appointment():
             print(f"Database error: {e}")
             flash("An error occurred while processing your request. Please try again later.", "error")
             return redirect(url_for("patient_dashboard"))
-
 @app.route("/appointment/<int:appointment_id>/cancel", methods=["POST"])
 @patient_required
 def cancel_appointment(appointment_id):
     patient_id = session["patient_id"]
     connection = create_connection()
+    if connection is None:
+        flash("Database connection error. Please try again later.", "error")
+        return redirect(url_for("appointment"))
     try:
-         
-       cursor = connection.cursor(dictionary=True, buffered=True)
-       cursor.execute(
+        cursor = connection.cursor(dictionary=True, buffered=True)
+        cursor.execute(
             "UPDATE appointments SET status = 'cancelled' "
-            "WHERE id = %s AND patient_id = %s AND status IN ('pending','approved')",
+            "WHERE appointment_id = %s AND patient_id = %s AND status IN ('pending','approved')",
             (appointment_id, patient_id),
         )
-       if cursor.rowcount:
+        if cursor.rowcount:
             cursor.execute(
-                "SELECT doctor_id FROM appointments WHERE id = %s", (appointment_id,)
+                "SELECT doctor_id FROM appointments WHERE appointment_id = %s", (appointment_id,)
             )
             row = cursor.fetchone()
             if row:
                 create_notification(
                     cursor, "doctor", row["doctor_id"], appointment_id, "cancelled",
                     "A patient cancelled their appointment."
-                              )
-       flash("Appointment cancelled.", "success")
-       return redirect(url_for("appointment"))
+                )
+            connection.commit()
+            flash("Appointment cancelled.", "success")
+        else:
+            flash("Appointment could not be cancelled.", "error")
     except Error as e:
-          print(f"Database error: {e}")
-          flash("An error occurred while processing your request. Please try again later.", "error")
-          return redirect(url_for("appointment"))     
+        print(f"Database error: {e}")
+        flash("An error occurred while processing your request. Please try again later.", "error")
+    finally:
+        connection.close()
+    return redirect(url_for("appointment")) 
 
 @app.route("/system_settings", methods=["GET"])
 @login_required
@@ -851,16 +855,15 @@ def doctor_logout():
 # ---------------------------------------------------------------------------
 # Doctor Dashboard
 # ---------------------------------------------------------------------------
- 
 @app.route("/doctor_dashboard")
 @doctor_login_required
 def doctor_dashboard():
-    # Create a connection first
     connection = create_connection()
     doctor = None
     pending_appointments = []
     upcoming_appointments = []
     todays_appointments = []
+    patient = []
     try:
         if connection is None:
             flash("Database connection error. Please try again later.", "error")
@@ -872,72 +875,166 @@ def doctor_dashboard():
             (session.get("doctor_id"),)
         )
         doctor = cursor.fetchone()
-          
+
         base_query = """
-                    SELECT
-                         appointment_id, appointment_date, appointment_time, mode, reason, status,
-                         first_name AS first_name,
-                         last_name  AS last_name
-                    FROM appointments a
-                    JOIN patient p ON p.patient_id = a.patient_id
-                    WHERE a.doctor_id = %s AND a.status = %s
-                    ORDER BY a.appointment_date ASC, a.appointment_time ASC
-               """
-          
+            SELECT
+                appointment_id, appointment_date, appointment_time, mode, reason, status,
+                first_name AS first_name,
+                last_name AS last_name
+            FROM appointments a
+            JOIN patient p ON p.patient_id = a.patient_id
+            WHERE a.doctor_id = %s AND a.status = %s
+            ORDER BY a.appointment_date ASC, a.appointment_time ASC
+        """
+
+        # Appointments THIS doctor scheduled that are awaiting patient response
         cursor.execute(base_query, (session.get("doctor_id"), "pending"))
-        pending_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
-          
+        pending_appointments = [_row_to_appointment(r, include="patient") for r in cursor.fetchall()]
+
         cursor.execute(base_query, (session.get("doctor_id"), "approved"))
-        upcoming_appointments = [_row_to_appointment(r) for r in cursor.fetchall()]
-        
+        upcoming_appointments = [_row_to_appointment(r, include="patient") for r in cursor.fetchall()]
+
+        # Roster for the "Schedule Appointment" patient picker
+        cursor.execute(
+            "SELECT patient_id, first_name, last_name FROM patient ORDER BY last_name"
+        )
+        patient = cursor.fetchall()
+
     except Error as e:
-         print(f"Dashboard query error: {e}")  
+        print(f"Dashboard query error: {e}")
     finally:
-         connection.close()     
-         
+        if connection:
+            connection.close()
+
     todays_appointments = [
-         apt for apt in upcoming_appointments if apt["date"] == date.today()
-            ]
+        apt for apt in upcoming_appointments if apt["date"] == date.today()
+    ]
     return render_template(
         "doctor_dashboard.html",
         doctor=doctor,
         pending_appointments=pending_appointments,
         upcoming_appointments=upcoming_appointments,
         todays_appointments=todays_appointments,
+        patient=patient,
     )
- 
- 
+
+
 # ---------------------------------------------------------------------------
-# Accept / Reject
+# Doctor: Schedule a new appointment for a patient
 # ---------------------------------------------------------------------------
- 
-@app.route("/appointment/<int:appointment_id>/accept", methods=["POST"])
+@app.route("/doctor/schedule_appointment", methods=["POST"])
 @doctor_login_required
-def accept_appointment(appointment_id):
-    _update_appointment_status(appointment_id, "approved")
-    flash("Appointment confirmed.", "success")
+def schedule_appointment():
+    doctor_id = session["doctor_id"]
+    patient_id = request.form.get("patient_id", type=int)
+    date_str = request.form.get("date", "").strip()
+    time_str = request.form.get("time", "").strip()
+    mode = request.form.get("mode", "").strip()
+    reason = request.form.get("reason", "").strip()
+
+    errors = []
+    try:
+        apt_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        if apt_date < date.today():
+            errors.append("Date can't be in the past.")
+    except ValueError:
+        errors.append("Invalid date.")
+    try:
+        apt_time = datetime.datetime.strptime(time_str, "%H:%M").time()
+    except ValueError:
+        errors.append("Invalid time.")
+    if mode not in ("in_person", "virtual"):
+        errors.append("Invalid consultation type.")
+    if not patient_id:
+        errors.append("Please choose a patient.")
+
+    if errors:
+        for e in errors:
+            flash(e, "error")
+        return redirect(url_for("doctor_dashboard"))
+
+    connection = create_connection()
+    if connection is None:
+        flash("Database connection error. Please try again later.", "error")
+        return redirect(url_for("doctor_dashboard"))
+
+    try:
+        cursor = connection.cursor(dictionary=True, buffered=True)
+
+        cursor.execute("SELECT patient_id FROM patient WHERE patient_id = %s", (patient_id,))
+        if cursor.fetchone() is None:
+            flash("Selected patient not found.", "error")
+            return redirect(url_for("doctor_dashboard"))
+
+        cursor.execute(
+            "INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, mode, reason, status) "
+            "VALUES (%s, %s, %s, %s, %s, %s, 'pending')",
+            (patient_id, doctor_id, apt_date, apt_time, mode, reason),
+        )
+        new_id = cursor.lastrowid
+
+        cursor.execute(
+            "SELECT doctor_first_name, doctor_last_name FROM doctors WHERE doctor_id = %s",
+            (doctor_id,),
+        )
+        doc = cursor.fetchone()
+
+        create_notification(
+            cursor, "patient", patient_id, new_id, "scheduled",
+            f"Dr. {doc['doctor_last_name']} has scheduled an appointment for you on "
+            f"{apt_date.strftime('%b %d, %Y')} at {apt_time.strftime('%I:%M %p')}. "
+            f"Please confirm or decline."
+        )
+
+        connection.commit()
+        flash("Appointment scheduled. The patient has been notified.", "success")
+    except Error as e:
+        print(f"Database error: {e}")
+        flash("An error occurred while scheduling the appointment. Please try again later.", "error")
+    finally:
+        connection.close()
+
     return redirect(url_for("doctor_dashboard"))
- 
- 
-@app.route("/appointment/<int:appointment_id>/reject", methods=["POST"])
+
+
+# ---------------------------------------------------------------------------
+# Doctor: Cancel an appointment they scheduled
+# ---------------------------------------------------------------------------
+@app.route("/appointment/<int:appointment_id>/doctor_cancel", methods=["POST"])
 @doctor_login_required
-def reject_appointment(appointment_id):
-    _update_appointment_status(appointment_id, "rejected")
-    flash("Appointment rejected.", "success")
-    return redirect(url_for("doctor_dashboard"))
- 
- 
-def _update_appointment_status(appointment_id, new_status):
+def doctor_cancel_appointment(appointment_id):
     doctor_id = session["doctor_id"]
     connection = create_connection()
-    with get_dict_cursor(connection, commit=True) as cursor: # type: ignore
-        # Scope the UPDATE to this doctor's own id so one doctor can
-        # never accept/reject another doctor's appointment via a
-        # crafted request.
+    if connection is None:
+        flash("Database connection error. Please try again later.", "error")
+        return redirect(url_for("doctor_dashboard"))
+    try:
+        cursor = connection.cursor(dictionary=True, buffered=True)
         cursor.execute(
-            "UPDATE appointments SET status = %s "
-            "WHERE id = %s AND doctor_id = %s",
-            (new_status, appointment_id, doctor_id),
+            "UPDATE appointments SET status = 'cancelled' "
+            "WHERE appointment_id = %s AND doctor_id = %s AND status IN ('pending','approved')",
+            (appointment_id, doctor_id),
         )
+        if cursor.rowcount:
+            cursor.execute(
+                "SELECT patient_id FROM appointments WHERE appointment_id = %s", (appointment_id,)
+            )
+            row = cursor.fetchone()
+            if row:
+                create_notification(
+                    cursor, "patient", row["patient_id"], appointment_id, "cancelled",
+                    "Your doctor cancelled this appointment."
+                )
+            connection.commit()
+            flash("Appointment cancelled.", "success")
+        else:
+            flash("Appointment could not be cancelled.", "error")
+    except Error as e:
+        print(f"Database error: {e}")
+        flash("An error occurred while cancelling the appointment. Please try again later.", "error")
+    finally:
+        connection.close()
+    return redirect(url_for("doctor_dashboard"))
+
 if __name__ == '__main__':
      app.run(debug=True)

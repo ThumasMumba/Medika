@@ -1,16 +1,5 @@
 {% extends 'base.html' %} {% block title %}Doctor Dashboard{% endblock %} {%
-block body %} {% macro appointment_request_row(apt) %} {% with messages =
-get_flashed_messages(with_categories=true) %} {% if messages %}
-<div class="space-y-2 mb-md">
-  {% for category, msg in messages %}
-  <div
-    class="px-md py-sm rounded-lg font-body-md {{ 'bg-tertiary/15 text-tertiary' if category == 'success' else 'bg-error/15 text-error' }}"
-  >
-    {{ msg }}
-  </div>
-  {% endfor %}
-</div>
-{% endif %} {% endwith %}
+block body %} {% macro pending_row(apt) %}
 <div
   class="p-md md:px-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:bg-white/5 transition-all"
 >
@@ -41,7 +30,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
           <span
             class="w-2 h-2 bg-on-surface-variant rounded-full animate-pulse"
           ></span>
-          Pending
+          Awaiting patient confirmation
         </span>
       </div>
       {% if apt.reason %}
@@ -62,34 +51,19 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         {{ apt.time.strftime('%I:%M %p') }}
       </p>
     </div>
-    <div class="flex items-center gap-xs">
-      <form
-        action="{{ url_for('doctor.reject_appointment', appointment_id=apt.id) }}"
-        method="POST"
+    <form
+      action="{{ url_for('doctor_cancel_appointment', appointment_id=apt.id) }}"
+      method="POST"
+    >
+      <button
+        type="submit"
+        class="w-10 h-10 flex items-center justify-center rounded-full bg-error/10 hover:bg-error/20 text-error transition-all"
+        aria-label="Cancel appointment"
+        title="Cancel"
       >
-        <button
-          type="submit"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-error/10 hover:bg-error/20 text-error transition-all"
-          aria-label="Reject appointment"
-          title="Reject"
-        >
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </form>
-      <form
-        action="{{ url_for('doctor.accept_appointment', appointment_id=apt.id) }}"
-        method="POST"
-      >
-        <button
-          type="submit"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-tertiary/10 hover:bg-tertiary/20 text-tertiary transition-all"
-          aria-label="Accept appointment"
-          title="Accept"
-        >
-          <span class="material-symbols-outlined">check</span>
-        </button>
-      </form>
-    </div>
+        <span class="material-symbols-outlined">event_busy</span>
+      </button>
+    </form>
   </div>
 </div>
 {% endmacro %} {% macro schedule_row(apt) %}
@@ -136,7 +110,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
     <button
       type="button"
       class="add-record-btn w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all"
-      data-action="{{ url_for('doctor.add_record', appointment_id=apt.id) }}"
+      data-action="{{ url_for('add_record', appointment_id=apt.id) }}"
       data-patient-name="{{ apt.patient.first_name }} {{ apt.patient.last_name }}"
       data-appointment-date="{{ apt.date.strftime('%Y-%m-%d') }}"
       aria-label="Add medical record"
@@ -204,7 +178,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
       </a>
       <a
         href="#"
-        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+        class="nav-not-ready w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
       >
         <span
           class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform"
@@ -214,7 +188,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
       </a>
       <a
         href="#"
-        class="w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
+        class="nav-not-ready w-full flex items-center gap-md p-sm rounded-xl text-on-surface hover:bg-white/5 transition-colors group"
       >
         <span
           class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform"
@@ -258,20 +232,75 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
   </div>
   <div class="flex items-center gap-sm">
     <button
-      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
-      aria-label="Notifications"
+      id="schedule-btn"
+      class="hidden md:flex items-center gap-sm px-md py-2 rounded-xl bg-primary text-on-primary font-bold hover:brightness-110 transition-all"
     >
-      <span class="material-symbols-outlined">notifications</span>
-      {% if pending_appointments and pending_appointments|length > 0 %}
-      <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-      {% endif %}
+      <span class="material-symbols-outlined text-[20px]">add</span>
+      Schedule Appointment
     </button>
+    <div class="relative">
+      <button
+        id="notif-btn"
+        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative"
+        aria-label="Notifications"
+      >
+        <span class="material-symbols-outlined">notifications</span>
+        {% if pending_appointments and pending_appointments|length > 0 %}
+        <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+        {% endif %}
+      </button>
+      <div
+        class="hidden absolute right-0 mt-sm w-80 max-w-[90vw] glass-card rounded-xl border border-white/10 shadow-xl overflow-hidden z-[80]"
+        id="notif-panel"
+      >
+        <div
+          class="p-sm border-b border-white/10 flex items-center justify-between"
+        >
+          <p class="font-label-md text-on-surface font-bold">Notifications</p>
+          <span class="text-caption text-on-surface-variant"
+            >{{ notifications|length if notifications else 0 }}</span
+          >
+        </div>
+        <div class="max-h-80 overflow-y-auto divide-y divide-white/5">
+          {% for n in notifications %}
+          <div
+            class="p-sm flex items-start gap-sm {{ 'bg-primary/5' if not n.read else '' }}"
+          >
+            <span
+              class="material-symbols-outlined text-[20px] mt-0.5 {{ 'text-tertiary' if n.type == 'accepted' else 'text-error' if n.type == 'declined' or n.type == 'cancelled' else 'text-secondary' }}"
+            >
+              {{ 'check_circle' if n.type == 'accepted' else 'cancel' if
+              n.type == 'declined' or n.type == 'cancelled' else 'info' }}
+            </span>
+            <div class="flex-1 min-w-0">
+              <p class="font-body-md text-on-surface leading-snug">
+                {{ n.message }}
+              </p>
+              <p class="text-caption text-on-surface-variant mt-1">
+                {{ n.created_at }}
+              </p>
+            </div>
+          </div>
+          {% else %}
+          <div class="p-lg text-center">
+            <span
+              class="material-symbols-outlined text-on-surface-variant text-3xl"
+              >notifications_off</span
+            >
+            <p class="text-caption text-on-surface-variant mt-sm">
+              You're all caught up
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
 <!-- Main Content -->
 <main
-  class="pt-24 pb-32 md:pb-md px-margin-mobile md:px-margin-desktop min-h-screen max-w-7xl mx-auto"
+  class="pt-24 pb-40 md:pb-2xl px-margin-mobile md:px-margin-desktop min-h-screen max-w-7xl mx-auto"
 >
   {% with messages = get_flashed_messages(with_categories=true) %} {% if
   messages %}
@@ -286,13 +315,24 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
   </div>
   {% endif %} {% endwith %}
 
-  <div class="mb-lg">
-    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
-      Welcome back, Dr. {{ session['doctor_first_name'] }} {{ session['doctor_last_name'] }}
-    </h2>
-    <p class="text-on-surface-variant font-body-md">
-      Review incoming requests and keep track of your confirmed visits.
-    </p>
+  <div
+    class="mb-lg flex flex-col md:flex-row md:items-center justify-between gap-md"
+  >
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
+        Welcome back, Dr. {{ session['doctor_first_name'] }} {{ session['doctor_last_name'] }}
+      </h2>
+      <p class="text-on-surface-variant font-body-md">
+        Schedule visits for your patients and keep track of confirmations.
+      </p>
+    </div>
+    <button
+      id="schedule-btn-mobile"
+      class="md:hidden flex items-center justify-center gap-sm px-md py-2 rounded-xl bg-primary text-on-primary font-bold hover:brightness-110 transition-all"
+    >
+      <span class="material-symbols-outlined text-[20px]">add</span>
+      Schedule Appointment
+    </button>
   </div>
 
   <!-- Stat cards -->
@@ -304,7 +344,7 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         <span class="material-symbols-outlined">hourglass_empty</span>
       </div>
       <div>
-        <p class="text-caption text-on-surface-variant">Pending requests</p>
+        <p class="text-caption text-on-surface-variant">Awaiting patients</p>
         <p class="font-headline-md text-on-surface font-bold">
           {{ pending_appointments|length }}
         </p>
@@ -339,29 +379,28 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-    <!-- Pending requests -->
+    <!-- Pending patient confirmations -->
     <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
       <div
         class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
       >
-        <h3 class="font-bold text-on-surface">Pending Requests</h3>
+        <h3 class="font-bold text-on-surface">Awaiting Patient Confirmation</h3>
         <span class="text-caption text-on-surface-variant"
-          >{{ pending_appointments|length }} awaiting your response</span
+          >{{ pending_appointments|length }} pending</span
         >
       </div>
       <div class="divide-y divide-white/5">
-        {% for apt in pending_appointments %} {{ appointment_request_row(apt) }}
-        {% else %}
+        {% for apt in pending_appointments %} {{ pending_row(apt) }} {% else %}
         <div class="p-lg text-center text-on-surface-variant">
           <span class="material-symbols-outlined text-3xl">task_alt</span>
-          <p class="mt-sm">No pending requests right now.</p>
+          <p class="mt-sm">Nothing awaiting confirmation right now.</p>
         </div>
         {% endfor %}
       </div>
     </section>
 
     <!-- Upcoming confirmed schedule -->
-    <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-xl">
+    <section class="lg:col-span-12 glass-card rounded-xl overflow-hidden mb-2xl">
       <div
         class="p-md md:px-lg md:py-sm border-b border-white/5 flex items-center justify-between"
       >
@@ -383,7 +422,137 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
   </div>
 </main>
 
-<!-- Add Record Modal (shared, filled in by JS per row) -->
+<!-- Schedule Appointment Modal -->
+<div
+  class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
+  id="schedule-modal"
+>
+  <div
+    class="glass-card rounded-xl w-full max-w-lg p-md md:p-lg space-y-md max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-headline-md text-on-surface">
+        Schedule an Appointment
+      </h3>
+      <button
+        type="button"
+        class="modal-close text-on-surface-variant hover:text-on-surface"
+        data-target="schedule-modal"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form
+      action="{{ url_for('schedule_appointment') }}"
+      method="POST"
+      class="space-y-md"
+    >
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="patient_id"
+          >Patient</label
+        >
+        <select
+          id="patient_id"
+          name="patient_id"
+          required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="" disabled selected>Choose a patient</option>
+          {% for p in patient %}
+          <option value="{{ p.patient_id }}">
+            {{ p.first_name }} {{ p.last_name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="date"
+            >Date</label
+          >
+          <input
+            id="date"
+            name="date"
+            type="date"
+            required
+            min="{{ today }}"
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+        <div class="space-y-1">
+          <label
+            class="text-caption text-on-surface-variant uppercase tracking-wider"
+            for="time"
+            >Time</label
+          >
+          <input
+            id="time"
+            name="time"
+            type="time"
+            required
+            class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="mode"
+          >Consultation Type</label
+        >
+        <select
+          id="mode"
+          name="mode"
+          required
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="in_person">In-person</option>
+          <option value="virtual">Virtual</option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label
+          class="text-caption text-on-surface-variant uppercase tracking-wider"
+          for="reason"
+          >Reason for Visit (optional)</label
+        >
+        <textarea
+          id="reason"
+          name="reason"
+          rows="3"
+          placeholder="e.g. Follow-up on lab results, routine check-up"
+          class="w-full bg-surface-container-low border border-white/10 rounded-lg px-sm py-2 text-on-surface focus:ring-1 focus:ring-primary outline-none resize-none"
+        ></textarea>
+      </div>
+      <p class="text-caption text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">info</span>
+        The patient will be notified and asked to confirm or decline.
+      </p>
+      <div class="flex justify-end gap-sm pt-sm">
+        <button
+          type="button"
+          class="modal-close px-md py-2 rounded-lg text-on-surface-variant hover:bg-white/5"
+          data-target="schedule-modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-md py-2 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110"
+        >
+          Send Request
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Record Modal -->
 <div
   class="hidden fixed inset-0 z-[90] bg-surface-dim/70 backdrop-blur-sm items-center justify-center p-md"
   id="record-modal"
@@ -535,25 +704,35 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
       data-nav="dashboard"
     >
       <span
-        
         class="material-symbols-outlined"
         style="font-variation-settings: &quot;FILL&quot; 1"
         >dashboard</span
       >
-</a>
-    <a
-      href="#"
+    </a>
+    <button
+      id="schedule-nav-btn"
+      type="button"
       class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+      data-nav="schedule"
+      aria-label="Schedule appointment"
+    >
+      <span class="material-symbols-outlined">calendar_today</span>
+    </button>
+    <button
       id="menu-btn-mobile"
+      type="button"
+      class="flex items-center justify-center text-on-surface-variant w-12 h-12 hover:bg-white/5 active:scale-90 transition-transform"
+      data-nav="menu"
       aria-label="Open menu"
     >
       <span class="material-symbols-outlined">menu</span>
-</a>
+    </button>
   </nav>
 </div>
 
 <script>
   (function () {
+    // --- Drawer toggle (top-bar + bottom-nav hamburgers) ---
     ["menu-btn", "menu-btn-mobile"].forEach((id) => {
       const btn = document.getElementById(id);
       if (btn) {
@@ -564,12 +743,22 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         });
       }
     });
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    if (drawerOverlay) {
+      drawerOverlay.addEventListener("click", () => {
+        document.body.classList.remove("drawer-open");
+        document.body.classList.add("drawer-closed");
+      });
+    }
 
-    // Add Record modal: one shared modal, filled in per row
-    const recordModal = document.getElementById("record-modal");
-    const recordForm = document.getElementById("record-form");
-    const recordPatientLabel = document.getElementById("record-modal-patient");
-    const recordDateInput = document.getElementById("record_date");
+    // --- Nav links that aren't built yet: don't leave the user stuck on a dead "#" ---
+    document.querySelectorAll(".nav-not-ready").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.body.classList.remove("drawer-open");
+        document.body.classList.add("drawer-closed");
+      });
+    });
 
     const openModal = (modal) => {
       if (modal) {
@@ -583,6 +772,21 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         modal.classList.remove("flex");
       }
     };
+
+    // --- Schedule Appointment modal (desktop button, mobile button, bottom-nav icon) ---
+    const scheduleModal = document.getElementById("schedule-modal");
+    ["schedule-btn", "schedule-btn-mobile", "schedule-nav-btn"].forEach(
+      (id) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener("click", () => openModal(scheduleModal));
+      },
+    );
+
+    // --- Add Record modal: one shared modal, filled in per row ---
+    const recordModal = document.getElementById("record-modal");
+    const recordForm = document.getElementById("record-form");
+    const recordPatientLabel = document.getElementById("record-modal-patient");
+    const recordDateInput = document.getElementById("record_date");
 
     document.querySelectorAll(".add-record-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -600,9 +804,25 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
         closeModal(document.getElementById(btn.dataset.target)),
       );
     });
-    if (recordModal) {
-      recordModal.addEventListener("click", (e) => {
-        if (e.target === recordModal) closeModal(recordModal);
+    [scheduleModal, recordModal].forEach((modal) => {
+      if (modal) {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      }
+    });
+
+    // --- Notifications dropdown ---
+    const notifBtn = document.getElementById("notif-btn");
+    const notifPanel = document.getElementById("notif-panel");
+    if (notifBtn && notifPanel) {
+      notifBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notifPanel.classList.toggle("hidden");
+      });
+      document.addEventListener("click", (e) => {
+        if (!notifPanel.contains(e.target) && e.target !== notifBtn)
+          notifPanel.classList.add("hidden");
       });
     }
   })();
